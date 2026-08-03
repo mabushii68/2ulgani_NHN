@@ -31,6 +31,7 @@ Assets/_Project/
 │   ├── UI/
 │   └── Data/      # SO 정의 클래스
 ├── SO/            # SO 인스턴스 = 밸런스 수치의 유일한 위치
+├── Docs/          # AI_USAGE_LOG.md, TEAM_ROLES_LOG.md (세션마다 갱신), SUBMISSION.md
 ├── Prefabs/  Sprites/  Audio/  Materials/
 ```
 
@@ -67,7 +68,7 @@ Assets/_Project/
 2. 플레이 모드 스모크: 대상 기능 동작 확인
 3. `AIBrain` 변경 시: 순수 C# 테스트 루틴(가짜 이벤트 주입 → 확률/신뢰도 출력) 실행, 결과 로그
 4. 변경 파일 목록 + 테스트 절차 + 신규 설정값 의미·초기값 요약
-5. `ai-usage-log/dayNN.md`에 세션 기록 append (아래 형식)
+5. `Assets/_Project/Docs/AI_USAGE_LOG.md`에 세션 기록 append + `TEAM_ROLES_LOG.md` §2에 실작업 1행 append (요청자/영역/변경 파일/교차 여부)
 - **에러가 남은 상태로 세션 종료 절대 금지**
 
 **커밋:** `[D일차][타입] 내용` — 타입: feat/fix/balance/art/ui/docs/build/chore. 하루 최소 3커밋. main 단일 브랜치
@@ -81,13 +82,25 @@ Assets/_Project/
 - **API 키 클라이언트 하드코딩 (절대 금지)**
 - 라이선스 불명 에셋 추가 / 전체 구조 임의 변경 / 요구되지 않은 대규모 리팩터링
 
-## ai-usage-log (심사 제출 자료 — 누락 금지)
-```
-ai-usage-log/day01.md … day10.md, highlights.md
-```
-- 세션마다: `## 세션 N — 기능명` / 목표 / 핵심 프롬프트 **원문** / 결과·수정 / 커밋 해시
-- 세션 종료 시 Claude Code가 **직접 append** (사람 기억 재구성 금지)
-- AI 기술 문서에 실을 대표 프롬프트 발견 즉시 `highlights.md`에 복사
+## AI 활용 로그 (심사 제출 자료 — 누락 금지)
+- **단일 문서**: `Assets/_Project/Docs/AI_USAGE_LOG.md` — 제출물 #4(AI 활용 기술 문서)의 원천 데이터. 문서 내 §0 기록 규칙을 따른다
+- **세션 종료 시 Claude Code가 직접 append** (세션 종료 조건 5번). 사람 기억 재구성 금지
+- 기록 단위: `§3 일자별 세션 로그`에 `세션 N — 기능명 / 목표 / 핵심 프롬프트 원문 / 결과·수정 / 커밋 해시`
+- 대표 프롬프트(구조 설계·AIBrain 지시·인상적 성공/실패 사례)는 발견 즉시 같은 문서 `§2`에 복사
+- AI 생성 에셋 발생 시 `§4` 기록 + CREDITS.md 갱신을 **같은 커밋**으로
+- 시도 후 폐기한 AI 활용(예: ML-Agents)은 `§5`에 기록 — 삭제 금지, 최종 문서 서사 자료
+- 기존 기록 수정·삭제 금지. D10에 이 문서를 편집·요약해 최종 PDF 제작
+
+## 제출 문서 지도
+| 문서 | 위치 | 갱신 시점 | 용도 |
+|---|---|---|---|
+| `AI_USAGE_LOG.md` | `Assets/_Project/Docs/` | **매 세션 종료** | 제출물 #4 원천 |
+| `TEAM_ROLES_LOG.md` | `Assets/_Project/Docs/` | **매 세션 종료** (§2 1행) + 페어 작업 시 §3 | 제출물 #5 원천 |
+| `SUBMISSION.md` | `Assets/_Project/Docs/` | D9 1차 / D10 최종 점검 | 제출 5종 누락 방어 체크리스트 |
+| `CREDITS.md` | 저장소 루트 | **에셋 반입과 같은 커밋** | 제출물 #4 출처 절 + 실격 리스크 차단 |
+| `README.md` | 저장소 루트 | D4 스모크 빌드 후 플레이 링크 / D9 영상·스크린샷 / D10 최종 | 심사자 첫 화면 (제출물 #1의 일부) |
+- 각 문서 상단의 기록 규칙이 우선. 문서 형식 임의 변경 금지
+- Claude Code는 세션 중 위 문서의 갱신 시점이 도래하면 사람에게 상기시킬 것 (예: 에셋 반입 감지 → CREDITS 갱신 요구)
 
 ## 에셋 규칙
 - 외부 에셋 반입 커밋 = CREDITS.md 갱신 **같은 커밋** (분리 금지)
