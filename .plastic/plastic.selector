@@ -1,0 +1,4 @@
+repository "2ulgani_NHN/2ulgani_NHN@14569324609151@cloud"
+  path "/"
+    br "/main"
+    co "/main"
