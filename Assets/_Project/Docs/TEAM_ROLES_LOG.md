@@ -27,6 +27,8 @@
 
 | D1 | 6 | 김정준 | **(D2 작업 선행)** AIBrain 프로토 — 회피 예측기(온라인 조건부 확률 모델), 피격 위기 이벤트 탐지기, 자체 검증 51건 | `Scripts/AIBrain/*` (8종 신규), `Scripts/Data/PredictorConfigSO.cs`, `SO/PredictorConfig_Default.asset`, `Scripts/Editor/AIBrainSelfTest.cs`, `CLAUDE.md` | ⭕ | **AIBrain은 이양빈 담당 영역이고 🔴 계약 3건이 걸린 최고 민감 구역** — 사람이 "담당 상관없이" 진행 지시. 계약을 코드로 강제(가상 카운트 const화, 계약값 이탈 시 OnValidate 경고). GDD 미명시 1건·GDD 문자해석 1건은 사람 확인 대상으로 분리 보고. `Scripts/Editor/`를 폴더 스펙에 정식 추가 |
 
+| D1 | 7 | 김정준 | **(D2 완료)** AIBrainRunner 어댑터 — AIBrain↔Unity 연결, `GameEvents` 이벤트 버스 개설, 투사체 레지스트리, AIBrain 디버그·씬 배선 도구 | `Scripts/Core/{GameEvents,AIBrainRunner}.cs`, `Scripts/Combat/Projectile.cs`, `Scripts/Editor/{AIBrainDebugTools,SceneSetupTools}.cs`, `Scenes/Main.unity` | ⭕ | AIBrain·전투 로직 = 이양빈 담당 영역. 규칙 4의 단일 정적 이벤트 버스를 이 세션에서 처음 개설 — 이후 시스템 간 결합은 여기를 경유한다. §7.1 계약 경계 사례 1건(무적 중 관통) 사람 결정 대기 |
+
 ## 3. 협업·페어 작업 기록
 | 일차 | 작업 | 참여 | 분업 방식 (누가 무엇을) | 결과 |
 |---|---|---|---|---|
