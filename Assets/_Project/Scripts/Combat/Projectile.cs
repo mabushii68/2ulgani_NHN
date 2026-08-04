@@ -17,6 +17,7 @@ namespace Luddite.Combat
         private Rigidbody2D _body;
         private CircleCollider2D _hitbox;
         private Transform _ownerRoot;
+        private Faction _targetFaction;
         private float _damage;
         private float _lifeRemaining;
         private bool _consumed;
@@ -33,12 +34,15 @@ namespace Luddite.Combat
             _hitbox.isTrigger = true;
         }
 
-        /// <summary>발사 직후 1회 호출. 방향·속도·데미지·수명·크기·발사자를 주입한다.</summary>
-        public void Launch(Vector2 direction, float speed, float damage, float lifetime, float diameter, Transform owner)
+        /// <summary>발사 직후 1회 호출. 방향·속도·데미지·수명·크기·발사자·표적 진영을 주입한다.</summary>
+        /// <param name="targetFaction">이 진영의 <see cref="IDamageable"/>만 때린다. 같은 편은 통과.</param>
+        public void Launch(Vector2 direction, float speed, float damage, float lifetime, float diameter,
+            Transform owner, Faction targetFaction)
         {
             _damage = damage;
             _lifeRemaining = lifetime;
             _ownerRoot = owner;
+            _targetFaction = targetFaction;
             _consumed = false;
 
             // 콜라이더 반지름은 원본 기준으로 두고 스케일로 최종 크기를 맞춘다 (스프라이트와 히트박스 동시 반영)
@@ -70,7 +74,14 @@ namespace Luddite.Combat
             }
 
             IDamageable target = other.GetComponentInParent<IDamageable>();
-            if (target == null || !target.IsAlive) return;
+            if (target == null) return;
+
+            // 같은 편은 통과 — 탄이 소멸하지도 않는다 (아군 오사 없음)
+            if (target.Faction != _targetFaction) return;
+
+            // 무적·사망 상태는 탄을 소모하지 않고 통과시킨다.
+            // 소모시키면 스폰 텔레그래프 중인 적이 방패가 되고, 무적 중인 플레이어가 탄을 지워버린다.
+            if (!target.CanBeDamaged) return;
 
             _consumed = true;
             target.TakeDamage(_damage, _body.linearVelocity.normalized);

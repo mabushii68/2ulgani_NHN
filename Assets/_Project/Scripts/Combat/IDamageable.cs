@@ -7,8 +7,16 @@ namespace Luddite.Combat
     /// </summary>
     public interface IDamageable
     {
-        /// <summary>아직 살아 있는지. false면 데미지를 무시한다.</summary>
-        bool IsAlive { get; }
+        /// <summary>소속 진영. 투사체는 자기 표적 진영만 때린다.</summary>
+        Faction Faction { get; }
+
+        /// <summary>
+        /// 지금 데미지를 받을 수 있는지. 사망했거나 무적이면 false
+        /// (플레이어 피격 후 i-frame, 적 스폰 텔레그래프).
+        /// "살아 있는가"와는 다른 질문이다 — 살아 있어도 무적이면 false다.
+        /// 판정 주체가 먼저 확인하고, 구현 쪽도 <see cref="TakeDamage"/>에서 한 번 더 방어한다.
+        /// </summary>
+        bool CanBeDamaged { get; }
 
         /// <param name="amount">데미지량</param>
         /// <param name="hitDirection">

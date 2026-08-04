@@ -53,7 +53,8 @@ namespace Luddite.Combat
                 damage: _stats.ProjectileDamage,
                 lifetime: _stats.ProjectileLifetime,
                 diameter: _stats.ProjectileDiameter,
-                owner: transform.root);
+                owner: transform.root,
+                targetFaction: Faction.Enemy);
         }
     }
 }
