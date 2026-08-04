@@ -143,6 +143,7 @@
   - **빌드·검증**: 17MB (목표 50MB 이내). 압축 실체를 매직 바이트로 확인(`1f8b` × 3 = gzip, Brotli 아님). 로컬 `python -m http.server`로 6개 에셋 200 + 크기 일치 — 이 서버는 `Content-Encoding` 헤더를 주지 않고 `.unityweb`을 `application/octet-stream`으로 내보내므로 **GitHub Pages와 동일 조건**이며, 여기서 로딩되면 Pages에서도 된다는 근거가 됨. 브라우저 실플레이는 사람 확인
   - **배포**: `gh-pages` **orphan 커밋 + force push** 방식 채택 — 재배포마다 17MB가 히스토리에 누적되면 D6·D7 재배포만으로 리포가 50MB+가 됨. 워킹트리·`HEAD`를 건드리지 않는 plumbing(임시 인덱스 → `write-tree` → `commit-tree`)으로 만들어 작업 중 배포가 안전. `.nojekyll` 포함. `.gitattributes`의 `* text=auto`가 gzip 바이너리를 손대지 않는지 **blob md5를 원본과 대조해 검증**(3/3 일치)
   - Pages 활성화는 리포 설정 권한 문제로 사람 몫 (`gh` CLI 미설치)
+  - **(후속) Pages 활성화 완료** → `https://mabushii68.github.io/2ulgani_NHN/` 라이브 확인(에셋 4/4 `200`). GitHub Pages는 `.unityweb`을 `application/vnd.unity`로 서빙하고 `Content-Encoding`은 주지 않으므로, 예상대로 Decompression Fallback 경로로 로딩됨 — Brotli였다면 실패했을 조건. `README.md`에 플레이 링크 기입 + **"현재 빌드는 D1 개발 중 상태(회색 박스 최소 전투, 적·웨이브·AI 미포함)"임을 명시**. README가 최종 사양을 설명하는데 링크는 D1 빌드를 열기 때문에, 심사자·팀원의 오해를 막는 경고를 함께 넣었다. README의 Unity 버전·패키지·배포 방식 표기도 실제와 맞춤
 - **검증**: Unity 콘솔 에러 0. WebGL 빌드 성공 17MB. 로컬 서버 6/6 에셋 200. gzip 매직 바이트 3/3. blob 무결성 3/3. 브라우저 실플레이(로딩·렌더·입력) 사람 확인 완료. `JungJoon`·`gh-pages` 원격 푸시 완료.
 - **커밋 해시**: `4400efe` (WebGL 설정·빌드 검증) / 배포 커밋 `75f2737` (`gh-pages`, orphan) / 일정 재압축 `e11f0da`
 
