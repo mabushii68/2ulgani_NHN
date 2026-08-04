@@ -41,7 +41,7 @@
 ## 6. 오픈소스 / 패키지
 | 이름 | 버전 | 라이선스 | 용도 |
 |---|---|---|---|
-| Unity 6 LTS (6000.0.x) | | Unity 약관 | 엔진 |
+| Unity 6 | 6000.3.7f1 | Unity 약관 | 엔진 |
 | Universal RP (URP) | | Unity Companion License | 2D 렌더러 |
 | TextMeshPro | | Unity Companion License | UI 텍스트 |
 | <!-- ML-Agents/Sentis는 §14.1 착수 시에만 추가 --> | | | |

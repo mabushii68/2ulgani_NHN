@@ -97,6 +97,27 @@
 - **검증**: Unity 콘솔 컴파일 에러 0 / 런타임 에러 0 / 경고 0. 플레이 모드 자동 스모크 3종 — ① 진입 시 참조 누락 에러 없음, ② 3발 × 데미지 10 → HP 30 표적 파괴 로그 확인(발사→비행→트리거 피격→데미지→넉백→파괴 체인), ③ 수명 10초 프로브를 벽으로 발사 → 2초 내 소멸(벽 차단 확인, 수명 만료와 구분됨). **입력 경로(WASD·마우스·홀드 연사)는 MCP로 키보드·마우스를 주입할 수 없어 사람에게 인계 → 김정준이 플레이 모드에서 이동·조준·홀드 연사·표적 파괴 정상 동작 확인.** AIBrain 미변경이라 순수 C# 테스트 해당 없음.
 - **커밋 해시**: `34ac874` (브랜치 `JungJoon`)
 
+#### 세션 3 — 환경 정합성 정리 (세션 규칙 문서를 실제 리포에 현행화)
+- **목표**: 세션 2에서 발견한 CLAUDE.md ↔ 실제 프로젝트 불일치 5건을 사람이 판단해 확정하고, 문서를 현실 기준으로 갱신한다. 코드 변경 없음.
+- **핵심 프롬프트 (원문)**:
+  ```
+  1. SampleScene.unity에는 아무것도 없어보임. Assets/_Project/Scenes/Main.unity 제대로 있음.
+  2. Both 써도 상관 없는거면 걍 냅두고 CLAUDE.md 수정
+  3. 일단 보류
+  4. 브랜치는 여러개 써도 상관 없는 걸로 수정
+  5. Unity 버전은 현재 쓰고 있는 버전으로 표기, 폴더 스펙은 현재 프로젝트 폴더 기준으로 하셈
+  ```
+- **결과·수정** (사람 결정 → Claude Code 반영):
+  1. **빌드 씬 교체**: `Assets/Scenes/SampleScene.unity`(URP 2D 템플릿 기본 — 카메라·Global Light 2D만 있는 빈 씬) → `Assets/_Project/Scenes/Main.unity` 단독. `manage_build`로 변경 후 `File/Save Project`로 `EditorBuildSettings.asset` flush 필요했음 (MCP 호출만으로는 디스크에 반영되지 않음)
+  2. **입력**: Active Input Handling `Both` 유지 확정. CLAUDE.md를 "코드는 구 Input Manager API만 사용 / Player Settings는 Both / `InputSystem_Actions.inputactions`·`UnityEngine.InputSystem` API 사용 금지"로 개정 — 원래 규칙의 **의도**(입력 6개에 신 시스템은 과잉)는 유지하고 **수단**만 현실에 맞춤
+  3. **아트 방향 보류**: 픽셀아트(Franuka 18팩) vs GDD §11 플랫 벡터 도형 — 미결 유지. 현재 플레이스홀더가 플랫 도형이므로 사실상 GDD 방향으로 진행 중
+  4. **브랜치 전략 개정**: main 단일 → 담당자별 작업 브랜치 + main 병합. `CLAUDE.md` 커밋 절 + `TEAM_ROLES_LOG.md` §4 갱신
+  5. **버전·폴더 현행화**: `Unity 6 LTS (6000.0.x)` → `6000.3.7f1` (CLAUDE.md + CREDITS.md §6). 폴더 스펙을 실제 구조로 재작성하고, 용도 미확정 4개(`Art/`·`Data/`·`Input/`·`Settings/`)를 **사용 금지 + 사람 확정 필요**로 명시. CREDITS.md 위치 표기도 `저장소 루트` → 실제 위치 `Assets/_Project/Docs/`로 정정
+  - 패키지 항목은 사람 지시에 없었으나 같은 성격의 불일치여서 함께 처리: "TMP·URP 외 없음"(사실과 다름) → "현재 manifest 집합을 기준선으로, 추가는 승인 필수 / 미사용 패키지 제거는 GUID·템플릿 의존성 위험으로 하지 않고 D8 WebGL 실측 후 판단". 제약의 의도는 보존.
+  - 세션 2의 교훈을 규칙으로 승격: 세션 종료 조건 2번에 "키보드·마우스 입력은 MCP 주입 불가 → 임시 `[MenuItem]` 스모크로 최대한 자동 검증 + 남는 입력 경로는 사람 확인 후 커밋" 추가
+- **검증**: 코드 변경 없음. Unity 콘솔 에러 0 / 경고 0. `EditorBuildSettings.asset`에 `Main.unity` 단독 등록 확인.
+- **커밋 해시**: (본 세션 커밋 직후 기록)
+
 <!-- D2 ~ D10 블록은 해당 일차 첫 세션 종료 시 생성 -->
 
 ---

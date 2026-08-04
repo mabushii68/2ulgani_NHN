@@ -9,31 +9,46 @@
 - 정체성 문구: "AI는 당신의 플레이를 학습합니다. 그러니 AI에게 거짓말하세요."
 
 ## 환경 (고정)
-- **Unity 6 LTS (6000.0.x)** — D1 폴백 판단 이후 버전 변경 금지
-- **구 Input Manager** (신 Input System 사용 금지 — 입력 6개뿐)
+- **Unity 6000.3.7f1** — 이 프로젝트의 실제 사용 버전. 버전 변경 금지
+- **입력 코드는 구 Input Manager API만 사용** (`Input.GetAxisRaw` / `Input.GetMouseButton` — 입력 6개뿐이라 신 Input System은 과잉)
+  - Player Settings의 Active Input Handling은 **`Both`(activeInputHandler: 2)** 로 둔다. 프로젝트가 URP 2D 템플릿에서 시작해 Input System 패키지가 이미 물려 있기 때문 — `Old` 전용으로 바꾸지 않아도 무해하다
+  - 단, **`InputSystem_Actions.inputactions` 및 `UnityEngine.InputSystem` API는 사용하지 않는다**
 - **URP 2D Renderer** / Global Light 2D 1개만, 동적 라이트 금지 / 포스트프로세싱은 **Bloom 1개만** (마젠타 발광용, HDR 색상)
 - 해상도 1920×1080, WebGL 캔버스 16:9 고정
-- 추가 패키지: TextMeshPro, URP 외 **없음**. 패키지 추가는 사람 승인 필수
+- **패키지**: 현재 `Packages/manifest.json`에 설치된 집합을 기준선으로 삼는다 (URP, ugui/TextMeshPro, 2D 툴셋, Input System, Timeline, Visual Scripting, Test Framework, Unity MCP 등 — URP 2D 템플릿 기본값). **여기에 새 패키지를 추가하는 것은 사람 승인 필수**
+  - 실제로 코드가 의존하는 것은 URP + ugui/TMP + 구 Input Manager API뿐이다. 미사용 패키지 제거는 GUID·템플릿 의존성을 깨뜨릴 수 있어 임의로 하지 않으며, 빌드 사이즈 영향은 **D8 WebGL 검증에서 실측 후 판단**한다
   - 예외 (조건부): `com.unity.ml-agents` + `com.unity.sentis` — GDD §14.1 착수 조건(D8 WebGL 검증 통과 + 잔여 1.5일 이상) 충족 시, 사람 승인 하에만 추가. 그 전에 요청받으면 거절하고 착수 조건을 안내할 것. ML 정책은 보스 이동 전용이며 회피 심리전(§7) 대체 금지
 - Assembly Definition **사용 안 함**
 - WebGL 빌드: Compression **Gzip + Decompression Fallback** (GitHub Pages는 Brotli MIME 미지원), 목표 < 50MB
+- 빌드 씬 목록은 **`Assets/_Project/Scenes/Main.unity` 단 하나** (D1 세션 2에 템플릿 `Assets/Scenes/SampleScene.unity`에서 교체)
 
 ## 폴더 구조 (준수)
+> **실제 리포 구조 기준** (D1 세션 2에 현행화). 우리 작업물은 전부 `Assets/_Project/` 아래에 둔다 — `Assets/` 루트는 URP 2D 템플릿이 만든 것이므로 건드리지 않는다.
+
 ```
 Assets/_Project/
 ├── Scenes/        # Main.unity 단 하나 (씬 추가 금지)
 ├── Scripts/
-│   ├── Core/      # GameManager, GameState, WaveManager
+│   ├── Core/      # GameManager, GameState, GameEvents, WaveManager
 │   ├── Player/
 │   ├── Enemies/   # FSM, EliteModifier, Boss
 │   ├── AIBrain/   # ⭐ 순수 C# 전용 — MonoBehaviour 금지
 │   ├── Combat/    # 투사체, 판정, 히트스톱
 │   ├── UI/
-│   └── Data/      # SO 정의 클래스
-├── SO/            # SO 인스턴스 = 밸런스 수치의 유일한 위치
-├── Docs/          # AI_USAGE_LOG.md, TEAM_ROLES_LOG.md (세션마다 갱신), SUBMISSION.md
-├── Prefabs/  Sprites/  Audio/  Materials/
+│   └── Data/      # SO 정의 클래스 (ScriptableObject 상속 코드)
+├── SO/            # SO 인스턴스(.asset) = 밸런스 수치의 유일한 위치
+├── Prefabs/       # 플레이어, 적, 투사체 프리팹
+├── Sprites/       # 게임 내 스프라이트 (플레이스홀더 포함)
+├── Materials/     # 머티리얼
+├── Audio/         # SFX, BGM
+├── Docs/          # AI_USAGE_LOG.md, TEAM_ROLES_LOG.md (세션마다 갱신), SUBMISSION.md, CREDITS.md, GDD.md
+├── Art/           # 용도 미확정 — 사람 확정 전까지 사용 금지 (아트 원본 소스 후보)
+├── Data/          # 용도 미확정 — SO 인스턴스는 SO/, SO 정의 코드는 Scripts/Data/. 사용 금지
+├── Input/         # 미사용 (구 Input Manager API를 쓰므로 .inputactions 불필요)
+└── Settings/      # 미사용 (URP 렌더러·볼륨 애셋은 Assets/Settings/ 에 있음)
 ```
+- `Art/` · `Data/` · `Input/` · `Settings/` 4개는 프로젝트 초기 세팅 때 만들어졌으나 **현재 비어 있고 용도가 확정되지 않았다.** 새 파일을 여기에 넣지 말고, 필요하면 사람에게 용도를 물어 이 표를 먼저 갱신한다
+- 리포 루트 `CREDITS.md`는 존재하지 않는다 — 실제 위치는 `Assets/_Project/Docs/CREDITS.md`
 
 ## 아키텍처 규칙
 1. **단일 씬 + GameState 상태 머신** (`Title, MajorSelect, Combat, WaveInterval, BossIntro, Result, Paused`). 씬 분리 금지
@@ -66,12 +81,15 @@ Assets/_Project/
 **세션 종료 조건 (전부 충족 후 커밋):**
 1. MCP로 Unity 콘솔 조회 → 컴파일 에러 0, 런타임 에러 0
 2. 플레이 모드 스모크: 대상 기능 동작 확인
+   - **키보드·마우스 입력은 MCP로 주입할 수 없다.** 입력이 걸린 기능은 코드 경로를 직접 호출하는 임시 `[MenuItem]` 스모크로 최대한 자동 검증하고, 남는 입력 경로는 **사람에게 확인 절차를 제시하고 결과를 받은 뒤** 커밋한다
 3. `AIBrain` 변경 시: 순수 C# 테스트 루틴(가짜 이벤트 주입 → 확률/신뢰도 출력) 실행, 결과 로그
 4. 변경 파일 목록 + 테스트 절차 + 신규 설정값 의미·초기값 요약
 5. `Assets/_Project/Docs/AI_USAGE_LOG.md`에 세션 기록 append + `TEAM_ROLES_LOG.md` §2에 실작업 1행 append (요청자/영역/변경 파일/교차 여부)
 - **에러가 남은 상태로 세션 종료 절대 금지**
 
-**커밋:** `[D일차][타입] 내용` — 타입: feat/fix/balance/art/ui/docs/build/chore. 하루 최소 3커밋. main 단일 브랜치
+**커밋:** `[D일차][타입] 내용` — 타입: feat/fix/balance/art/ui/docs/build/chore. 하루 최소 3커밋
+
+**브랜치:** 여러 브랜치를 사용한다. 담당자별 작업 브랜치(예: 김정준 = `JungJoon`)에서 진행하고 `main`으로 병합한다. 현재 어느 브랜치인지 세션 시작 시 확인하고, 브랜치를 새로 만들거나 병합·푸시하는 것은 **사람이 지시할 때만** 수행한다
 
 ## 금지 목록
 - `ProjectSettings/` 변경 (제안만, 수행은 사람)
@@ -97,7 +115,8 @@ Assets/_Project/
 | `AI_USAGE_LOG.md` | `Assets/_Project/Docs/` | **매 세션 종료** | 제출물 #4 원천 |
 | `TEAM_ROLES_LOG.md` | `Assets/_Project/Docs/` | **매 세션 종료** (§2 1행) + 페어 작업 시 §3 | 제출물 #5 원천 |
 | `SUBMISSION.md` | `Assets/_Project/Docs/` | D9 1차 / D10 최종 점검 | 제출 5종 누락 방어 체크리스트 |
-| `CREDITS.md` | 저장소 루트 | **에셋 반입과 같은 커밋** | 제출물 #4 출처 절 + 실격 리스크 차단 |
+| `CREDITS.md` | `Assets/_Project/Docs/` | **에셋 반입과 같은 커밋** | 제출물 #4 출처 절 + 실격 리스크 차단 |
+| `GDD.md` | `Assets/_Project/Docs/` | 디자인 결정 변경 시 (사람) | 구현 기준의 유일한 진실 원천 |
 | `README.md` | 저장소 루트 | D4 스모크 빌드 후 플레이 링크 / D9 영상·스크린샷 / D10 최종 | 심사자 첫 화면 (제출물 #1의 일부) |
 - 각 문서 상단의 기록 규칙이 우선. 문서 형식 임의 변경 금지
 - Claude Code는 세션 중 위 문서의 갱신 시점이 도래하면 사람에게 상기시킬 것 (예: 에셋 반입 감지 → CREDITS 갱신 요구)
