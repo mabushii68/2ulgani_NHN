@@ -18,7 +18,8 @@
 ## 2. 세션별 실작업 기록
 | 일차 | 세션 | 요청자 | 작업 영역 (기능) | 주요 변경 파일 | 교차 | 비고 |
 |---|---|---|---|---|---|---|
-| <!-- D1 --> | | | | | | |
+| D1 | 1 | 공동 | 프로젝트 초기 세팅 — GDD v1.0 확정, 제출용 문서 4종 신규 작성, 세션 규칙 정비 | `GDD.md`, `AI_USAGE_LOG.md`, `CREDITS.md`, `SUBMISSION.md`, `TEAM_ROLES_LOG.md`, `CLAUDE.md`, `README.md` | — | 코드 미착수. 문서 체계 확립 세션 |
+| D1 | 2 | 김정준 | 최소 전투 — 플레이어 이동·조준·홀드 연사, 투사체, `Main.unity` 아레나·고정 카메라 골격, 플레이스홀더 스프라이트 | `Scripts/Player/PlayerController.cs`, `Scripts/Combat/{IWeapon,IDamageable,Projectile,ProjectileBlocker,BasicWeapon,TargetDummy}.cs`, `Scripts/Data/PlayerStatsSO.cs`, `SO/PlayerStats_Default.asset`, `Prefabs/Projectile.prefab`, `Scenes/Main.unity`, `Sprites/Placeholder_*.png` | ⭕ | 씬 골격·아트 플레이스홀더는 담당 영역이지만 **전투 로직(투사체·데미지·넉백)은 이양빈 담당 영역**. D1 일정의 "최소 전투"를 굴리려면 분리 불가여서 함께 구현 — `IWeapon` 인터페이스로 경계를 만들어 이후 전투 로직 확장이 UI/아트와 충돌하지 않게 함 |
 
 ## 3. 협업·페어 작업 기록
 | 일차 | 작업 | 참여 | 분업 방식 (누가 무엇을) | 결과 |
@@ -29,6 +30,7 @@
 > 제출물 #5의 "협업·분업 방식" 절 재료. 예: 브랜치 전략(main 단일), 세션 단위 분업, GDD를 통한 의사결정, 담당 영역 파일 소유권 규칙 등. 실제로 운영한 방식만 기록.
 
 - (예시) main 단일 브랜치 + 세션 단위 커밋(`[D일차][타입]`)으로 충돌 최소화
+- **D1: 실제로는 담당자별 브랜치로 운영 시작** — 김정준 작업분은 `JungJoon` 브랜치에서 진행. `CLAUDE.md`·본 문서 §1의 "main 단일 브랜치" 표기와 어긋나므로, 브랜치 전략을 확정하면 두 문서를 함께 갱신할 것 (미결)
 -
 
 ## 5. D10 최종 문서 변환 체크리스트

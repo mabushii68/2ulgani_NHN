@@ -76,6 +76,27 @@
 - **검증**: Unity 콘솔 에러 0 / 경고 0 (코드 미작성 상태). 플레이 모드 스모크·AIBrain 테스트는 대상 기능 없어 해당 없음.
 - **커밋 해시**: `a40dc5f`
 
+#### 세션 2 — 최소 전투 (플레이어 이동·조준·홀드 연사 + Main.unity 아레나 골격)
+- **목표**: 코드 첫 착수. GDD §3.1의 플레이어 조작(WASD 8방향 / 마우스 조준 / 좌클릭 홀드 자동 연사)과 §2 아레나·고정 카메라를 동작하는 상태로 만든다. 적 FSM·웨이브·AIBrain은 범위 밖.
+- **핵심 프롬프트 (원문)**:
+  ```
+  JungJoon 브랜치 새로 파서 작업 시작할거야. 아직 아무런 작업도 안되어있을거야.
+  ```
+  이후 Claude Code가 리포 상태를 조사해 선택지를 제시하고, 사람이 2건을 결정:
+  ```
+  작업 범위 → "최소 전투 (플레이어 이동·조준·연사)"
+  입력 시스템 → "구 Input Manager로 전환"
+  ```
+  (그 외 지시 없음 — 구현 판단은 `CLAUDE.md` + `GDD.md`를 근거로 Claude Code가 자율 수행)
+- **결과·수정**:
+  - **환경 불일치 4건 발견** (작업 전 리포 조사): ① `activeInputHandler: 1`(신 Input System 전용)인데 CLAUDE.md는 구 Input Manager 요구 → 사람이 `2`(Both)로 변경, 구 `Input.GetAxisRaw` 동작 확인. ② Unity 실제 `6000.3.7f1` vs CLAUDE.md 표기 `6000.0.x`. ③ 패키지에 visualscripting·timeline·multiplayer.center·2d.aseprite/psdimporter 등 미승인 항목 다수. ④ `Assets/_Project/` 하위 폴더가 CLAUDE.md 스펙과 상이(`Art/`·`Data/`·`Input/`·`Settings/`). ①만 처리, ②~④는 사람 판단 대기.
+  - Claude Code 산출: 스크립트 7개(`PlayerStatsSO`, `IWeapon`, `IDamageable`, `Projectile`, `ProjectileBlocker`, `BasicWeapon`, `TargetDummy`, `PlayerController`), `PlayerStats_Default.asset`, `Projectile.prefab`, 플레이스홀더 스프라이트 2종(코드 생성 원/사각), `Main.unity`.
+  - **실패 → 우회 1**: Unity MCP `execute_code`가 서버 측 BOM 삽입 버그로 전부 컴파일 실패(`Line 1: ﻿`, codedom 백엔드 / Roslyn 미설치). → 일회용 에디터 스크립트(`D1SceneBuilder.cs`)에 `[MenuItem]`을 달아 `execute_menu_item`으로 호출하는 방식으로 우회. 씬 구성을 코드로 결정론적으로 재현할 수 있게 되어 결과적으로 더 나은 경로였고, 사용 후 삭제.
+  - **실패 → 수정 2**: `PlayerStatsSO`를 `EditorSceneManager.NewScene` **이전에** 생성해 참조를 넘겼더니, 다른 필드(`_projectilePrefab`·`_aimPivot`)는 정상인데 `_stats`만 조용히 `fileID: 0`으로 직렬화됨. 씬 교체가 애셋 인스턴스 매핑을 무효화한 탓. → SO 확보를 `NewScene` 이후로 옮기고 `SaveAssets()` 후 디스크에서 재로드하도록 수정. **교훈: 에디터 스크립트에서 씬 생성 전후로 얻은 애셋 참조를 섞지 말 것. 참조 누락은 예외 없이 조용히 null이 된다.**
+  - 계약 준수 확인: 고정 카메라(Ortho 7.5, 16:9), 단일 씬, 마젠타 미사용(플레이어=전공 파랑 / 적=무채색), 플레이어 넉백 없음(적 넉백만 0.5유닛), 모든 수치 SO 경유.
+- **검증**: Unity 콘솔 컴파일 에러 0 / 런타임 에러 0 / 경고 0. 플레이 모드 자동 스모크 3종 — ① 진입 시 참조 누락 에러 없음, ② 3발 × 데미지 10 → HP 30 표적 파괴 로그 확인(발사→비행→트리거 피격→데미지→넉백→파괴 체인), ③ 수명 10초 프로브를 벽으로 발사 → 2초 내 소멸(벽 차단 확인, 수명 만료와 구분됨). **입력 경로(WASD·마우스·홀드 연사)는 MCP로 키보드·마우스를 주입할 수 없어 사람에게 인계 → 김정준이 플레이 모드에서 이동·조준·홀드 연사·표적 파괴 정상 동작 확인.** AIBrain 미변경이라 순수 C# 테스트 해당 없음.
+- **커밋 해시**: (본 세션 커밋 직후 기록)
+
 <!-- D2 ~ D10 블록은 해당 일차 첫 세션 종료 시 생성 -->
 
 ---
