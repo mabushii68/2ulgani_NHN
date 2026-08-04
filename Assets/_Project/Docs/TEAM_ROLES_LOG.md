@@ -21,6 +21,7 @@
 | D1 | 1 | 공동 | 프로젝트 초기 세팅 — GDD v1.0 확정, 제출용 문서 4종 신규 작성, 세션 규칙 정비 | `GDD.md`, `AI_USAGE_LOG.md`, `CREDITS.md`, `SUBMISSION.md`, `TEAM_ROLES_LOG.md`, `CLAUDE.md`, `README.md` | — | 코드 미착수. 문서 체계 확립 세션 |
 | D1 | 2 | 김정준 | 최소 전투 — 플레이어 이동·조준·홀드 연사, 투사체, `Main.unity` 아레나·고정 카메라 골격, 플레이스홀더 스프라이트 | `Scripts/Player/PlayerController.cs`, `Scripts/Combat/{IWeapon,IDamageable,Projectile,ProjectileBlocker,BasicWeapon,TargetDummy}.cs`, `Scripts/Data/PlayerStatsSO.cs`, `SO/PlayerStats_Default.asset`, `Prefabs/Projectile.prefab`, `Scenes/Main.unity`, `Sprites/Placeholder_*.png` | ⭕ | 씬 골격·아트 플레이스홀더는 담당 영역이지만 **전투 로직(투사체·데미지·넉백)은 이양빈 담당 영역**. D1 일정의 "최소 전투"를 굴리려면 분리 불가여서 함께 구현 — `IWeapon` 인터페이스로 경계를 만들어 이후 전투 로직 확장이 UI/아트와 충돌하지 않게 함 |
 | D1 | 3 | 김정준 | 환경 정합성 정리 — 빌드 씬 교체(Main.unity 단독), 세션 규칙 문서를 실제 리포 기준으로 현행화(Unity 버전·입력·패키지·폴더 스펙·브랜치 전략) | `CLAUDE.md`, `CREDITS.md`, `TEAM_ROLES_LOG.md`, `ProjectSettings/EditorBuildSettings.asset` | — | 코드 변경 없음. 불일치 5건을 사람이 판단·확정 |
+| D1 | 4 | 김정준 | WebGL 파이프라인 — 퍼블리싱 설정 확정(Gzip+Fallback, 1280×720), 첫 빌드 검증(17MB), `gh-pages` orphan 배포 + 일정 7일 재압축 | `ProjectSettings/ProjectSettings.asset`, `Assets/Settings/UniversalRP.asset`, `CLAUDE.md`, `GDD.md` §14·§15, `AI_USAGE_LOG.md` | ⭕ | WebGL 파이프라인은 담당 영역 정면. **`GDD.md` 수정은 이양빈 담당 영역** — 기능 컷 없이 일차 번호 재배치와 영향 주석만 추가(§15 게이트 통합, §14 스트레치 미착수 확정). 스코프 결정은 하지 않음 |
 
 ## 3. 협업·페어 작업 기록
 | 일차 | 작업 | 참여 | 분업 방식 (누가 무엇을) | 결과 |
