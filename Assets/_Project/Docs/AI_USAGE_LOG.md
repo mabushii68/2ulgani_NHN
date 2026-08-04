@@ -144,7 +144,7 @@
   - **배포**: `gh-pages` **orphan 커밋 + force push** 방식 채택 — 재배포마다 17MB가 히스토리에 누적되면 D6·D7 재배포만으로 리포가 50MB+가 됨. 워킹트리·`HEAD`를 건드리지 않는 plumbing(임시 인덱스 → `write-tree` → `commit-tree`)으로 만들어 작업 중 배포가 안전. `.nojekyll` 포함. `.gitattributes`의 `* text=auto`가 gzip 바이너리를 손대지 않는지 **blob md5를 원본과 대조해 검증**(3/3 일치)
   - Pages 활성화는 리포 설정 권한 문제로 사람 몫 (`gh` CLI 미설치)
 - **검증**: Unity 콘솔 에러 0. WebGL 빌드 성공 17MB. 로컬 서버 6/6 에셋 200. gzip 매직 바이트 3/3. blob 무결성 3/3. 브라우저 실플레이(로딩·렌더·입력) 사람 확인 완료. `JungJoon`·`gh-pages` 원격 푸시 완료.
-- **커밋 해시**: `4400efe` (WebGL 설정·빌드 검증) / 배포 커밋 `75f2737` (`gh-pages`, orphan) / 일정 재압축은 본 세션 커밋 직후 기록
+- **커밋 해시**: `4400efe` (WebGL 설정·빌드 검증) / 배포 커밋 `75f2737` (`gh-pages`, orphan) / 일정 재압축 `e11f0da`
 
 <!-- D2 ~ D7 블록은 해당 일차 첫 세션 종료 시 생성 -->
 
