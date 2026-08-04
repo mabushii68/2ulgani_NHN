@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1c3142e84affb14e8ccc6c655d30cfc, type: 3}
+  m_Name: PredictorConfig_Default
+  m_EditorClassIdentifier: Assembly-CSharp::Luddite.Data.PredictorConfigSO
+  _triggerTimeToImpact: 0.5
+  _resolveWindow: 0.6
+  _minLateralDisplacement: 0.3
+  _threatMissRadius: 2
+  _decayFactor: 0.8
+  _minValidSamples: 8
+  _minDominantProbability: 0.7
+  _behaviourCorrectionFactor: 0.2
+  _dataFabricationSamples: 8

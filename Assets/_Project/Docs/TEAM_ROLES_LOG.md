@@ -25,6 +25,8 @@
 
 | D1 | 5 | 김정준 | **(D2 작업 선행)** 챗봇 드론 교전 — 적 FSM(Approach→Aim→Fire→Cooldown), 적 탄환, 스폰 텔레그래프, 플레이어 체력·무적, 진영 판정 | `Scripts/Enemies/{EnemyBase,ChatbotDrone,EnemyGun}.cs`, `Scripts/Player/PlayerHealth.cs`, `Scripts/Combat/{Faction,IDamageable,Projectile}.cs`, `Scripts/Data/EnemyStatsSO.cs`, `SO/EnemyStats_ChatbotDrone.asset`, `Prefabs/{ChatbotDrone,EnemyProjectile}.prefab`, `Scenes/Main.unity` | ⭕ | **전 범위가 이양빈 담당 영역(적 FSM·전투 로직)** — 사람이 "담당 상관없이" 진행 지시. `TargetDummy` 삭제(실제 적으로 대체). `IDamageable.IsAlive`→`CanBeDamaged` 개명은 세션 2에 직접 작성한 인터페이스라 파급 3파일로 국한 |
 
+| D1 | 6 | 김정준 | **(D2 작업 선행)** AIBrain 프로토 — 회피 예측기(온라인 조건부 확률 모델), 피격 위기 이벤트 탐지기, 자체 검증 51건 | `Scripts/AIBrain/*` (8종 신규), `Scripts/Data/PredictorConfigSO.cs`, `SO/PredictorConfig_Default.asset`, `Scripts/Editor/AIBrainSelfTest.cs`, `CLAUDE.md` | ⭕ | **AIBrain은 이양빈 담당 영역이고 🔴 계약 3건이 걸린 최고 민감 구역** — 사람이 "담당 상관없이" 진행 지시. 계약을 코드로 강제(가상 카운트 const화, 계약값 이탈 시 OnValidate 경고). GDD 미명시 1건·GDD 문자해석 1건은 사람 확인 대상으로 분리 보고. `Scripts/Editor/`를 폴더 스펙에 정식 추가 |
+
 ## 3. 협업·페어 작업 기록
 | 일차 | 작업 | 참여 | 분업 방식 (누가 무엇을) | 결과 |
 |---|---|---|---|---|
