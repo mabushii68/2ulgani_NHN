@@ -45,6 +45,8 @@
 
 | D2 | 8 | 김정준 | **(D4 작업 선행)** 7웨이브 시스템 — 전멸형 종료(🔴), 순차 스폰, 웨이브 감쇠 자동화, WAVE 라벨, 테스트 적 정리 | `Scripts/Core/{WaveManager,GameEvents,AIBrainRunner}.cs`, `Scripts/Data/{WaveConfigSO,WaveSystemConfigSO}.cs`, `Scripts/UI/WaveLabel.cs`, `Scripts/Editor/WaveSetupTools.cs`, `SO/WaveConfig_1~7.asset`, `SO/WaveSystemConfig_Default.asset`, `Scenes/Main.unity` | ⭕ | **웨이브·전투 구조 = 이양빈 담당 영역** — 기존 지시 연장선. 코어 루프(타이틀→전투→인터벌→보스 스텁→결과) 최초 관통 |
 
+| D2 | 9 | 김정준 | **(D4 작업 선행)** 업그레이드 8종 — SO·추첨 규칙·배수 적용·3택 카드 UI. AI 상호작용 2종은 전용 API 경유 | `Scripts/Data/UpgradeSO.cs`, `Scripts/Player/{PlayerUpgrades,PlayerController,PlayerHealth}.cs`, `Scripts/Core/UpgradeManager.cs`, `Scripts/UI/UpgradePanel.cs`, `Scripts/Combat/BasicWeapon.cs`, `Scripts/Editor/UpgradeSetupTools.cs`, `SO/Upgrade_*.asset` ×8, `Scenes/Main.unity` | ⭕ | 카드 UI = 김정준 담당, **밸런스 수치·전투 배수 = 이양빈 담당 영역** (수치는 GDD §8 표 그대로, 결정 없음). 전공 심화는 D6 의존으로 풀 미편입 |
+
 ## 3. 협업·페어 작업 기록
 | 일차 | 작업 | 참여 | 분업 방식 (누가 무엇을) | 결과 |
 |---|---|---|---|---|
