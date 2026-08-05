@@ -158,17 +158,28 @@ namespace Luddite.Core
 
         private void Consume(ThreatSample sample)
         {
+            // §10.3의 "LEFT 82% → 64%" 표시를 위해 학습 반영 전의 우세 방향·확률을 캡처
+            DodgeDirection dominantBefore = _predictor.DominantDirection;
+            float probabilityBefore = _predictor.DominantProbability;
+
             if (sample.WasPredictive)
             {
                 PredictiveAttempts++;
                 if (sample.WasHit) PredictiveHits++;
-                // TODO(D3): 예측탄을 회피했으면 PREDICTION FAILED 연출 트리거 (§10.3) + 역카운터 판정 (§7.5)
             }
 
             if (sample.CountsAsLearningSample)
             {
                 _predictor.Observe(sample.Direction);
                 LearnedSampleCount++;
+            }
+
+            // PREDICTION FAILED (§10.3): 예측탄을 피했다 — 학습 반영 후 같은 방향의 확률로 하락 폭을 보고
+            // TODO(§7.5 역카운터): 예측 방향의 반대로 피했는지 판정하려면 탄에 예측 방향을 실어야 한다 — 별도 세션
+            if (sample.WasPredictive && !sample.WasHit)
+            {
+                GameEvents.RaisePredictionFailed(new PredictionFailedReport(
+                    dominantBefore, probabilityBefore, _predictor.ProbabilityOf(dominantBefore)));
             }
 
             if (_logSamples) Debug.Log($"[AIBrain] {sample} → {_predictor}");

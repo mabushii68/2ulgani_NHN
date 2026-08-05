@@ -22,8 +22,12 @@ namespace Luddite.Core
         [Tooltip("BossIntro 연출 길이(초) — 연출 타이밍이므로 SerializeField 허용 (GDD §1.1: 2초)")]
         [SerializeField] private float _bossIntroDuration = 2f;
 
+        [Tooltip("PREDICTION FAILED 히트스톱 길이(초) — §10.3: 0.08~0.15")]
+        [SerializeField] private float _predictionFailedHitStop = 0.12f;
+
         private GameState _state = GameState.Title;
         private float _bossIntroRemaining;
+        private float _hitStopRemaining;
 
         public GameState State => _state;
 
@@ -33,9 +37,17 @@ namespace Luddite.Core
         /// <summary>이번 런의 승패 — Result 화면 메시지 분기 (§1.4). 승리 = 보스 격파.</summary>
         public bool RunWon { get; private set; }
 
-        private void OnEnable() => GameEvents.PlayerDied += OnPlayerDied;
+        private void OnEnable()
+        {
+            GameEvents.PlayerDied += OnPlayerDied;
+            GameEvents.PredictionFailed += OnPredictionFailed;
+        }
 
-        private void OnDisable() => GameEvents.PlayerDied -= OnPlayerDied;
+        private void OnDisable()
+        {
+            GameEvents.PlayerDied -= OnPlayerDied;
+            GameEvents.PredictionFailed -= OnPredictionFailed;
+        }
 
         private void Start()
         {
@@ -58,6 +70,36 @@ namespace Luddite.Core
                 _bossIntroRemaining -= Time.unscaledDeltaTime;
                 if (_bossIntroRemaining <= 0f) ApplyState(GameState.Combat);
             }
+
+            TickHitStop();
+        }
+
+        /// <summary>
+        /// 히트스톱 (§10.3). timeScale의 소유자가 GameManager이므로 여기서 관리한다 —
+        /// 별도 컴포넌트가 timeScale을 만지면 상태 전환(일시정지 등)과 복원 값이 충돌한다.
+        /// </summary>
+        public void BeginHitStop(float duration)
+        {
+            if (_state != GameState.Combat) return;   // 전투 밖에서는 시간이 이미 멈춰 있다
+
+            _hitStopRemaining = Mathf.Max(_hitStopRemaining, duration);
+            Time.timeScale = 0f;
+        }
+
+        private void TickHitStop()
+        {
+            if (_hitStopRemaining <= 0f) return;
+
+            _hitStopRemaining -= Time.unscaledDeltaTime;
+            if (_hitStopRemaining > 0f) return;
+
+            // 히트스톱 도중 상태가 바뀌었다면 ApplyState가 이미 timeScale을 소유했다
+            if (_state == GameState.Combat) Time.timeScale = 1f;
+        }
+
+        private void OnPredictionFailed(PredictionFailedReport report)
+        {
+            BeginHitStop(_predictionFailedHitStop);
         }
 
         // ── 전환 API (UI 버튼·WaveManager(D4)·보스(D5)가 호출) ──
@@ -158,6 +200,8 @@ namespace Luddite.Core
 
             // Combat만 시간이 흐른다. WaveInterval·Paused의 완전 일시정지(§1.1)를 포함해
             // 비전투 상태 전부에 같은 규칙을 적용한다 — 연출·UI는 unscaled 시간을 쓸 것.
+            // 상태 전환은 진행 중인 히트스톱을 취소하고 timeScale 소유권을 되찾는다.
+            _hitStopRemaining = 0f;
             Time.timeScale = next == GameState.Combat ? 1f : 0f;
 
             if (next == GameState.BossIntro) _bossIntroRemaining = _bossIntroDuration;

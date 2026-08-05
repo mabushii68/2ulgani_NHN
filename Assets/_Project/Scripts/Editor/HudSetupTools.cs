@@ -133,6 +133,49 @@ namespace Luddite.EditorTools
             barSo.FindProperty("_majorIcon").objectReferenceValue = iconImage;
             barSo.ApplyModifiedPropertiesWithoutUndo();
 
+            // ── PREDICTION FAILED 오버레이 (§10.3 — HUD와 같은 Combat 수명) ──
+            GameObject overlayRoot = EnsureChild(hudPanel, "PredictionFailedOverlay");
+            Stretch(overlayRoot);
+
+            GameObject overlayContent = EnsureChild(overlayRoot, "Content");
+            Stretch(overlayContent);
+
+            GameObject flashObject = EnsureChild(overlayContent, "Flash");
+            Stretch(flashObject);
+            Image flashImage = EnsureComponent<Image>(flashObject);
+            flashImage.color = new Color(1f, 1f, 1f, 0f);
+            flashImage.raycastTarget = false;
+
+            GameObject mainTextObject = EnsureChild(overlayContent, "MainText");
+            RectTransform mainRect = mainTextObject.GetComponent<RectTransform>();
+            CenterRect(mainRect, new Vector2(0f, 60f), new Vector2(1200f, 100f));
+            TextMeshProUGUI mainText = EnsureComponent<TextMeshProUGUI>(mainTextObject);
+            mainText.text = "PREDICTION FAILED";
+            mainText.fontSize = 72f;
+            mainText.fontStyle = FontStyles.Bold;
+            mainText.color = TEXT_MAIN;
+            mainText.alignment = TextAlignmentOptions.Center;
+            mainText.raycastTarget = false;
+
+            GameObject subTextObject = EnsureChild(overlayContent, "SubText");
+            RectTransform subRect = subTextObject.GetComponent<RectTransform>();
+            CenterRect(subRect, new Vector2(0f, -20f), new Vector2(900f, 50f));
+            TextMeshProUGUI subText = EnsureComponent<TextMeshProUGUI>(subTextObject);
+            subText.text = "";
+            subText.fontSize = 34f;
+            subText.color = new Color(1f, 0.35f, 1f, 1f); // 마젠타 계열 — AI 모델이 흔들리는 순간의 표기
+            subText.alignment = TextAlignmentOptions.Center;
+            subText.raycastTarget = false;
+
+            PredictionFailedOverlay overlay = EnsureComponent<PredictionFailedOverlay>(overlayRoot);
+            SerializedObject overlaySo = new SerializedObject(overlay);
+            overlaySo.FindProperty("_content").objectReferenceValue = overlayContent;
+            overlaySo.FindProperty("_flash").objectReferenceValue = flashImage;
+            overlaySo.FindProperty("_mainText").objectReferenceValue = mainText;
+            overlaySo.FindProperty("_subText").objectReferenceValue = subText;
+            overlaySo.ApplyModifiedPropertiesWithoutUndo();
+            overlayContent.SetActive(false);
+
             // GameScreens에 HUD 배선 + 초기 비활성 (Title에서 시작하므로)
             SerializedObject screensSo = new SerializedObject(screens);
             screensSo.FindProperty("_hudPanel").objectReferenceValue = hudPanel;
@@ -167,6 +210,14 @@ namespace Luddite.EditorTools
             rect.anchorMax = Vector2.one;
             rect.offsetMin = Vector2.zero;
             rect.offsetMax = Vector2.zero;
+        }
+
+        private static void CenterRect(RectTransform rect, Vector2 anchoredPosition, Vector2 size)
+        {
+            rect.anchorMin = new Vector2(0.5f, 0.5f);
+            rect.anchorMax = new Vector2(0.5f, 0.5f);
+            rect.anchoredPosition = anchoredPosition;
+            rect.sizeDelta = size;
         }
     }
 }

@@ -79,6 +79,21 @@ namespace Luddite.Core
         }
 
         /// <summary>
+        /// 플레이어가 예측탄을 회피했다 — "게임에서 가장 중요한 1초" (§10.3).
+        /// <para>
+        /// 발행: <see cref="AIBrainRunner"/> — 예측탄 위기 이벤트가 회피 성공으로 확정되는 곳.
+        /// 구독: <see cref="GameManager"/>(히트스톱), <c>Luddite.UI.PredictionFailedOverlay</c>(플래시·문구).
+        /// 로직(판정)과 비주얼(연출)이 서로를 모른 채 붙는 접점이라 버스를 경유한다.
+        /// </para>
+        /// </summary>
+        public static event Action<PredictionFailedReport> PredictionFailed;
+
+        public static void RaisePredictionFailed(PredictionFailedReport report)
+        {
+            PredictionFailed?.Invoke(report);
+        }
+
+        /// <summary>
         /// 정적 이벤트는 도메인 리로드를 끄고 플레이 모드를 재시작하면 죽은 구독자를 물고 있다.
         /// 플레이 모드 진입 시점에 한 번 비워 그 사고를 막는다.
         /// </summary>
@@ -89,6 +104,7 @@ namespace Luddite.Core
             GameStateChanged = null;
             PlayerDied = null;
             RunStarted = null;
+            PredictionFailed = null;
         }
     }
 }
