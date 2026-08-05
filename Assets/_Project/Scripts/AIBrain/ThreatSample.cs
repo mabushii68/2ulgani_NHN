@@ -26,8 +26,21 @@ namespace Luddite.AIBrain
         /// <summary>트리거부터 판정까지 걸린 시간(초). 0.6초 창을 넘지 않는지 확인용.</summary>
         public readonly float ResolveDelay;
 
+        /// <summary>예측탄이 노렸던 회피 방향. <see cref="WasPredictive"/>가 false면 의미 없음.</summary>
+        public readonly DodgeDirection PredictedDirection;
+
+        /// <summary>
+        /// 역카운터 (🔴 §7.5 — 3조건 전부 충족 시 1회):
+        /// ① HIGH 상태의 예측 (예측탄 발사 자체가 HIGH에서만 일어난다) ② 실제 예측탄
+        /// ③ 예측의 <b>반대</b> 방향으로 회피 성공. 확률표와 반대로 움직인 것만으로는 집계하지 않는다 —
+        /// 변위 미달(제자리 회피)도, 일반탄 회피도 아니다. "읽고 깨뜨린 순간"만.
+        /// </summary>
+        public bool IsCounterDodge =>
+            WasPredictive && !WasHit && CountsAsLearningSample && Direction != PredictedDirection;
+
         public ThreatSample(bool wasHit, bool wasPredictive, bool countsAsLearningSample,
-            DodgeDirection direction, float lateralDisplacement, float resolveDelay)
+            DodgeDirection direction, float lateralDisplacement, float resolveDelay,
+            DodgeDirection predictedDirection = DodgeDirection.Left)
         {
             WasHit = wasHit;
             WasPredictive = wasPredictive;
@@ -35,12 +48,15 @@ namespace Luddite.AIBrain
             Direction = direction;
             LateralDisplacement = lateralDisplacement;
             ResolveDelay = resolveDelay;
+            PredictedDirection = predictedDirection;
         }
 
         public override string ToString()
         {
             string outcome = WasHit ? "HIT" : "DODGE";
-            string predictive = WasPredictive ? " predictive" : "";
+            string predictive = WasPredictive
+                ? (IsCounterDodge ? " predictive COUNTER!" : " predictive")
+                : "";
             string counted = CountsAsLearningSample
                 ? Direction.ToString().ToUpperInvariant()
                 : "EXCLUDED(변위부족)";

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Luddite.AIBrain;
 using Luddite.Core;
 
 namespace Luddite.Combat
@@ -70,8 +71,16 @@ namespace Luddite.Combat
         /// </summary>
         public bool IsPredictive { get; private set; }
 
-        /// <summary>엘리트·보스의 예측탄 발사기가 <see cref="Launch"/> 직후 호출한다 (D3).</summary>
-        public void MarkAsPredictive() => IsPredictive = true;
+        /// <summary>예측탄이 노린 회피 방향 (§7.4). 역카운터 판정(§7.5)의 기준값. 예측탄일 때만 의미.</summary>
+        public DodgeDirection PredictedDirection { get; private set; }
+
+        /// <summary>엘리트·보스의 예측탄 발사기가 <see cref="Launch"/> 직후 호출한다.</summary>
+        /// <param name="predictedDirection">이 예측탄이 노린 학습 우세 회피 방향</param>
+        public void MarkAsPredictive(DodgeDirection predictedDirection)
+        {
+            IsPredictive = true;
+            PredictedDirection = predictedDirection;
+        }
 
         /// <summary>발사 직후 1회 호출. 방향·속도·데미지·수명·크기·발사자·표적 진영을 주입한다.</summary>
         /// <param name="targetFaction">이 진영의 <see cref="IDamageable"/>만 때린다. 같은 편은 통과.</param>
@@ -85,6 +94,7 @@ namespace Luddite.Combat
             _consumed = false;
             _invincibleTouchReported = false;
             IsPredictive = false;
+            PredictedDirection = DodgeDirection.Left;
 
             // 콜라이더 반지름은 원본 기준으로 두고 스케일로 최종 크기를 맞춘다 (스프라이트와 히트박스 동시 반영)
             _hitbox.radius = _spriteBaseDiameter * 0.5f;

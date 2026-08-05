@@ -28,14 +28,15 @@ namespace Luddite.Enemies
         }
 
         /// <summary>지정 방향으로 1발. 쿨다운 판단은 호출자(FSM) 책임.</summary>
-        public void Fire(Vector2 aimDirection) => Fire(aimDirection, _projectileColor, markPredictive: false);
+        public void Fire(Vector2 aimDirection) => Fire(aimDirection, _projectileColor);
 
         /// <summary>
-        /// 색·예측탄 여부를 지정하는 변형 — 엘리트·보스의 예측탄(§7.4)용.
-        /// 마젠타 색은 예측탄일 때만 넘길 것 (🔴 §10.4).
+        /// 색을 지정하는 변형 — 엘리트·보스의 예측탄(§7.4)용. 마젠타 색은 예측탄일 때만 넘길 것 (🔴 §10.4).
+        /// 예측 마킹(<c>MarkAsPredictive</c>)은 예측 방향을 아는 호출자(EliteModifier)가 반환값에 직접 한다 —
+        /// 총이 AIBrain의 방향 개념을 알 필요는 없다.
         /// </summary>
-        /// <returns>발사된 투사체. 실패 시 null — 호출자가 트레일 등 후처리를 붙일 수 있게 반환한다.</returns>
-        public Projectile Fire(Vector2 aimDirection, Color projectileColor, bool markPredictive)
+        /// <returns>발사된 투사체. 실패 시 null — 호출자가 마킹·트레일 등 후처리를 붙일 수 있게 반환한다.</returns>
+        public Projectile Fire(Vector2 aimDirection, Color projectileColor)
         {
             if (_stats == null || _projectilePrefab == null) return null;
 
@@ -54,7 +55,6 @@ namespace Luddite.Enemies
                 owner: transform.root,
                 targetFaction: Faction.Player);
 
-            if (markPredictive) shot.MarkAsPredictive();
             return shot;
         }
     }

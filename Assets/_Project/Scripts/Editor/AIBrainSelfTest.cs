@@ -46,6 +46,12 @@ namespace Luddite.EditorTools
             TestThreatTriggersOncePerBullet();
             TestThreatIgnoresDistantBullet();
 
+            TestCounterDodgeDetected();
+            TestCounterRequiresOppositeDirection();
+            TestCounterRequiresDodgeSuccess();
+            TestCounterRequiresDisplacement();
+            TestCounterRequiresPredictiveBullet();
+
             TestProfilerInitialState();
             TestProfilerAverageEngageDistance();
             TestProfilerIgnoresEmptyArena();
@@ -342,6 +348,74 @@ namespace Luddite.EditorTools
                 bulletPos = bulletPos + bulletVel * TICK;
             }
             return null;
+        }
+
+        // ───────────────────────── 역카운터 (§7.5) ─────────────────────────
+
+        /// <summary>예측탄 1발을 접근시키는 시뮬레이션. 탄 진행 (0,1) 기준 -X 이동 = LEFT 회피.</summary>
+        private static ThreatSample? SimulatePredictiveBullet(float playerLateralSpeed,
+            DodgeDirection predictedDirection, bool forceHit, bool markPredictive = true)
+        {
+            ThreatEventTracker tracker = NewTracker();
+            List<ThreatBullet> bullets = new List<ThreatBullet>(1);
+
+            Vec2 playerPos = Vec2.Zero;
+            Vec2 bulletPos = new Vec2(0f, -6f);
+            Vec2 bulletVel = new Vec2(0f, 6f);
+            bool triggered = false;
+
+            for (int i = 0; i < 300; i++)
+            {
+                bullets.Clear();
+                bullets.Add(new ThreatBullet(202, bulletPos, bulletVel, markPredictive, predictedDirection));
+
+                int hitId = ThreatEventTracker.NO_BULLET;
+                if (forceHit && triggered && bulletPos.Y >= -0.5f) hitId = 202;
+
+                IReadOnlyList<ThreatSample> samples = tracker.Tick(TICK, playerPos, bullets, hitId);
+                if (samples.Count > 0) return samples[0];
+
+                if (tracker.HasActiveWatch) triggered = true;
+                if (triggered) playerPos = playerPos + new Vec2(-playerLateralSpeed * TICK, 0f);
+                bulletPos = bulletPos + bulletVel * TICK;
+            }
+            return null;
+        }
+
+        private static void TestCounterDodgeDetected()
+        {
+            // AI가 RIGHT를 예측 → 플레이어가 LEFT로 회피 성공 = 역카운터 (3조건 전부 충족)
+            ThreatSample? s = SimulatePredictiveBullet(6f, DodgeDirection.Right, forceHit: false);
+            IsTrue("예측탄 판정 확정", s.HasValue && s.Value.WasPredictive);
+            IsTrue("예측 RIGHT + LEFT 회피 성공 → 역카운터 (§7.5)", s.HasValue && s.Value.IsCounterDodge);
+        }
+
+        private static void TestCounterRequiresOppositeDirection()
+        {
+            // 예측대로 움직였는데 우연히 피한 경우 — "읽고 깨뜨린 순간"이 아니다
+            ThreatSample? s = SimulatePredictiveBullet(6f, DodgeDirection.Left, forceHit: false);
+            IsTrue("예측 LEFT + LEFT 회피 → 역카운터 아님", s.HasValue && !s.Value.IsCounterDodge);
+        }
+
+        private static void TestCounterRequiresDodgeSuccess()
+        {
+            ThreatSample? s = SimulatePredictiveBullet(6f, DodgeDirection.Right, forceHit: true);
+            IsTrue("피격이면 반대로 움직였어도 역카운터 아님", s.HasValue && !s.Value.IsCounterDodge);
+        }
+
+        private static void TestCounterRequiresDisplacement()
+        {
+            // 변위 0.3유닛 미달 — 제자리 회피는 방향 판정 자체가 무의미하다
+            ThreatSample? s = SimulatePredictiveBullet(0.3f, DodgeDirection.Right, forceHit: false);
+            IsTrue("변위 미달 회피 → 역카운터 아님", s.HasValue && !s.Value.IsCounterDodge);
+        }
+
+        private static void TestCounterRequiresPredictiveBullet()
+        {
+            // 일반탄을 확률표 반대로 피한 것은 집계하지 않는다 (§7.5 명시)
+            ThreatSample? s = SimulatePredictiveBullet(6f, DodgeDirection.Right, forceHit: false,
+                markPredictive: false);
+            IsTrue("일반탄 회피 → 역카운터 아님", s.HasValue && !s.Value.IsCounterDodge);
         }
 
         // ───────────────────────── 프로파일러 (§6.4) ─────────────────────────

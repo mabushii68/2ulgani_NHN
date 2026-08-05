@@ -103,6 +103,13 @@ namespace Luddite.Core
         public float PredictionAccuracy =>
             PredictiveAttempts > 0 ? (float)PredictiveHits / PredictiveAttempts : 0f;
 
+        /// <summary>역카운터 성공 횟수 (🔴 §7.5 — "읽고 깨뜨린 순간"). 결과 화면 §13.</summary>
+        public int CounterDodgeCount { get; private set; }
+
+        /// <summary>역카운터 성공률 0~1 = 역카운터 / 예측탄 위기 이벤트 수.</summary>
+        public float CounterDodgeRate =>
+            PredictiveAttempts > 0 ? (float)CounterDodgeCount / PredictiveAttempts : 0f;
+
         private void Awake()
         {
             if (_config == null)
@@ -216,7 +223,8 @@ namespace Luddite.Core
                     shot.GetInstanceID(),
                     ToVec2(shot.Position),
                     ToVec2(shot.Velocity),
-                    shot.IsPredictive));
+                    shot.IsPredictive,
+                    shot.PredictedDirection));
             }
         }
 
@@ -230,6 +238,7 @@ namespace Luddite.Core
             {
                 PredictiveAttempts++;
                 if (sample.WasHit) PredictiveHits++;
+                if (sample.IsCounterDodge) CounterDodgeCount++;   // §7.5 — 판정은 순수 C#이 한다
             }
 
             if (sample.CountsAsLearningSample)
@@ -239,7 +248,6 @@ namespace Luddite.Core
             }
 
             // PREDICTION FAILED (§10.3): 예측탄을 피했다 — 학습 반영 후 같은 방향의 확률로 하락 폭을 보고
-            // TODO(§7.5 역카운터): 예측 방향의 반대로 피했는지 판정하려면 탄에 예측 방향을 실어야 한다 — 별도 세션
             if (sample.WasPredictive && !sample.WasHit)
             {
                 GameEvents.RaisePredictionFailed(new PredictionFailedReport(
@@ -296,13 +304,14 @@ namespace Luddite.Core
             LearnedSampleCount = 0;
             PredictiveAttempts = 0;
             PredictiveHits = 0;
+            CounterDodgeCount = 0;
         }
 
         /// <summary>디버그용 한 줄 상태. HUD가 붙기 전까지 이걸로 확인한다.</summary>
         public string DescribeState() =>
             IsReady
                 ? $"{_predictor} | 학습표본={LearnedSampleCount} 예측적중={PredictiveHits}/{PredictiveAttempts} " +
-                  $"추적중={HasActiveThreat} | 프로파일: 평균거리={AverageEngageDistance:F1} " +
+                  $"역카운터={CounterDodgeCount} 추적중={HasActiveThreat} | 프로파일: 평균거리={AverageEngageDistance:F1} " +
                   $"(직전 웨이브 {LastWaveAverageEngageDistance:F1}) 무빙샷={MovingShotRatio:P0} 구역={FavoriteQuadrant}"
                 : "AIBrain 미초기화 (PredictorConfigSO 확인)";
 

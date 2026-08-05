@@ -14,12 +14,18 @@ namespace Luddite.AIBrain
         /// <summary>예측탄인지 (§7.4). "예측 적중" 집계에 쓰인다.</summary>
         public readonly bool IsPredictive;
 
-        public ThreatBullet(int id, Vec2 position, Vec2 velocity, bool isPredictive)
+        /// <summary>예측탄이 노린 회피 방향 (§7.4). <see cref="IsPredictive"/>가 false면 의미 없음.
+        /// 역카운터 판정(§7.5)의 기준값 — "예측의 반대로 피했는가"를 여기에 비교한다.</summary>
+        public readonly DodgeDirection PredictedDirection;
+
+        public ThreatBullet(int id, Vec2 position, Vec2 velocity, bool isPredictive,
+            DodgeDirection predictedDirection = DodgeDirection.Left)
         {
             Id = id;
             Position = position;
             Velocity = velocity;
             IsPredictive = isPredictive;
+            PredictedDirection = predictedDirection;
         }
     }
 
@@ -86,6 +92,7 @@ namespace Luddite.AIBrain
         private bool _hasActiveWatch;
         private int _watchBulletId;
         private bool _watchIsPredictive;
+        private DodgeDirection _watchPredictedDirection;
         private Vec2 _watchBulletDirection;
         private Vec2 _watchPlayerPositionAtTrigger;
         private float _watchAge;
@@ -172,7 +179,8 @@ namespace Luddite.AIBrain
                 countsAsLearningSample: counts,
                 direction: direction,
                 lateralDisplacement: lateral,
-                resolveDelay: _watchAge));
+                resolveDelay: _watchAge,
+                predictedDirection: _watchPredictedDirection));
 
             _hasActiveWatch = false;
             _watchBulletId = NO_BULLET;
@@ -203,6 +211,7 @@ namespace Luddite.AIBrain
             _hasActiveWatch = true;
             _watchBulletId = chosen.Id;
             _watchIsPredictive = chosen.IsPredictive;
+            _watchPredictedDirection = chosen.PredictedDirection;
             _watchBulletDirection = chosen.Velocity.Normalized;
             _watchPlayerPositionAtTrigger = playerPosition;
             _watchAge = 0f;

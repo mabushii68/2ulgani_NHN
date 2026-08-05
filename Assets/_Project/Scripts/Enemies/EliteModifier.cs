@@ -155,9 +155,11 @@ namespace Luddite.Enemies
                 ? direction.normalized
                 : (_player != null ? ((Vector2)_player.position - origin).normalized : Vector2.right);
 
-            Projectile shot = _gun.Fire(direction, _predictiveColor, markPredictive: true);
+            Projectile shot = _gun.Fire(direction, _predictiveColor);
             if (shot != null)
             {
+                // 발사 시점의 우세 방향이 이 탄의 "예측" — 역카운터(§7.5)는 이것의 반대로 피했는지를 본다
+                shot.MarkAsPredictive(_brain.DominantDirection);
                 PredictiveShotsFired++;
                 AttachTrail(shot);
             }
