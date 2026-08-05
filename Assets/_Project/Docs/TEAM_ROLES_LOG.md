@@ -41,6 +41,8 @@
 
 | D2 | 6 | 김정준 | **(D4 작업 선행)** 그림봇 — 거리 유지·횡이동·부채꼴 3발 FSM, 전용 수치 SO 필드 | `Scripts/Enemies/PainterBot.cs`, `Scripts/Data/EnemyStatsSO.cs`, `Scripts/Editor/PainterBotSetupTools.cs`, `Prefabs/PainterBot.prefab`, `SO/EnemyStats_PainterBot.asset`, `Scenes/Main.unity` | ⭕ | **적 FSM = 이양빈 담당 영역** — 기존 지시("담당 상관없이") 연장선에서 진행 |
 
+| D2 | 7 | 김정준 | **(D4 작업 선행)** 코딩봇 — 돌진형 FSM(방향 고정 텔레그래프), 상태별 접촉 데미지, 삼각 플레이스홀더 절차 생성 | `Scripts/Enemies/{CoderBot,EnemyBase}.cs`, `Scripts/Data/EnemyStatsSO.cs`, `Scripts/Editor/CoderBotSetupTools.cs`, `Prefabs/CoderBot.prefab`, `SO/EnemyStats_CoderBot.asset`, `Sprites/Placeholder_Triangle.png`, `Scenes/Main.unity`, `CREDITS.md` | ⭕ | **적 FSM = 이양빈 담당 영역** — 기존 지시 연장선. 적 3종 + 엘리트 완성 |
+
 ## 3. 협업·페어 작업 기록
 | 일차 | 작업 | 참여 | 분업 방식 (누가 무엇을) | 결과 |
 |---|---|---|---|---|
