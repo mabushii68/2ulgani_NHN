@@ -28,15 +28,22 @@ namespace Luddite.Enemies
         }
 
         /// <summary>지정 방향으로 1발. 쿨다운 판단은 호출자(FSM) 책임.</summary>
-        public void Fire(Vector2 aimDirection)
+        public void Fire(Vector2 aimDirection) => Fire(aimDirection, _projectileColor, markPredictive: false);
+
+        /// <summary>
+        /// 색·예측탄 여부를 지정하는 변형 — 엘리트·보스의 예측탄(§7.4)용.
+        /// 마젠타 색은 예측탄일 때만 넘길 것 (🔴 §10.4).
+        /// </summary>
+        /// <returns>발사된 투사체. 실패 시 null — 호출자가 트레일 등 후처리를 붙일 수 있게 반환한다.</returns>
+        public Projectile Fire(Vector2 aimDirection, Color projectileColor, bool markPredictive)
         {
-            if (_stats == null || _projectilePrefab == null) return;
+            if (_stats == null || _projectilePrefab == null) return null;
 
             Vector2 origin = (Vector2)transform.position + aimDirection * _muzzleOffset;
             Projectile shot = Instantiate(_projectilePrefab, origin, Quaternion.identity);
 
             SpriteRenderer spriteRenderer = shot.GetComponent<SpriteRenderer>();
-            if (spriteRenderer != null) spriteRenderer.color = _projectileColor;
+            if (spriteRenderer != null) spriteRenderer.color = projectileColor;
 
             shot.Launch(
                 direction: aimDirection,
@@ -46,6 +53,9 @@ namespace Luddite.Enemies
                 diameter: _stats.ProjectileDiameter,
                 owner: transform.root,
                 targetFaction: Faction.Player);
+
+            if (markPredictive) shot.MarkAsPredictive();
+            return shot;
         }
     }
 }

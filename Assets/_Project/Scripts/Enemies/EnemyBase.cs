@@ -30,6 +30,7 @@ namespace Luddite.Enemies
         private Rigidbody2D _body;
         private CircleCollider2D _hitbox;
         private Color _baseColor;
+        private Vector3 _baseScale = Vector3.one;
         private float _hp;
         private float _spawnRemaining;
         private float _flashRemaining;
@@ -85,6 +86,10 @@ namespace Luddite.Enemies
             _hp = _stats.MaxHp;
             _spawnRemaining = _stats.SpawnTelegraphDuration;
 
+            // 엘리트(×1.3, §5.1)처럼 프리팹이 기본 스케일을 갖는 경우를 위해 캡처 —
+            // 스폰 텔레그래프가 Vector3.one으로 복원하면 엘리트가 스폰 후 일반 크기가 된다
+            _baseScale = transform.localScale;
+
             if (_renderer == null) _renderer = GetComponentInChildren<SpriteRenderer>();
             if (_renderer != null) _baseColor = _renderer.color;
         }
@@ -115,7 +120,7 @@ namespace Luddite.Enemies
                 ? 1f
                 : Mathf.Clamp01(1f - _spawnRemaining / _stats.SpawnTelegraphDuration);
 
-            transform.localScale = Vector3.one * Mathf.Lerp(0.5f, 1f, progress);
+            transform.localScale = _baseScale * Mathf.Lerp(0.5f, 1f, progress);
             if (_renderer != null)
             {
                 Color c = _baseColor;
@@ -125,7 +130,7 @@ namespace Luddite.Enemies
 
             if (_spawnRemaining > 0f) return;
 
-            transform.localScale = Vector3.one;
+            transform.localScale = _baseScale;
             if (_renderer != null) _renderer.color = _baseColor;
         }
 

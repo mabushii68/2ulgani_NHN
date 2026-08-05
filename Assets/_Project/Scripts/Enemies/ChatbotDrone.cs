@@ -27,6 +27,10 @@ namespace Luddite.Enemies
         private Vector2 _aimDirection = Vector2.right;
         private float _stateTimer;
 
+        /// <summary>엘리트일 때만 존재 (§5.1: 엘리트 = 챗봇 프리팹 + EliteModifier). 없으면 일반 챗봇.</summary>
+        private EliteModifier _elite;
+        private bool _predictiveAim;
+
         /// <summary>현재 FSM 상태 이름. 디버그·스모크 테스트용.</summary>
         public string StateName => _state.ToString();
 
@@ -35,6 +39,7 @@ namespace Luddite.Enemies
             base.Awake();
             if (_gun == null) _gun = GetComponentInChildren<EnemyGun>();
             if (_gun == null) Debug.LogError("[ChatbotDrone] EnemyGun을 찾지 못함", this);
+            _elite = GetComponent<EliteModifier>();
         }
 
         private void Start()
@@ -80,19 +85,33 @@ namespace Luddite.Enemies
                 return;
             }
 
-            // 사거리 진입 → 멈추고 조준
+            // 사거리 진입 → 멈추고 조준. 엘리트라면 이번 공격이 예측탄인지 여기서 결정된다 (§7.4)
             SetMoveVelocity(Vector2.zero);
             EnterState(State.Aim);
+            _predictiveAim = _elite != null && _elite.TryBeginPredictiveAim();
         }
 
         private void TickAim(float deltaTime)
         {
             SetMoveVelocity(Vector2.zero);
             _stateTimer += deltaTime;
-            if (_stateTimer < Stats.AimDuration) return;
+
+            // 예측 공격은 조준 시간도 §7.4 텔레그래프(0.35s)로 대체 — 마커가 플레이어를 따라간다
+            if (_predictiveAim) _elite.UpdatePredictiveAim();
+            float aimDuration = _predictiveAim ? _elite.TelegraphDuration : Stats.AimDuration;
+            if (_stateTimer < aimDuration) return;
 
             // Fire는 상태가 아니라 Aim 종료 시점의 1회 동작이다
-            if (_gun != null) _gun.Fire(_aimDirection);
+            if (_predictiveAim)
+            {
+                _elite.FirePredictive();
+                _predictiveAim = false;
+            }
+            else if (_gun != null)
+            {
+                _gun.Fire(_aimDirection);
+            }
+
             EnterState(State.Cooldown);
         }
 
