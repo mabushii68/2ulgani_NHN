@@ -37,6 +37,8 @@
 
 | D2 | 4 | 김정준 | **(D3 작업 선행)** HUD — AI 미니 패널(엘리트 생존 시만·LEARNING 표기·HIGH 펄스) + HP 바 + 전공색 아이콘 | `Scripts/UI/{AiMiniPanel,HpBar,GameScreens}.cs`, `Scripts/Editor/{HudSetupTools,GameStateSmokeTest}.cs`, `Scripts/Core/AIBrainRunner.cs`, `Scripts/Data/PredictorConfigSO.cs`, `Scripts/Enemies/EliteModifier.cs`, `Scenes/Main.unity` | — | HUD/UI = 김정준 담당 정면. AIBrain 쪽은 읽기 전용 게터 추가만 |
 
+| D2 | 5 | 김정준 | **(D3 작업 선행)** PREDICTION FAILED 연출 + 히트스톱 — 이벤트 버스 접점, 신뢰도 하락 보고, 오버레이, GameManager 히트스톱 | `Scripts/Core/{PredictionFailedReport,GameEvents,AIBrainRunner,GameManager}.cs`, `Scripts/UI/PredictionFailedOverlay.cs`, `Scripts/Editor/{HudSetupTools,GameFeelDebugTools}.cs`, `Scenes/Main.unity` | ⭕ | **원래 D4 페어 작업으로 계획된 로직×비주얼 접점** — 사람(김정준) 지시로 단독 진행. 판정 로직(AIBrainRunner·이양빈 영역)과 연출(김정준 영역)을 GameEvents로 분리해 이후 각자 수정 가능하게 함 |
+
 ## 3. 협업·페어 작업 기록
 | 일차 | 작업 | 참여 | 분업 방식 (누가 무엇을) | 결과 |
 |---|---|---|---|---|
