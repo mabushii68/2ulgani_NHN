@@ -53,6 +53,8 @@
 
 | D3 | 1 | 김정준 | 역카운터 판정(🔴 §7.5) — 탄에 예측 방향 탑재, 순수 C# 판정 + 테스트 6건, 러너 집계 | `Scripts/AIBrain/{ThreatEventTracker,ThreatSample}.cs`, `Scripts/Combat/Projectile.cs`, `Scripts/Enemies/{EnemyGun,EliteModifier}.cs`, `Scripts/Core/AIBrainRunner.cs`, `Scripts/Editor/AIBrainSelfTest.cs` | ⭕ | **AIBrain·🔴 계약 = 이양빈 담당 영역** — 기존 지시 연장선 |
 
+| D3 | 2 | 김정준 | 결과 화면 §13 — 별명 3축 룰 테이블(SO), AI ANALYSIS 블록, 히스토그램, ResultPanel 재배치 | `Scripts/Data/NicknameTableSO.cs`, `Scripts/UI/ResultProfile.cs`, `Scripts/Editor/{ResultSetupTools,GameFlowSetupTools}.cs`, `SO/NicknameTable_Default.asset`, `Scenes/Main.unity` | ⭕ | 화면 = 김정준 담당. **별명 11종 초안 = 이양빈(기획) 검토 대상** — SO에서 문구 수정 가능 |
+
 ## 3. 협업·페어 작업 기록
 | 일차 | 작업 | 참여 | 분업 방식 (누가 무엇을) | 결과 |
 |---|---|---|---|---|
