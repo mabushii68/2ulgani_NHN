@@ -38,6 +38,26 @@ namespace Luddite.EditorTools
             Debug.Log($"[GameFeelDebug] 현재 상태: {manager.State}");
         }
 
+        [MenuItem("Luddite/Dev/보스 웨이브로 점프 (플레이 모드)")]
+        public static void JumpToBossWave()
+        {
+            if (!Application.isPlaying)
+            {
+                Debug.LogWarning("[GameFeelDebug] 플레이 모드에서만 실행 가능");
+                return;
+            }
+
+            WaveManager waveManager = Object.FindFirstObjectByType<WaveManager>();
+            if (waveManager == null)
+            {
+                Debug.LogError("[GameFeelDebug] WaveManager 없음");
+                return;
+            }
+
+            ForceCombat();   // Combat이 아니면 유효 전환으로 진입부터
+            waveManager.DebugJumpToWave(waveManager.TotalWaves);
+        }
+
         [MenuItem("Luddite/Dev/PREDICTION FAILED 연출 테스트 (플레이 모드)")]
         public static void TriggerPredictionFailed()
         {

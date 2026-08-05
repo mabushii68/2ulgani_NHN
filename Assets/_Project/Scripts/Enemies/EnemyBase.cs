@@ -57,8 +57,9 @@ namespace Luddite.Enemies
         /// <summary>생존 여부. 무적과 무관하게 체력만 본다.</summary>
         public bool IsAlive => _hp > 0f;
 
-        /// <summary>피격 가능 상태. 사망했거나 스폰 텔레그래프 중이면 false.</summary>
-        public bool CanBeDamaged => IsAlive && !IsSpawning;
+        /// <summary>피격 가능 상태. 사망했거나 스폰 텔레그래프 중이면 false.
+        /// 보스의 페이즈 전환 무적(§9) 같은 추가 조건은 파생이 확장한다.</summary>
+        public virtual bool CanBeDamaged => IsAlive && !IsSpawning;
 
         /// <summary>남은 체력. HUD·디버그용.</summary>
         public float Hp => _hp;

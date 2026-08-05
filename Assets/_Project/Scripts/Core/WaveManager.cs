@@ -111,18 +111,11 @@ namespace Luddite.Core
 
             WaveConfigSO config = _waves[_waveIndex];
 
-            if (config.IsBossWave)
+            // 보스 웨이브는 스폰 전에 BossIntro 연출을 한 번 태운다 (§1.1: 2초 후 Combat 복귀 → 다시 여기로)
+            if (config.IsBossWave && !_bossIntroStarted)
             {
-                if (!_bossIntroStarted)
-                {
-                    _bossIntroStarted = true;
-                    _gameManager.BeginBossIntro();   // §1.1: 2초 연출 후 Combat 복귀 → 다시 여기로
-                    return;
-                }
-
-                // TODO(D5): 보스 스폰 + P1/P2 페이즈. 지금은 루프 검증을 위한 임시 승리
-                Debug.Log("[WaveManager] 웨이브 7(보스)은 D5 예정 — 임시 승리 처리");
-                _gameManager.EndRun(won: true);
+                _bossIntroStarted = true;
+                _gameManager.BeginBossIntro();
                 return;
             }
 
@@ -182,7 +175,17 @@ namespace Luddite.Core
         {
             _waveActive = false;
             int cleared = CurrentWaveNumber;
+            WaveConfigSO clearedConfig = _waves[_waveIndex];
             _waveIndex++;
+
+            // 보스 격파 = 승리 (§1.4). 런이 끝나므로 감쇠를 적용하지 않는다 —
+            // 결과 화면(§13)이 보여 줄 최종 학습 상태를 웨이브 감쇠로 왜곡하지 않기 위해.
+            if (clearedConfig.IsBossWave)
+            {
+                Debug.Log("[WaveManager] 보스 격파 — 승리");
+                _gameManager.EndRun(won: true);
+                return;
+            }
 
             Debug.Log($"[WaveManager] 웨이브 {cleared} 전멸 — 감쇠 적용 후 인터벌 진입");
             GameEvents.RaiseWaveEnded(cleared);      // AIBrain 감쇠 + 프로파일 스냅숏 (§7.2/§6.4)
@@ -271,12 +274,27 @@ namespace Luddite.Core
 
         private void DespawnAll()
         {
-            for (int i = 0; i < _alive.Count; i++)
+            // 추적 목록이 아니라 레지스트리 전체를 비운다 — 보스가 직접 소환한 미니언(§9)은
+            // WaveManager가 스폰하지 않아 추적 목록에 없기 때문. Destroy는 프레임 말 지연이라 순회 안전.
+            IReadOnlyList<EnemyBase> active = EnemyBase.Active;
+            for (int i = active.Count - 1; i >= 0; i--)
             {
-                if (_alive[i] != null) Destroy(_alive[i].gameObject);
+                if (active[i] != null) Destroy(active[i].gameObject);
             }
             _alive.Clear();
             _pending.Clear();
+        }
+
+        /// <summary>디버그 전용 — 지정 웨이브로 점프 (보스 테스트용). 정식 게임 흐름에서 호출 금지.</summary>
+        public void DebugJumpToWave(int waveNumber)
+        {
+            DespawnAll();
+            _waveIndex = Mathf.Clamp(waveNumber - 1, 0, TotalWaves - 1);
+            _waveActive = false;
+            _bossIntroStarted = false;
+            _plannedAdjustment = DdaDecision.None;
+            Debug.Log($"[WaveManager] (디버그) 웨이브 {CurrentWaveNumber}로 점프");
+            if (_gameManager != null && _gameManager.State == GameState.Combat) BeginWave();
         }
 
         private static void Shuffle(List<EnemyBase> list)

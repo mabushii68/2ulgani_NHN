@@ -13,4 +13,6 @@ MonoBehaviour:
   m_Name: WaveConfig_7
   m_EditorClassIdentifier: Assembly-CSharp::Luddite.Data.WaveConfigSO
   _isBossWave: 1
-  _entries: []
+  _entries:
+  - _enemyPrefab: {fileID: 7064046205509108699, guid: ce83564fc63e9d94891e0d7c40ee152a, type: 3}
+    _count: 1

@@ -34,6 +34,7 @@ namespace Luddite.Combat
         private float _lifeRemaining;
         private bool _consumed;
         private bool _invincibleTouchReported;
+        private bool _piercing;
 
         private void Awake()
         {
@@ -82,6 +83,12 @@ namespace Luddite.Combat
             PredictedDirection = predictedDirection;
         }
 
+        /// <summary>
+        /// 관통탄으로 표시 (보스 문과 패턴 §9). 대상을 맞혀도 소멸하지 않고 계속 난다 —
+        /// 벽(<see cref="ProjectileBlocker"/>)과 수명에는 여전히 막힌다.
+        /// </summary>
+        public void MarkAsPiercing() => _piercing = true;
+
         /// <summary>발사 직후 1회 호출. 방향·속도·데미지·수명·크기·발사자·표적 진영을 주입한다.</summary>
         /// <param name="targetFaction">이 진영의 <see cref="IDamageable"/>만 때린다. 같은 편은 통과.</param>
         public void Launch(Vector2 direction, float speed, float damage, float lifetime, float diameter,
@@ -93,6 +100,7 @@ namespace Luddite.Combat
             _targetFaction = targetFaction;
             _consumed = false;
             _invincibleTouchReported = false;
+            _piercing = false;
             IsPredictive = false;
             PredictedDirection = DodgeDirection.Left;
 
@@ -145,13 +153,20 @@ namespace Luddite.Combat
                 return;
             }
 
-            _consumed = true;
             target.TakeDamage(_damage, _body.linearVelocity.normalized);
 
             // AIBrain이 §7.1 위기 이벤트를 "회피 실패"로 확정하려면 어느 탄에 맞았는지 알아야 한다.
             // 투사체가 AIBrain을 직접 알 필요는 없으므로 이벤트 버스를 경유한다 (규칙 4).
-            if (_targetFaction == Faction.Player) GameEvents.RaiseProjectileHitPlayer(GetInstanceID());
+            // 관통탄도 통보는 1회만 (_invincibleTouchReported를 "이 탄이 이미 접촉을 통보함"으로 겸용).
+            if (_targetFaction == Faction.Player && !_invincibleTouchReported)
+            {
+                _invincibleTouchReported = true;
+                GameEvents.RaiseProjectileHitPlayer(GetInstanceID());
+            }
 
+            if (_piercing) return;   // 관통 (보스 문과 패턴) — 소멸하지 않는다
+
+            _consumed = true;
             Despawn();
         }
 
