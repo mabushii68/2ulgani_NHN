@@ -85,9 +85,17 @@ namespace Luddite.Core
             _tracker = new ThreatEventTracker(_config.ToDetectionSettings());
         }
 
-        private void OnEnable() => GameEvents.ProjectileHitPlayer += OnProjectileHitPlayer;
+        private void OnEnable()
+        {
+            GameEvents.ProjectileHitPlayer += OnProjectileHitPlayer;
+            GameEvents.RunStarted += ResetRun;
+        }
 
-        private void OnDisable() => GameEvents.ProjectileHitPlayer -= OnProjectileHitPlayer;
+        private void OnDisable()
+        {
+            GameEvents.ProjectileHitPlayer -= OnProjectileHitPlayer;
+            GameEvents.RunStarted -= ResetRun;
+        }
 
         private void Start()
         {
@@ -197,7 +205,7 @@ namespace Luddite.Core
             return injected;
         }
 
-        /// <summary>런 재시작 시 초기화. TODO(D4): GameState가 Title → MajorSelect 전환에서 호출.</summary>
+        /// <summary>런 재시작 시 초기화. <see cref="GameEvents.RunStarted"/>(전공 확정 시점)가 호출한다.</summary>
         public void ResetRun()
         {
             if (!IsReady) return;

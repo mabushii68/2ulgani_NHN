@@ -44,6 +44,7 @@
 | Unity 6 | 6000.3.7f1 | Unity 약관 | 엔진 |
 | Universal RP (URP) | | Unity Companion License | 2D 렌더러 |
 | TextMeshPro | | Unity Companion License | UI 텍스트 |
+| TMP Essential Resources (`Assets/TextMesh Pro/`) | ugui 패키지 동봉 | 에셋 Unity Companion / LiberationSans 폰트 SIL OFL 1.1 | UI 텍스트 렌더링 기본 리소스 — D2 GameState 골격 UI에 반입. 한글 글리프 없음 → D3에 OFL 한글 폰트 반입 예정 |
 | <!-- ML-Agents/Sentis는 §14.1 착수 시에만 추가 --> | | | |
 
 ## 7. 개발 도구 (에셋 아님 — 참고 기재)

@@ -1,5 +1,6 @@
 using UnityEngine;
 using Luddite.Combat;
+using Luddite.Core;
 using Luddite.Data;
 
 namespace Luddite.Player
@@ -57,6 +58,20 @@ namespace Luddite.Player
             _hp = _stats.MaxHp;
         }
 
+        private void OnEnable() => GameEvents.RunStarted += ResetForNewRun;
+
+        private void OnDisable() => GameEvents.RunStarted -= ResetForNewRun;
+
+        /// <summary>새 런 시작(전공 확정) 시 체력·무적을 초기 상태로 되돌린다.</summary>
+        private void ResetForNewRun()
+        {
+            if (_stats == null) return;
+
+            _hp = _stats.MaxHp;
+            _invincibleRemaining = 0f;
+            RestoreColor();
+        }
+
         private void Update()
         {
             if (_invincibleRemaining <= 0f) return;
@@ -108,9 +123,11 @@ namespace Luddite.Player
 
         private void Die()
         {
-            // TODO(D4 GameState): 사망 시 GameState.Result로 전환하고 "당신의 직업은 대체되었습니다" 표시 (GDD §1.4)
             RestoreColor();
-            Debug.Log("[PlayerHealth] 사망 — GameState.Result 전환은 D4에 연결");
+            Debug.Log("[PlayerHealth] 사망");
+
+            // GameManager가 구독해 Result(패배)로 전환한다 (§1.4). 체력이 게임 플로우를 알 필요 없음
+            GameEvents.RaisePlayerDied();
         }
     }
 }

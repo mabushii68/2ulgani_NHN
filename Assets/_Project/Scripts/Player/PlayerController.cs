@@ -1,5 +1,6 @@
 using UnityEngine;
 using Luddite.Combat;
+using Luddite.Core;
 using Luddite.Data;
 
 namespace Luddite.Player
@@ -31,6 +32,13 @@ namespace Luddite.Player
         private Vector2 _aimDirection = Vector2.right;
         private bool _fireHeld;
 
+        /// <summary>
+        /// Combat 상태에서만 입력을 받는다 — 타이틀 화면 클릭이 발사가 되면 안 된다.
+        /// 기본 true인 이유: GameManager가 없는 테스트 씬에서도 단독 동작해야 하므로,
+        /// 첫 상태 통지가 오기 전까지는 기존 동작을 유지한다.
+        /// </summary>
+        private bool _controlEnabled = true;
+
         /// <summary>현재 조준 방향(정규화). HUD·AIBrain이 읽는다.</summary>
         public Vector2 AimDirection => _aimDirection;
 
@@ -50,16 +58,33 @@ namespace Luddite.Player
             if (_weapon == null) Debug.LogError("[PlayerController] IWeapon 구현 컴포넌트를 찾지 못함", this);
         }
 
+        private void OnEnable() => GameEvents.GameStateChanged += OnGameStateChanged;
+
+        private void OnDisable() => GameEvents.GameStateChanged -= OnGameStateChanged;
+
         private void Start()
         {
             _camera = Camera.main;
             if (_camera == null) Debug.LogError("[PlayerController] MainCamera 태그 카메라 없음 — 마우스 조준 불가", this);
         }
 
+        private void OnGameStateChanged(GameState previous, GameState next)
+        {
+            _controlEnabled = next == GameState.Combat;
+
+            // 잔류 입력 제거 — 일시정지 순간의 이동·발사가 재개 프레임에 이어지지 않게
+            if (_controlEnabled) return;
+            _moveInput = Vector2.zero;
+            _fireHeld = false;
+        }
+
         private void Update()
         {
-            ReadInput();
-            UpdateAim();
+            if (_controlEnabled)
+            {
+                ReadInput();
+                UpdateAim();
+            }
 
             if (_weapon == null) return;
 

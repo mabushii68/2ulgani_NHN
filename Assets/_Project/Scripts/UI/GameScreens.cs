@@ -1,0 +1,99 @@
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+using Luddite.Core;
+
+namespace Luddite.UI
+{
+    /// <summary>
+    /// <see cref="GameState"/> ↔ 화면 패널 라우팅 (GDD §1.2 — 화면 7종).
+    /// <see cref="GameEvents.GameStateChanged"/>를 구독해 상태당 패널 1개만 켠다.
+    /// Combat은 전용 패널이 없다 — HUD(D3)가 따로 붙는다.
+    ///
+    /// <para>
+    /// UI는 게임 상태를 <b>읽고 표시만</b> 하고, 전환 의사는 전부 <see cref="GameManager"/>의
+    /// 전환 API를 호출하는 것으로 표현한다 (규칙 7과 같은 정신 — UI가 상태를 직접 소유하지 않는다).
+    /// 버튼 배선은 인스펙터 UnityEvent가 아니라 코드로 한다 (규칙 4 — UnityEvent 남발 금지).
+    /// </para>
+    ///
+    /// <para>
+    /// TODO(D3 폰트): TMP 기본 폰트(LiberationSans)에 한글 글리프가 없어 지금은 전 텍스트가
+    /// 영문 터미널체다. OFL 한글 폰트 반입(CREDITS 같은 커밋) 후 §1.4 승패 문구·§10.5 한국어
+    /// 병기를 원문으로 교체할 것.
+    /// </para>
+    /// </summary>
+    public class GameScreens : MonoBehaviour
+    {
+        // §1.4 승패 문구 — 한글 폰트 반입 전까지의 영문 대응 표기
+        private const string RESULT_WIN = "CONGRATULATIONS.\nHUMAN NECESSITY EXTENDED BY 24 HOURS.";
+        private const string RESULT_LOSE = "YOUR JOB HAS BEEN REPLACED.";
+
+        [SerializeField] private GameManager _gameManager;
+
+        [Header("상태별 패널 (상태당 1개만 활성)")]
+        [SerializeField] private GameObject _titlePanel;
+        [SerializeField] private GameObject _majorSelectPanel;
+        [SerializeField] private GameObject _waveIntervalPanel;
+        [SerializeField] private GameObject _bossIntroPanel;
+        [SerializeField] private GameObject _resultPanel;
+        [SerializeField] private GameObject _pausePanel;
+
+        [Header("버튼 (배선은 코드에서)")]
+        [SerializeField] private Button _startButton;
+        [SerializeField] private Button _majorLiberalArtsButton;
+        [SerializeField] private Button _majorScienceButton;
+        [SerializeField] private Button _majorArtsButton;
+        [SerializeField] private Button _nextWaveButton;
+        [SerializeField] private Button _resumeButton;
+        [SerializeField] private Button _pauseToTitleButton;
+        [SerializeField] private Button _resultToTitleButton;
+
+        [Header("동적 텍스트")]
+        [SerializeField] private TMP_Text _resultMessage;
+
+        private void Awake()
+        {
+            if (_gameManager == null)
+            {
+                Debug.LogError("[GameScreens] GameManager 미지정 — 화면 전환 불가", this);
+                return;
+            }
+
+            Wire(_startButton, () => _gameManager.StartRun());
+            Wire(_majorLiberalArtsButton, () => _gameManager.SelectMajor(Major.LiberalArts));
+            Wire(_majorScienceButton, () => _gameManager.SelectMajor(Major.Science));
+            Wire(_majorArtsButton, () => _gameManager.SelectMajor(Major.Arts));
+            Wire(_nextWaveButton, () => _gameManager.ContinueToNextWave());
+            Wire(_resumeButton, () => _gameManager.ResumeFromPause());
+            Wire(_pauseToTitleButton, () => _gameManager.ReturnToTitle());
+            Wire(_resultToTitleButton, () => _gameManager.ReturnToTitle());
+        }
+
+        private void OnEnable() => GameEvents.GameStateChanged += OnGameStateChanged;
+
+        private void OnDisable() => GameEvents.GameStateChanged -= OnGameStateChanged;
+
+        private static void Wire(Button button, UnityEngine.Events.UnityAction action)
+        {
+            if (button != null) button.onClick.AddListener(action);
+        }
+
+        private void OnGameStateChanged(GameState previous, GameState next)
+        {
+            SetActive(_titlePanel, next == GameState.Title);
+            SetActive(_majorSelectPanel, next == GameState.MajorSelect);
+            SetActive(_waveIntervalPanel, next == GameState.WaveInterval);
+            SetActive(_bossIntroPanel, next == GameState.BossIntro);
+            SetActive(_resultPanel, next == GameState.Result);
+            SetActive(_pausePanel, next == GameState.Paused);
+
+            if (next == GameState.Result && _resultMessage != null)
+                _resultMessage.text = _gameManager.RunWon ? RESULT_WIN : RESULT_LOSE;
+        }
+
+        private static void SetActive(GameObject panel, bool active)
+        {
+            if (panel != null && panel.activeSelf != active) panel.SetActive(active);
+        }
+    }
+}
