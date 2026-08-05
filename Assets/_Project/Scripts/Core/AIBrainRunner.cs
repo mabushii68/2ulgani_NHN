@@ -57,6 +57,9 @@ namespace Luddite.Core
         public float ProbabilityOf(DodgeDirection direction) =>
             _predictor?.ProbabilityOf(direction) ?? 0.5f;
 
+        /// <summary>HIGH CONFIDENCE에 필요한 최소 표본 수. HUD의 "LEARNING..." 표기 기준 (§10.1).</summary>
+        public float RequiredSamples => _config != null ? _config.MinValidSamples : 8f;
+
         /// <summary>지금 위기 이벤트 판정이 진행 중인지.</summary>
         public bool HasActiveThreat => _tracker != null && _tracker.HasActiveWatch;
 

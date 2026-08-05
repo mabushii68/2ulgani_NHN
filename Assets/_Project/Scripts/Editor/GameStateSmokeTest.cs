@@ -73,13 +73,15 @@ namespace Luddite.EditorTools
             Check(manager.State == GameState.Combat, "SelectMajor → Combat");
             Check(manager.SelectedMajor == Major.Science, "선택 전공 = Science 보존");
             Check(Mathf.Approximately(Time.timeScale, 1f), "Combat에서 timeScale = 1");
-            CheckPanels(panels, null, "Combat에서는 모든 패널 비활성 (HUD는 D3)");
+            CheckPanels(panels, null, "Combat에서는 모든 패널 비활성 (HUD는 별도)");
+            Check(panels.Hud != null && panels.Hud.activeSelf, "Combat에서 HUD 활성 (§10.1)");
 
             // Combat ↔ WaveInterval
             manager.BeginWaveInterval();
             Check(manager.State == GameState.WaveInterval, "BeginWaveInterval → WaveInterval");
             Check(Mathf.Approximately(Time.timeScale, 0f), "WaveInterval에서 timeScale = 0 (완전 일시정지)");
             CheckPanels(panels, panels.WaveInterval, "WaveInterval 패널만 활성");
+            Check(panels.Hud != null && !panels.Hud.activeSelf, "Combat 밖에서 HUD 비활성");
 
             manager.ContinueToNextWave();
             Check(manager.State == GameState.Combat, "ContinueToNextWave → Combat");
@@ -125,6 +127,7 @@ namespace Luddite.EditorTools
         private struct Panels
         {
             public GameObject Title, MajorSelect, WaveInterval, BossIntro, Result, Pause;
+            public GameObject Hud;
             public TMP_Text ResultMessage;
         }
 
@@ -140,6 +143,7 @@ namespace Luddite.EditorTools
                 BossIntro = so.FindProperty("_bossIntroPanel").objectReferenceValue as GameObject,
                 Result = so.FindProperty("_resultPanel").objectReferenceValue as GameObject,
                 Pause = so.FindProperty("_pausePanel").objectReferenceValue as GameObject,
+                Hud = so.FindProperty("_hudPanel").objectReferenceValue as GameObject,
                 ResultMessage = so.FindProperty("_resultMessage").objectReferenceValue as TMP_Text,
             };
         }

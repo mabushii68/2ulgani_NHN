@@ -65,6 +65,9 @@ namespace Luddite.Data
         public float BehaviourCorrectionFactor => _behaviourCorrectionFactor;
         public float DataFabricationSamples => _dataFabricationSamples;
 
+        /// <summary>HIGH CONFIDENCE 최소 표본 수. HUD가 "AI MODEL: LEARNING..." 판정(§10.1)에 읽는다.</summary>
+        public float MinValidSamples => _minValidSamples;
+
         /// <summary>순수 C# 예측기에 넘길 값 묶음으로 변환한다.</summary>
         public PredictorSettings ToPredictorSettings() =>
             new PredictorSettings(_decayFactor, _minValidSamples, _minDominantProbability);

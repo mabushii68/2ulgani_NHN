@@ -43,6 +43,13 @@ namespace Luddite.Enemies
         [Tooltip("예측탄 색 — 🔴 §10.4: 마젠타는 AI가 나를 읽고 행하는 것 전용. 일반탄에 쓰지 말 것")]
         [SerializeField] private Color _predictiveColor = Color.magenta;
 
+        /// <summary>살아 있는 엘리트 수. HUD AI 미니 패널이 "엘리트 생존 시만" 조건(§10.1)에 읽는다.</summary>
+        public static int ActiveCount { get; private set; }
+
+        /// <summary>도메인 리로드를 끈 상태에서 플레이 모드를 재시작하면 카운트가 남는다.</summary>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetActiveCount() => ActiveCount = 0;
+
         private AIBrainRunner _brain;
         private Transform _player;
         private int _attackCount;
@@ -64,6 +71,10 @@ namespace Luddite.Enemies
 
             HideTelegraph();
         }
+
+        private void OnEnable() => ActiveCount++;
+
+        private void OnDisable() => ActiveCount--;
 
         private void Start()
         {

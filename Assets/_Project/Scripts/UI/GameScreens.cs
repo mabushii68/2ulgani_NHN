@@ -32,6 +32,9 @@ namespace Luddite.UI
 
         [Header("상태별 패널 (상태당 1개만 활성)")]
         [SerializeField] private GameObject _titlePanel;
+
+        [Tooltip("Combat 전용 HUD (§10.1). 상태 패널이 아니라 별도 토글")]
+        [SerializeField] private GameObject _hudPanel;
         [SerializeField] private GameObject _majorSelectPanel;
         [SerializeField] private GameObject _waveIntervalPanel;
         [SerializeField] private GameObject _bossIntroPanel;
@@ -86,6 +89,7 @@ namespace Luddite.UI
             SetActive(_bossIntroPanel, next == GameState.BossIntro);
             SetActive(_resultPanel, next == GameState.Result);
             SetActive(_pausePanel, next == GameState.Paused);
+            SetActive(_hudPanel, next == GameState.Combat);
 
             if (next == GameState.Result && _resultMessage != null)
                 _resultMessage.text = _gameManager.RunWon ? RESULT_WIN : RESULT_LOSE;
