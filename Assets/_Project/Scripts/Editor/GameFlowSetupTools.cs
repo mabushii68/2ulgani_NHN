@@ -88,10 +88,11 @@ namespace Luddite.EditorTools
             EnsureText(bossPanel, "IntroText", "WAVE 7 — MASSIVE LLM", 72, TEXT_MAIN, new Vector2(0f, 40f), new Vector2(1500f, 110f));
             EnsureText(bossPanel, "SubText", "INITIALIZING...", 30, TEXT_DIM, new Vector2(0f, -60f), new Vector2(1200f, 60f));
 
+            // 세로 배치: 승패 380 / 별명 280 / 요약 200 / 통계·히스토그램 -40 / 코멘트 -240 / 버튼 -340
+            // (별명~코멘트는 ResultSetupTools가 얹는다 — §13 프로필)
             GameObject resultPanel = EnsurePanel(canvasObject, "ResultPanel", PANEL_BG);
-            GameObject resultMessage = EnsureText(resultPanel, "ResultMessage", "RESULT", 48, TEXT_MAIN, new Vector2(0f, 80f), new Vector2(1500f, 200f));
-            EnsureText(resultPanel, "ProfileHint", "( TARGET PROFILE — D5 )", 24, TEXT_DIM, new Vector2(0f, -80f), new Vector2(1200f, 50f));
-            GameObject resultToTitle = EnsureButton(resultPanel, "ToTitleButton", "TO TITLE", BUTTON_BG, new Vector2(0f, -220f), new Vector2(360f, 72f));
+            GameObject resultMessage = EnsureText(resultPanel, "ResultMessage", "RESULT", 38, TEXT_MAIN, new Vector2(0f, 380f), new Vector2(1500f, 80f));
+            GameObject resultToTitle = EnsureButton(resultPanel, "ToTitleButton", "TO TITLE", BUTTON_BG, new Vector2(0f, -340f), new Vector2(360f, 72f));
 
             GameObject pausePanel = EnsurePanel(canvasObject, "PausePanel", PAUSE_BG);
             EnsureText(pausePanel, "HeaderText", "PAUSED", 64, TEXT_MAIN, new Vector2(0f, 140f), new Vector2(800f, 100f));
