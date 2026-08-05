@@ -39,6 +39,8 @@
 
 | D2 | 5 | 김정준 | **(D3 작업 선행)** PREDICTION FAILED 연출 + 히트스톱 — 이벤트 버스 접점, 신뢰도 하락 보고, 오버레이, GameManager 히트스톱 | `Scripts/Core/{PredictionFailedReport,GameEvents,AIBrainRunner,GameManager}.cs`, `Scripts/UI/PredictionFailedOverlay.cs`, `Scripts/Editor/{HudSetupTools,GameFeelDebugTools}.cs`, `Scenes/Main.unity` | ⭕ | **원래 D4 페어 작업으로 계획된 로직×비주얼 접점** — 사람(김정준) 지시로 단독 진행. 판정 로직(AIBrainRunner·이양빈 영역)과 연출(김정준 영역)을 GameEvents로 분리해 이후 각자 수정 가능하게 함 |
 
+| D2 | 6 | 김정준 | **(D4 작업 선행)** 그림봇 — 거리 유지·횡이동·부채꼴 3발 FSM, 전용 수치 SO 필드 | `Scripts/Enemies/PainterBot.cs`, `Scripts/Data/EnemyStatsSO.cs`, `Scripts/Editor/PainterBotSetupTools.cs`, `Prefabs/PainterBot.prefab`, `SO/EnemyStats_PainterBot.asset`, `Scenes/Main.unity` | ⭕ | **적 FSM = 이양빈 담당 영역** — 기존 지시("담당 상관없이") 연장선에서 진행 |
+
 ## 3. 협업·페어 작업 기록
 | 일차 | 작업 | 참여 | 분업 방식 (누가 무엇을) | 결과 |
 |---|---|---|---|---|
