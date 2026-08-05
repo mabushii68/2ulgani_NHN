@@ -35,6 +35,8 @@
 
 | D2 | 3 | 김정준 | **(D3 작업 선행)** 예측탄 + 엘리트 — EliteModifier(판단·조준·텔레그래프), 예측탄 SO, 챗봇 변형 프리팹, 마젠타 시각 요소(조준선·마커·트레일) | `Scripts/Enemies/{EliteModifier,ChatbotDrone,EnemyGun,EnemyBase}.cs`, `Scripts/Data/PredictiveShotConfigSO.cs`, `Scripts/Editor/EliteSetupTools.cs`, `Prefabs/EliteDrone.prefab`, `SO/{EnemyStats_Elite,PredictiveShotConfig_Default}.asset`, `Scenes/Main.unity` | ⭕ | **적 FSM·전투 로직 = 이양빈 담당 영역**, 예측탄 시각 언어(마젠타 텔레그래프)는 김정준 담당 정면. 점선 조준선은 실선 플레이스홀더(아트 패스 TODO) |
 
+| D2 | 4 | 김정준 | **(D3 작업 선행)** HUD — AI 미니 패널(엘리트 생존 시만·LEARNING 표기·HIGH 펄스) + HP 바 + 전공색 아이콘 | `Scripts/UI/{AiMiniPanel,HpBar,GameScreens}.cs`, `Scripts/Editor/{HudSetupTools,GameStateSmokeTest}.cs`, `Scripts/Core/AIBrainRunner.cs`, `Scripts/Data/PredictorConfigSO.cs`, `Scripts/Enemies/EliteModifier.cs`, `Scenes/Main.unity` | — | HUD/UI = 김정준 담당 정면. AIBrain 쪽은 읽기 전용 게터 추가만 |
+
 ## 3. 협업·페어 작업 기록
 | 일차 | 작업 | 참여 | 분업 방식 (누가 무엇을) | 결과 |
 |---|---|---|---|---|
