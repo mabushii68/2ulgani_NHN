@@ -49,6 +49,8 @@
 
 | D2 | 10 | 김정준 | **(D5 작업 선행)** 플레이 스타일 프로파일러 — §6.4 수집기 (순수 C# + 자체 테스트 18건), 적 레지스트리, 어댑터 확장 | `Scripts/AIBrain/PlayStyleProfiler.cs`, `Scripts/Core/AIBrainRunner.cs`, `Scripts/Enemies/EnemyBase.cs`, `Scripts/Player/PlayerController.cs`, `Scripts/Editor/AIBrainSelfTest.cs` | ⭕ | **AIBrain = 이양빈 담당 영역** — 기존 지시 연장선 |
 
+| D2 | 11 | 김정준 | **(D5 작업 선행)** 매크로 DDA — 판정·30% 상한 치환·COUNTER PROTOCOL 표기 + 인터벌 레이아웃 겹침 수정(사람 발견 버그) | `Scripts/Data/DdaConfigSO.cs`, `Scripts/Core/WaveManager.cs`, `Scripts/UI/CounterProtocolLabel.cs`, `Scripts/Editor/{DdaSetupTools,GameFlowSetupTools,UpgradeSetupTools}.cs`, `SO/DdaConfig_Default.asset`, `Scenes/Main.unity` | ⭕ | **DDA·웨이브 구성 = 이양빈 담당 영역** (수치는 §6.3 표 그대로). 패널 표기·레이아웃 = 김정준 담당 |
+
 ## 3. 협업·페어 작업 기록
 | 일차 | 작업 | 참여 | 분업 방식 (누가 무엇을) | 결과 |
 |---|---|---|---|---|
