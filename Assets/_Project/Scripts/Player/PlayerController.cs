@@ -27,6 +27,7 @@ namespace Luddite.Player
         private Rigidbody2D _body;
         private Camera _camera;
         private IWeapon _weapon;
+        private PlayerUpgrades _upgrades;
 
         private Vector2 _moveInput;
         private Vector2 _aimDirection = Vector2.right;
@@ -53,6 +54,7 @@ namespace Luddite.Player
             _body.freezeRotation = true;
 
             _weapon = GetComponentInChildren<IWeapon>();
+            _upgrades = GetComponent<PlayerUpgrades>();
 
             if (_stats == null) Debug.LogError("[PlayerController] PlayerStatsSO 미지정", this);
             if (_weapon == null) Debug.LogError("[PlayerController] IWeapon 구현 컴포넌트를 찾지 못함", this);
@@ -95,6 +97,7 @@ namespace Luddite.Player
         private void FixedUpdate()
         {
             float speed = _stats != null ? _stats.MoveSpeed : 0f;
+            if (_upgrades != null) speed *= _upgrades.MoveSpeedMultiplier;   // §8 #3 수강신청 올클
             _body.linearVelocity = _moveInput * speed;
         }
 

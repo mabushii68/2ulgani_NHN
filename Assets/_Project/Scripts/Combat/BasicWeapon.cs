@@ -1,5 +1,6 @@
 using UnityEngine;
 using Luddite.Data;
+using Luddite.Player;
 
 namespace Luddite.Combat
 {
@@ -21,12 +22,16 @@ namespace Luddite.Combat
 
         private float _cooldownRemaining;
 
+        /// <summary>업그레이드 배수 (§8). 없으면 배수 1로 동작한다 — 테스트 씬 호환.</summary>
+        private PlayerUpgrades _upgrades;
+
         public bool CanFire => _cooldownRemaining <= 0f;
 
         private void Awake()
         {
             if (_stats == null) Debug.LogError($"[BasicWeapon] PlayerStatsSO 미지정 — {name}", this);
             if (_projectilePrefab == null) Debug.LogError($"[BasicWeapon] Projectile 프리팹 미지정 — {name}", this);
+            _upgrades = GetComponentInParent<PlayerUpgrades>();
         }
 
         public void Tick(float deltaTime)
@@ -38,8 +43,12 @@ namespace Luddite.Combat
         {
             if (!CanFire || _stats == null || _projectilePrefab == null) return;
 
-            // TODO(D5 업그레이드): 공격력 +20% / 연사 +15% 스택은 여기서 배수로 곱한다 (GDD §8)
-            _cooldownRemaining = _stats.FireInterval;
+            // 업그레이드 배수 (§8): 연사 +15% = 발사 빈도 배수 → 간격은 나눗셈
+            float damageMultiplier = _upgrades != null ? _upgrades.DamageMultiplier : 1f;
+            float fireRateMultiplier = _upgrades != null ? _upgrades.FireRateMultiplier : 1f;
+            float sizeMultiplier = _upgrades != null ? _upgrades.ProjectileSizeMultiplier : 1f;
+
+            _cooldownRemaining = _stats.FireInterval / Mathf.Max(fireRateMultiplier, 0.01f);
 
             Vector2 spawnPoint = origin + aimDirection * _muzzleOffset;
             Projectile shot = Instantiate(_projectilePrefab, spawnPoint, Quaternion.identity);
@@ -50,9 +59,9 @@ namespace Luddite.Combat
             shot.Launch(
                 direction: aimDirection,
                 speed: _stats.ProjectileSpeed,
-                damage: _stats.ProjectileDamage,
+                damage: _stats.ProjectileDamage * damageMultiplier,
                 lifetime: _stats.ProjectileLifetime,
-                diameter: _stats.ProjectileDiameter,
+                diameter: _stats.ProjectileDiameter * sizeMultiplier,
                 owner: transform.root,
                 targetFaction: Faction.Enemy);
         }

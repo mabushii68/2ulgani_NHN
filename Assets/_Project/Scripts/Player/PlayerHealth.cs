@@ -29,6 +29,7 @@ namespace Luddite.Player
         private Color _baseColor;
         private float _hp;
         private float _invincibleRemaining;
+        private PlayerUpgrades _upgrades;
 
         public Faction Faction => Faction.Player;
 
@@ -39,7 +40,9 @@ namespace Luddite.Player
         public bool CanBeDamaged => IsAlive && _invincibleRemaining <= 0f;
 
         public float Hp => _hp;
-        public float MaxHp => _stats != null ? _stats.MaxHp : 0f;
+
+        /// <summary>최대 체력 = SO 기본값 + 업그레이드 보너스 (§8 #4 국가장학금).</summary>
+        public float MaxHp => (_stats != null ? _stats.MaxHp : 0f) + (_upgrades != null ? _upgrades.BonusMaxHp : 0f);
 
         /// <summary>0~1 체력 비율. HUD가 읽는다 (GDD §10.1).</summary>
         public float HpRatio => MaxHp > 0f ? Mathf.Clamp01(_hp / MaxHp) : 0f;
@@ -55,6 +58,7 @@ namespace Luddite.Player
             if (_renderer == null) _renderer = GetComponentInChildren<SpriteRenderer>();
             if (_renderer != null) _baseColor = _renderer.color;
 
+            _upgrades = GetComponent<PlayerUpgrades>();
             _hp = _stats.MaxHp;
         }
 
@@ -62,7 +66,11 @@ namespace Luddite.Player
 
         private void OnDisable() => GameEvents.RunStarted -= ResetForNewRun;
 
-        /// <summary>새 런 시작(전공 확정) 시 체력·무적을 초기 상태로 되돌린다.</summary>
+        /// <summary>
+        /// 새 런 시작(전공 확정) 시 체력·무적을 초기 상태로 되돌린다.
+        /// SO 기본값을 쓴다 — 새 런의 업그레이드 보너스는 항상 0이라, PlayerUpgrades의
+        /// RunStarted 리셋과의 구독 순서에 무관하게 결과가 같다.
+        /// </summary>
         private void ResetForNewRun()
         {
             if (_stats == null) return;
