@@ -31,6 +31,12 @@ namespace Luddite.Core
 
         [SerializeField] private GameManager _gameManager;
 
+        [Header("매크로 DDA (§6.3) — 비워 두면 비활성")]
+        [SerializeField] private DdaConfigSO _ddaConfig;
+
+        [Tooltip("직전 웨이브 평균 교전 거리의 출처")]
+        [SerializeField] private AIBrainRunner _brain;
+
         private readonly List<EnemyBase> _alive = new List<EnemyBase>(16);
         private readonly List<EnemyBase> _pending = new List<EnemyBase>(20);
 
@@ -38,6 +44,7 @@ namespace Luddite.Core
         private bool _waveActive;
         private bool _bossIntroStarted;
         private float _spawnTimer;
+        private DdaDecision _plannedAdjustment = DdaDecision.None;
 
         /// <summary>현재 웨이브 번호 (1-based). HUD "WAVE n/7" 표기용.</summary>
         public int CurrentWaveNumber => Mathf.Min(_waveIndex + 1, TotalWaves);
@@ -49,6 +56,12 @@ namespace Luddite.Core
 
         /// <summary>스폰 대기 수. 디버그용.</summary>
         public int PendingCount => _pending.Count;
+
+        /// <summary>다음 웨이브에 적용될 DDA 판정 (§6.3). WaveInterval의 COUNTER PROTOCOL이 읽는다.</summary>
+        public DdaDecision PlannedAdjustment => _plannedAdjustment;
+
+        /// <summary>DDA 치환 비율 (표기용, 0~1).</summary>
+        public float DdaRatio => _ddaConfig != null ? _ddaConfig.ReplacementRatio : 0f;
 
         private void Awake()
         {
@@ -76,6 +89,7 @@ namespace Luddite.Core
             _waveIndex = 0;
             _waveActive = false;
             _bossIntroStarted = false;
+            _plannedAdjustment = DdaDecision.None;
         }
 
         private void OnGameStateChanged(GameState previous, GameState next)
@@ -123,6 +137,7 @@ namespace Luddite.Core
                 }
                 for (int n = 0; n < entries[i].Count; n++) _pending.Add(entries[i].EnemyPrefab);
             }
+            ApplyDdaAdjustment();   // §6.3: 셔플 전에 치환 — 수량 합은 불변, 구성만 최대 30% 이동
             Shuffle(_pending);   // 유닛 종류가 섞여 나오도록 — 구성표의 수량은 그대로다 (§6.2)
 
             _waveActive = true;
@@ -170,8 +185,69 @@ namespace Luddite.Core
             _waveIndex++;
 
             Debug.Log($"[WaveManager] 웨이브 {cleared} 전멸 — 감쇠 적용 후 인터벌 진입");
-            GameEvents.RaiseWaveEnded(cleared);      // AIBrain 감쇠 (§7.2)
+            GameEvents.RaiseWaveEnded(cleared);      // AIBrain 감쇠 + 프로파일 스냅숏 (§7.2/§6.4)
+
+            // WaveEnded 구독이 동기 실행되므로 이 시점의 직전 웨이브 평균은 방금 끝난 웨이브 것이다
+            _plannedAdjustment = ComputeDdaDecision();
+            if (_plannedAdjustment != DdaDecision.None)
+                Debug.Log($"[WaveManager] DDA 판정: {_plannedAdjustment} (직전 평균 거리 " +
+                          $"{_brain.LastWaveAverageEngageDistance:F2})");
+
             _gameManager.BeginWaveInterval();        // 학습 패널 + 업그레이드 (§1.1)
+        }
+
+        /// <summary>§6.3 판정. 웨이브 4부터, 직전 웨이브 표본이 있을 때만.</summary>
+        private DdaDecision ComputeDdaDecision()
+        {
+            if (_ddaConfig == null || _brain == null) return DdaDecision.None;
+            if (CurrentWaveNumber < _ddaConfig.ActiveFromWave) return DdaDecision.None;
+
+            float lastAverage = _brain.LastWaveAverageEngageDistance;
+            if (lastAverage < 0f) return DdaDecision.None;   // 표본 없음
+
+            if (lastAverage > _ddaConfig.FarDistanceThreshold) return DdaDecision.MoreRushUnits;
+            if (lastAverage < _ddaConfig.NearDistanceThreshold) return DdaDecision.MoreRangedUnits;
+            return DdaDecision.None;
+        }
+
+        /// <summary>
+        /// §6.3 치환 실행: 대기 목록의 챗봇을 최대 30%(내림)까지 치환한다.
+        /// 총수 불변 — DDA는 구성을 기울일 뿐 구성표를 뒤엎지 않는다.
+        /// </summary>
+        private void ApplyDdaAdjustment()
+        {
+            if (_plannedAdjustment == DdaDecision.None || _ddaConfig == null) return;
+
+            EnemyBase chatbot = _ddaConfig.ChatbotPrefab;
+            EnemyBase replacement = _plannedAdjustment == DdaDecision.MoreRushUnits
+                ? _ddaConfig.RushReplacement
+                : _ddaConfig.RangedReplacement;
+            if (chatbot == null || replacement == null)
+            {
+                _plannedAdjustment = DdaDecision.None;
+                return;
+            }
+
+            int chatbotCount = 0;
+            for (int i = 0; i < _pending.Count; i++)
+            {
+                if (_pending[i] == chatbot) chatbotCount++;
+            }
+
+            int replaceCount = Mathf.FloorToInt(chatbotCount * _ddaConfig.ReplacementRatio);
+            int replaced = 0;
+            for (int i = 0; i < _pending.Count && replaced < replaceCount; i++)
+            {
+                if (_pending[i] != chatbot) continue;
+                _pending[i] = replacement;
+                replaced++;
+            }
+
+            if (replaced > 0)
+                Debug.Log($"[WaveManager] DDA 치환: 챗봇 {replaced}/{chatbotCount}기 → {replacement.name} " +
+                          $"({_plannedAdjustment})");
+
+            _plannedAdjustment = DdaDecision.None;   // 1회성 — 다음 판정은 다음 웨이브 종료 시
         }
 
         /// <summary>§2: 아레나 가장자리, 벽 안쪽 1유닛 링 위의 랜덤 점.</summary>

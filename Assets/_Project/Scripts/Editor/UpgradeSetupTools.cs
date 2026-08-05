@@ -152,7 +152,8 @@ namespace Luddite.EditorTools
                 RectTransform rect = card.GetComponent<RectTransform>();
                 rect.anchorMin = new Vector2(0.5f, 0.5f);
                 rect.anchorMax = new Vector2(0.5f, 0.5f);
-                rect.anchoredPosition = new Vector2(-380f + i * 380f, -40f);
+                // y -110: CounterProtocol(95~205)와 NextWave(-320) 사이의 예약 띠 (-230~10)
+                rect.anchoredPosition = new Vector2(-380f + i * 380f, -110f);
                 rect.sizeDelta = new Vector2(340f, 240f);
 
                 Image image = card.GetComponent<Image>();

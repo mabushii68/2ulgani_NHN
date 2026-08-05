@@ -77,10 +77,12 @@ namespace Luddite.EditorTools
             GameObject scienceButton = EnsureButton(majorPanel, "ScienceButton", "SCIENCE", MAJOR_GREEN, new Vector2(0f, -40f), new Vector2(360f, 180f));
             GameObject artsButton = EnsureButton(majorPanel, "ArtsButton", "ARTS", MAJOR_YELLOW, new Vector2(420f, -40f), new Vector2(360f, 180f));
 
+            // 세로 배치 (위→아래): Header 330 / Body 258 / CounterProtocol 150 (DdaSetupTools) /
+            // 업그레이드 카드 -110 (UpgradeSetupTools) / NextWave -320. 서로 겹치지 않게 예약된 띠.
             GameObject wavePanel = EnsurePanel(canvasObject, "WaveIntervalPanel", PANEL_BG);
-            EnsureText(wavePanel, "HeaderText", "TARGET PROFILE", 56, TEXT_MAIN, new Vector2(0f, 240f), new Vector2(1200f, 90f));
-            EnsureText(wavePanel, "BodyText", "( AI LEARNING PANEL + UPGRADES — D3/D4 )", 26, TEXT_DIM, new Vector2(0f, 80f), new Vector2(1200f, 60f));
-            GameObject nextWaveButton = EnsureButton(wavePanel, "NextWaveButton", "NEXT WAVE", BUTTON_BG, new Vector2(0f, -200f), new Vector2(360f, 72f));
+            EnsureText(wavePanel, "HeaderText", "TARGET PROFILE", 56, TEXT_MAIN, new Vector2(0f, 330f), new Vector2(1200f, 80f));
+            EnsureText(wavePanel, "BodyText", "( LEARNING STATS — D5 )", 24, TEXT_DIM, new Vector2(0f, 258f), new Vector2(1200f, 50f));
+            GameObject nextWaveButton = EnsureButton(wavePanel, "NextWaveButton", "NEXT WAVE", BUTTON_BG, new Vector2(0f, -320f), new Vector2(360f, 72f));
 
             GameObject bossPanel = EnsurePanel(canvasObject, "BossIntroPanel", PANEL_BG);
             EnsureText(bossPanel, "IntroText", "WAVE 7 — MASSIVE LLM", 72, TEXT_MAIN, new Vector2(0f, 40f), new Vector2(1500f, 110f));
