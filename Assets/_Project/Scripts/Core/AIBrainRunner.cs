@@ -3,6 +3,8 @@ using UnityEngine;
 using Luddite.AIBrain;
 using Luddite.Combat;
 using Luddite.Data;
+using Luddite.Enemies;
+using Luddite.Player;
 
 namespace Luddite.Core
 {
@@ -39,9 +41,14 @@ namespace Luddite.Core
 
         private DodgePredictor _predictor;
         private ThreatEventTracker _tracker;
+        private PlayStyleProfiler _profiler;
+        private PlayerController _playerController;
 
         /// <summary>매 프레임 재사용하는 버퍼. 프레임마다 새 리스트를 만들면 탄막에서 GC를 때린다.</summary>
         private readonly List<ThreatBullet> _bulletBuffer = new List<ThreatBullet>(64);
+
+        /// <summary>프로파일러에 넘길 적 위치 버퍼 (재사용).</summary>
+        private readonly List<Vec2> _enemyPositionBuffer = new List<Vec2>(16);
 
         private int _pendingHitProjectileId = ThreatEventTracker.NO_BULLET;
 
@@ -59,6 +66,26 @@ namespace Luddite.Core
 
         /// <summary>HIGH CONFIDENCE에 필요한 최소 표본 수. HUD의 "LEARNING..." 표기 기준 (§10.1).</summary>
         public float RequiredSamples => _config != null ? _config.MinValidSamples : 8f;
+
+        // ── 플레이 스타일 프로파일 (§6.4) — DDA·결과 화면이 읽기 전용으로 소비 ──
+
+        /// <summary>런 전체 평균 교전 거리.</summary>
+        public float AverageEngageDistance => _profiler?.AverageEngageDistance ?? 0f;
+
+        /// <summary>직전 웨이브 평균 교전 거리 — 매크로 DDA(§6.3)의 입력. 표본 없으면 음수.</summary>
+        public float LastWaveAverageEngageDistance =>
+            _profiler?.LastWaveAverageEngageDistance ?? PlayStyleProfiler.NO_SAMPLE;
+
+        /// <summary>무빙샷 비율 0~1 (결과 화면 전용 — §6.4).</summary>
+        public float MovingShotRatio => _profiler?.MovingShotRatio ?? 0f;
+
+        /// <summary>선호 4분할 구역 (결과 화면·보스 P2).</summary>
+        public Quadrant FavoriteQuadrant => _profiler?.FavoriteQuadrant ?? Quadrant.NW;
+
+        public float QuadrantRatio(Quadrant quadrant) => _profiler?.QuadrantRatio(quadrant) ?? 0f;
+
+        /// <summary>8방향 이동 히스토그램 (0=E 반시계). 결과 화면 전용.</summary>
+        public float DirectionRatio(int index) => _profiler?.DirectionRatio(index) ?? 0f;
 
         /// <summary>지금 위기 이벤트 판정이 진행 중인지.</summary>
         public bool HasActiveThreat => _tracker != null && _tracker.HasActiveWatch;
@@ -86,6 +113,7 @@ namespace Luddite.Core
 
             _predictor = new DodgePredictor(_config.ToPredictorSettings());
             _tracker = new ThreatEventTracker(_config.ToDetectionSettings());
+            _profiler = new PlayStyleProfiler();
         }
 
         private void OnEnable()
@@ -113,6 +141,17 @@ namespace Luddite.Core
             else Debug.LogError("[AIBrainRunner] Player 태그 오브젝트 없음 — 위기 이벤트 탐지 불가", this);
         }
 
+        /// <summary>무빙샷·이동 히스토그램 입력원. 지연 캐시 — _player가 인스펙터 배선일 수도 있어서.</summary>
+        private PlayerController PlayerControllerRef
+        {
+            get
+            {
+                if (_playerController == null && _player != null)
+                    _playerController = _player.GetComponent<PlayerController>();
+                return _playerController;
+            }
+        }
+
         /// <summary>
         /// 피격은 물리 단계(<c>OnTriggerEnter2D</c>)에서 통보되므로 여기서 기록만 하고,
         /// 다음 <see cref="Update"/>에서 소비한다. 한 프레임 지연은 0.6초 판정 창에 비해 무해하다.
@@ -137,6 +176,27 @@ namespace Luddite.Core
             _pendingHitProjectileId = ThreatEventTracker.NO_BULLET;
 
             for (int i = 0; i < samples.Count; i++) Consume(samples[i]);
+
+            TickProfiler();
+        }
+
+        /// <summary>§6.4 프로파일 수집. timeScale 0(인터벌·일시정지)에서는 deltaTime이 0이라 자연히 멈춘다.</summary>
+        private void TickProfiler()
+        {
+            _enemyPositionBuffer.Clear();
+            IReadOnlyList<EnemyBase> enemies = EnemyBase.Active;
+            for (int i = 0; i < enemies.Count; i++)
+            {
+                if (enemies[i] != null && enemies[i].IsAlive)
+                    _enemyPositionBuffer.Add(ToVec2(enemies[i].transform.position));
+            }
+
+            PlayerController controller = PlayerControllerRef;
+            Vec2 moveInput = controller != null ? ToVec2(controller.MoveInput) : Vec2.Zero;
+            bool isFiring = controller != null && controller.IsFiring;
+
+            _profiler.Tick(Time.deltaTime, ToVec2(_player.position),
+                _enemyPositionBuffer, moveInput, isFiring);
         }
 
         private void CollectEnemyBullets()
@@ -200,7 +260,9 @@ namespace Luddite.Core
             if (!IsReady) return;
 
             _predictor.ApplyWaveDecay();
-            if (_logSamples) Debug.Log($"[AIBrain] 웨이브 감쇠 적용 → {_predictor}");
+            _profiler.OnWaveEnded();   // 직전 웨이브 평균 교전 거리 확정 (§6.3 DDA 입력)
+            if (_logSamples) Debug.Log($"[AIBrain] 웨이브 감쇠 적용 → {_predictor} / " +
+                                       $"직전 웨이브 평균 교전 거리 {_profiler.LastWaveAverageEngageDistance:F2}");
         }
 
         /// <summary>업그레이드 「행동교정」 (§8 #7): 관측 카운트 ×0.2 → 신뢰도 사실상 리셋.</summary>
@@ -230,6 +292,7 @@ namespace Luddite.Core
 
             _predictor.Reset();
             _tracker.Reset();
+            _profiler.Reset();
             LearnedSampleCount = 0;
             PredictiveAttempts = 0;
             PredictiveHits = 0;
@@ -239,7 +302,8 @@ namespace Luddite.Core
         public string DescribeState() =>
             IsReady
                 ? $"{_predictor} | 학습표본={LearnedSampleCount} 예측적중={PredictiveHits}/{PredictiveAttempts} " +
-                  $"추적중={HasActiveThreat}"
+                  $"추적중={HasActiveThreat} | 프로파일: 평균거리={AverageEngageDistance:F1} " +
+                  $"(직전 웨이브 {LastWaveAverageEngageDistance:F1}) 무빙샷={MovingShotRatio:P0} 구역={FavoriteQuadrant}"
                 : "AIBrain 미초기화 (PredictorConfigSO 확인)";
 
         private static Vec2 ToVec2(Vector2 v) => new Vec2(v.x, v.y);

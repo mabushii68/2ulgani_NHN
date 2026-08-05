@@ -43,8 +43,11 @@ namespace Luddite.Player
         /// <summary>현재 조준 방향(정규화). HUD·AIBrain이 읽는다.</summary>
         public Vector2 AimDirection => _aimDirection;
 
-        /// <summary>이번 프레임 이동 입력(정규화). 무빙샷 비율 집계에 쓸 예정 (GDD §6.4).</summary>
+        /// <summary>이번 프레임 이동 입력(정규화). 무빙샷 비율 집계 입력 (GDD §6.4).</summary>
         public Vector2 MoveInput => _moveInput;
+
+        /// <summary>발사 입력이 눌려 있는지. 무빙샷 비율 집계 입력 (GDD §6.4).</summary>
+        public bool IsFiring => _fireHeld;
 
         private void Awake()
         {

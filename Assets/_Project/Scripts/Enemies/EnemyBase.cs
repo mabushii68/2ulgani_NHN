@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Luddite.Combat;
 using Luddite.Data;
@@ -13,6 +14,18 @@ namespace Luddite.Enemies
     [RequireComponent(typeof(CircleCollider2D))]
     public abstract class EnemyBase : MonoBehaviour, IDamageable
     {
+        /// <summary>
+        /// 살아 있는 적 레지스트리. 프로파일러(평균 교전 거리, §6.4)가 매 프레임 훑는다 —
+        /// <c>FindObjectsByType</c>의 프레임당 배열 할당을 피하는 투사체 레지스트리와 같은 패턴.
+        /// </summary>
+        private static readonly List<EnemyBase> _active = new List<EnemyBase>(16);
+
+        public static IReadOnlyList<EnemyBase> Active => _active;
+
+        /// <summary>도메인 리로드를 끈 상태에서 플레이 모드를 재시작하면 죽은 항목이 남는다.</summary>
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetRegistry() => _active.Clear();
+
         [SerializeField] protected EnemyStatsSO _stats;
 
         [Tooltip("본체 스프라이트. 피격 플래시·스폰 텔레그래프에 사용")]
@@ -93,6 +106,10 @@ namespace Luddite.Enemies
             if (_renderer == null) _renderer = GetComponentInChildren<SpriteRenderer>();
             if (_renderer != null) _baseColor = _renderer.color;
         }
+
+        protected virtual void OnEnable() => _active.Add(this);
+
+        protected virtual void OnDisable() => _active.Remove(this);
 
         protected virtual void Update()
         {

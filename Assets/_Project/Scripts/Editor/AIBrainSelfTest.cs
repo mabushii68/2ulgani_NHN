@@ -46,6 +46,15 @@ namespace Luddite.EditorTools
             TestThreatTriggersOncePerBullet();
             TestThreatIgnoresDistantBullet();
 
+            TestProfilerInitialState();
+            TestProfilerAverageEngageDistance();
+            TestProfilerIgnoresEmptyArena();
+            TestProfilerMovingShotRatio();
+            TestProfilerFavoriteQuadrant();
+            TestProfilerDirectionHistogram();
+            TestProfilerWaveSnapshot();
+            TestProfilerReset();
+
             string summary = $"결과: {_passed} 통과 / {_failed} 실패";
             _log.AppendLine("===== " + summary + " =====");
 
@@ -333,6 +342,110 @@ namespace Luddite.EditorTools
                 bulletPos = bulletPos + bulletVel * TICK;
             }
             return null;
+        }
+
+        // ───────────────────────── 프로파일러 (§6.4) ─────────────────────────
+
+        /// <summary>1초를 60틱으로 나눠 흘리는 헬퍼. enemies가 null이면 빈 아레나.</summary>
+        private static void TickSeconds(PlayStyleProfiler profiler, float seconds,
+            Vec2 playerPosition, List<Vec2> enemies, Vec2 moveInput, bool isFiring)
+        {
+            int ticks = Mathf.RoundToInt(seconds / TICK);
+            List<Vec2> list = enemies ?? new List<Vec2>();
+            for (int i = 0; i < ticks; i++)
+                profiler.Tick(TICK, playerPosition, list, moveInput, isFiring);
+        }
+
+        private static void TestProfilerInitialState()
+        {
+            PlayStyleProfiler profiler = new PlayStyleProfiler();
+            Approx("프로파일러 초기 평균 교전 거리 = 0", profiler.AverageEngageDistance, 0f);
+            Approx("프로파일러 초기 무빙샷 비율 = 0", profiler.MovingShotRatio, 0f);
+            Approx("프로파일러 초기 직전 웨이브 = 표본 없음(-1)",
+                profiler.LastWaveAverageEngageDistance, PlayStyleProfiler.NO_SAMPLE);
+        }
+
+        private static void TestProfilerAverageEngageDistance()
+        {
+            PlayStyleProfiler profiler = new PlayStyleProfiler();
+            // 거리 3과 5의 적 2기 → 프레임 평균 4
+            List<Vec2> enemies = new List<Vec2> { new Vec2(3f, 0f), new Vec2(0f, 5f) };
+            TickSeconds(profiler, 1f, Vec2.Zero, enemies, Vec2.Zero, false);
+            Approx("적 2기(거리 3, 5) → 평균 교전 거리 4", profiler.AverageEngageDistance, 4f, 0.01f);
+        }
+
+        private static void TestProfilerIgnoresEmptyArena()
+        {
+            PlayStyleProfiler profiler = new PlayStyleProfiler();
+            List<Vec2> enemies = new List<Vec2> { new Vec2(6f, 0f) };
+            TickSeconds(profiler, 1f, Vec2.Zero, enemies, Vec2.Zero, false);
+            TickSeconds(profiler, 3f, Vec2.Zero, null, Vec2.Zero, false);   // 빈 아레나 3초
+            Approx("빈 아레나 시간은 교전 거리에 미집계 (여전히 6)",
+                profiler.AverageEngageDistance, 6f, 0.01f);
+        }
+
+        private static void TestProfilerMovingShotRatio()
+        {
+            PlayStyleProfiler profiler = new PlayStyleProfiler();
+            // 발사 2초 중 1초만 이동 → 0.5
+            TickSeconds(profiler, 1f, Vec2.Zero, null, new Vec2(1f, 0f), true);
+            TickSeconds(profiler, 1f, Vec2.Zero, null, Vec2.Zero, true);
+            // 발사하지 않는 이동은 분모에 안 들어간다
+            TickSeconds(profiler, 5f, Vec2.Zero, null, new Vec2(1f, 0f), false);
+            Approx("발사 2초 중 이동 1초 → 무빙샷 0.5", profiler.MovingShotRatio, 0.5f, 0.01f);
+        }
+
+        private static void TestProfilerFavoriteQuadrant()
+        {
+            PlayStyleProfiler profiler = new PlayStyleProfiler();
+            TickSeconds(profiler, 2f, new Vec2(-5f, 3f), null, Vec2.Zero, false);   // NW
+            TickSeconds(profiler, 1f, new Vec2(5f, -3f), null, Vec2.Zero, false);   // SE
+            IsTrue("NW 2초 vs SE 1초 → 선호 구역 NW", profiler.FavoriteQuadrant == Quadrant.NW);
+            Approx("NW 체류 비율 = 2/3", profiler.QuadrantRatio(Quadrant.NW), 2f / 3f, 0.01f);
+        }
+
+        private static void TestProfilerDirectionHistogram()
+        {
+            PlayStyleProfiler profiler = new PlayStyleProfiler();
+            TickSeconds(profiler, 1f, Vec2.Zero, null, new Vec2(1f, 0f), false);    // 동(0)
+            TickSeconds(profiler, 1f, Vec2.Zero, null, new Vec2(1f, 1f), false);    // 북동(1)
+            Approx("동쪽 이동 비율 = 0.5", profiler.DirectionRatio(0), 0.5f, 0.01f);
+            Approx("북동 이동 비율 = 0.5", profiler.DirectionRatio(1), 0.5f, 0.01f);
+            Approx("서쪽 이동 비율 = 0", profiler.DirectionRatio(4), 0f);
+        }
+
+        private static void TestProfilerWaveSnapshot()
+        {
+            PlayStyleProfiler profiler = new PlayStyleProfiler();
+            List<Vec2> far = new List<Vec2> { new Vec2(8f, 0f) };
+            List<Vec2> near = new List<Vec2> { new Vec2(2f, 0f) };
+
+            TickSeconds(profiler, 1f, Vec2.Zero, far, Vec2.Zero, false);
+            profiler.OnWaveEnded();
+            Approx("웨이브 1 종료 → 직전 웨이브 평균 8", profiler.LastWaveAverageEngageDistance, 8f, 0.01f);
+
+            TickSeconds(profiler, 1f, Vec2.Zero, near, Vec2.Zero, false);
+            profiler.OnWaveEnded();
+            Approx("웨이브 2 종료 → 직전 웨이브 평균 2 (웨이브별 독립)",
+                profiler.LastWaveAverageEngageDistance, 2f, 0.01f);
+            Approx("런 전체 평균은 5 (두 웨이브 시간 동일)", profiler.AverageEngageDistance, 5f, 0.01f);
+
+            profiler.OnWaveEnded();   // 표본 없는 웨이브
+            Approx("교전 없는 웨이브 → 표본 없음(-1)",
+                profiler.LastWaveAverageEngageDistance, PlayStyleProfiler.NO_SAMPLE);
+        }
+
+        private static void TestProfilerReset()
+        {
+            PlayStyleProfiler profiler = new PlayStyleProfiler();
+            List<Vec2> enemies = new List<Vec2> { new Vec2(4f, 0f) };
+            TickSeconds(profiler, 1f, new Vec2(-3f, 2f), enemies, new Vec2(1f, 0f), true);
+            profiler.OnWaveEnded();
+            profiler.Reset();
+            Approx("리셋 후 평균 교전 거리 = 0", profiler.AverageEngageDistance, 0f);
+            Approx("리셋 후 무빙샷 = 0", profiler.MovingShotRatio, 0f);
+            Approx("리셋 후 직전 웨이브 = 표본 없음(-1)",
+                profiler.LastWaveAverageEngageDistance, PlayStyleProfiler.NO_SAMPLE);
         }
 
         private static DodgePredictor NewPredictor() => new DodgePredictor(PredictorSettings.Default);
