@@ -41,6 +41,22 @@ namespace Luddite.Data
         [Tooltip("발사 후 쿨다운(초). GDD §5.1의 '공격 간격'")]
         [SerializeField] private float _attackCooldown = 2f;
 
+        [Header("그림봇 전용 (GDD §5.1/§5.2 — 다른 유닛은 무시)")]
+        [Tooltip("유지 거리 하한(유닛). 이보다 가까우면 물러난다")]
+        [SerializeField] private float _preferredRangeMin = 6f;
+
+        [Tooltip("유지 거리 상한(유닛). 이보다 멀면 접근한다")]
+        [SerializeField] private float _preferredRangeMax = 9f;
+
+        [Tooltip("부채꼴 탄 수")]
+        [SerializeField] private int _spreadShotCount = 3;
+
+        [Tooltip("부채꼴 탄 사이 각도(도)")]
+        [SerializeField] private float _spreadAngleStep = 30f;
+
+        [Tooltip("발사 후 재배치 이동 시간(초)")]
+        [SerializeField] private float _repositionDuration = 0.8f;
+
         [Header("탄환")]
         [SerializeField] private float _projectileDamage = 8f;
         [SerializeField] private float _projectileSpeed = 6f;
@@ -65,6 +81,12 @@ namespace Luddite.Data
         public float AttackRange => _attackRange;
         public float AimDuration => _aimDuration;
         public float AttackCooldown => _attackCooldown;
+
+        public float PreferredRangeMin => _preferredRangeMin;
+        public float PreferredRangeMax => _preferredRangeMax;
+        public int SpreadShotCount => _spreadShotCount;
+        public float SpreadAngleStep => _spreadAngleStep;
+        public float RepositionDuration => _repositionDuration;
 
         public float ProjectileDamage => _projectileDamage;
         public float ProjectileSpeed => _projectileSpeed;
