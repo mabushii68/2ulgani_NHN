@@ -33,6 +33,8 @@
 
 | D2 | 2 | 김정준 | GameState 골격 — 7상태 머신, 화면 라우팅(패널 6종), 런 초기화 이벤트, 플레이어 입력 게이트, 전환 스모크 25건 | `Scripts/Core/{GameManager,GameState,Major,GameEvents,AIBrainRunner}.cs`, `Scripts/UI/GameScreens.cs`, `Scripts/Player/{PlayerController,PlayerHealth}.cs`, `Scripts/Editor/{GameFlowSetupTools,GameStateSmokeTest}.cs`, `Scenes/Main.unity`, `Assets/TextMesh Pro/`(TMP 리소스 반입), `CREDITS.md` | ⭕ | UI·화면은 담당 영역 정면. **PlayerHealth·AIBrainRunner 연결(전투·AIBrain) = 이양빈 담당 영역** — 런 초기화 이벤트 구독 추가만. 한글 폰트 미보유로 UI 영문 표기 (D3 폰트 반입 예정) |
 
+| D2 | 3 | 김정준 | **(D3 작업 선행)** 예측탄 + 엘리트 — EliteModifier(판단·조준·텔레그래프), 예측탄 SO, 챗봇 변형 프리팹, 마젠타 시각 요소(조준선·마커·트레일) | `Scripts/Enemies/{EliteModifier,ChatbotDrone,EnemyGun,EnemyBase}.cs`, `Scripts/Data/PredictiveShotConfigSO.cs`, `Scripts/Editor/EliteSetupTools.cs`, `Prefabs/EliteDrone.prefab`, `SO/{EnemyStats_Elite,PredictiveShotConfig_Default}.asset`, `Scenes/Main.unity` | ⭕ | **적 FSM·전투 로직 = 이양빈 담당 영역**, 예측탄 시각 언어(마젠타 텔레그래프)는 김정준 담당 정면. 점선 조준선은 실선 플레이스홀더(아트 패스 TODO) |
+
 ## 3. 협업·페어 작업 기록
 | 일차 | 작업 | 참여 | 분업 방식 (누가 무엇을) | 결과 |
 |---|---|---|---|---|
