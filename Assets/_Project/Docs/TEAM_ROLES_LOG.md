@@ -29,6 +29,10 @@
 
 | D1 | 7 | 김정준 | **(D2 완료)** AIBrainRunner 어댑터 — AIBrain↔Unity 연결, `GameEvents` 이벤트 버스 개설, 투사체 레지스트리, AIBrain 디버그·씬 배선 도구 | `Scripts/Core/{GameEvents,AIBrainRunner}.cs`, `Scripts/Combat/Projectile.cs`, `Scripts/Editor/{AIBrainDebugTools,SceneSetupTools}.cs`, `Scenes/Main.unity` | ⭕ | AIBrain·전투 로직 = 이양빈 담당 영역. 규칙 4의 단일 정적 이벤트 버스를 이 세션에서 처음 개설 — 이후 시스템 간 결합은 여기를 경유한다. §7.1 계약 경계 사례 1건(무적 중 관통) 사람 결정 대기 |
 
+| D2 | 1 | 김정준 | 🔴 §7.1 계약 해석 확정 — 무적 관통 = 피격 (표본 오염 차단). D1 세션 7 대기 건을 사람 결정으로 해소 | `Scripts/Combat/{Projectile,IDamageable}.cs`, `GDD.md` §7.1 | ⭕ | **전투 로직·GDD = 이양빈 담당 영역.** 계약 해석은 선택지 제시 후 사람이 결정("닿으면 피격"), Claude Code가 반영 |
+
+| D2 | 2 | 김정준 | GameState 골격 — 7상태 머신, 화면 라우팅(패널 6종), 런 초기화 이벤트, 플레이어 입력 게이트, 전환 스모크 25건 | `Scripts/Core/{GameManager,GameState,Major,GameEvents,AIBrainRunner}.cs`, `Scripts/UI/GameScreens.cs`, `Scripts/Player/{PlayerController,PlayerHealth}.cs`, `Scripts/Editor/{GameFlowSetupTools,GameStateSmokeTest}.cs`, `Scenes/Main.unity`, `Assets/TextMesh Pro/`(TMP 리소스 반입), `CREDITS.md` | ⭕ | UI·화면은 담당 영역 정면. **PlayerHealth·AIBrainRunner 연결(전투·AIBrain) = 이양빈 담당 영역** — 런 초기화 이벤트 구독 추가만. 한글 폰트 미보유로 UI 영문 표기 (D3 폰트 반입 예정) |
+
 ## 3. 협업·페어 작업 기록
 | 일차 | 작업 | 참여 | 분업 방식 (누가 무엇을) | 결과 |
 |---|---|---|---|---|
