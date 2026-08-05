@@ -169,6 +169,12 @@ namespace Luddite.Enemies
             Destroy(gameObject);
         }
 
+        /// <summary>
+        /// 현재 접촉 데미지량. 기본은 공통 8 (§3.2)이지만 파생이 상태에 따라 바꿀 수 있다 —
+        /// 코딩봇의 돌진 접촉 12 (§5.1)가 그 사례.
+        /// </summary>
+        protected virtual float CurrentContactDamage => _stats != null ? _stats.ContactDamage : 0f;
+
         /// <summary>접촉 데미지 (GDD §3.2). 플레이어의 무적 시간이 연타를 막아 준다.</summary>
         private void OnCollisionStay2D(Collision2D collision)
         {
@@ -178,7 +184,7 @@ namespace Luddite.Enemies
             if (target == null || target.Faction != Faction.Player || !target.CanBeDamaged) return;
 
             Vector2 toTarget = (Vector2)collision.transform.position - _body.position;
-            target.TakeDamage(_stats.ContactDamage, toTarget.normalized);
+            target.TakeDamage(CurrentContactDamage, toTarget.normalized);
         }
     }
 }

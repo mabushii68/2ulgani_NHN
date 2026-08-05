@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 687d25bf6d01efc448cf100c0c14ef9f, type: 3}
+  m_Name: EnemyStats_CoderBot
+  m_EditorClassIdentifier: Assembly-CSharp::Luddite.Data.EnemyStatsSO
+  _displayName: "\uCF54\uB529\uBD07"
+  _maxHp: 20
+  _spawnTelegraphDuration: 0.5
+  _knockbackDistance: 0.5
+  _moveSpeed: 5.5
+  _hitboxDiameter: 1
+  _contactDamage: 8
+  _attackRange: 5
+  _aimDuration: 0.4
+  _attackCooldown: 2
+  _preferredRangeMin: 6
+  _preferredRangeMax: 9
+  _spreadShotCount: 3
+  _spreadAngleStep: 30
+  _repositionDuration: 0.8
+  _dashSpeed: 10
+  _dashDuration: 0.6
+  _recoveryDuration: 0.8
+  _dashContactDamage: 12
+  _projectileDamage: 8
+  _projectileSpeed: 6
+  _projectileLifetime: 3
+  _projectileDiameter: 0.3

@@ -57,6 +57,19 @@ namespace Luddite.Data
         [Tooltip("발사 후 재배치 이동 시간(초)")]
         [SerializeField] private float _repositionDuration = 0.8f;
 
+        [Header("코딩봇 전용 (GDD §5.1/§5.2 — 다른 유닛은 무시)")]
+        [Tooltip("돌진 속도(유닛/초)")]
+        [SerializeField] private float _dashSpeed = 10f;
+
+        [Tooltip("돌진 지속 시간(초)")]
+        [SerializeField] private float _dashDuration = 0.6f;
+
+        [Tooltip("돌진 후 경직 시간(초)")]
+        [SerializeField] private float _recoveryDuration = 0.8f;
+
+        [Tooltip("돌진 중 접촉 데미지 (평시 접촉은 공통 8, §3.2)")]
+        [SerializeField] private float _dashContactDamage = 12f;
+
         [Header("탄환")]
         [SerializeField] private float _projectileDamage = 8f;
         [SerializeField] private float _projectileSpeed = 6f;
@@ -87,6 +100,11 @@ namespace Luddite.Data
         public int SpreadShotCount => _spreadShotCount;
         public float SpreadAngleStep => _spreadAngleStep;
         public float RepositionDuration => _repositionDuration;
+
+        public float DashSpeed => _dashSpeed;
+        public float DashDuration => _dashDuration;
+        public float RecoveryDuration => _recoveryDuration;
+        public float DashContactDamage => _dashContactDamage;
 
         public float ProjectileDamage => _projectileDamage;
         public float ProjectileSpeed => _projectileSpeed;
