@@ -43,6 +43,8 @@
 
 | D2 | 7 | 김정준 | **(D4 작업 선행)** 코딩봇 — 돌진형 FSM(방향 고정 텔레그래프), 상태별 접촉 데미지, 삼각 플레이스홀더 절차 생성 | `Scripts/Enemies/{CoderBot,EnemyBase}.cs`, `Scripts/Data/EnemyStatsSO.cs`, `Scripts/Editor/CoderBotSetupTools.cs`, `Prefabs/CoderBot.prefab`, `SO/EnemyStats_CoderBot.asset`, `Sprites/Placeholder_Triangle.png`, `Scenes/Main.unity`, `CREDITS.md` | ⭕ | **적 FSM = 이양빈 담당 영역** — 기존 지시 연장선. 적 3종 + 엘리트 완성 |
 
+| D2 | 8 | 김정준 | **(D4 작업 선행)** 7웨이브 시스템 — 전멸형 종료(🔴), 순차 스폰, 웨이브 감쇠 자동화, WAVE 라벨, 테스트 적 정리 | `Scripts/Core/{WaveManager,GameEvents,AIBrainRunner}.cs`, `Scripts/Data/{WaveConfigSO,WaveSystemConfigSO}.cs`, `Scripts/UI/WaveLabel.cs`, `Scripts/Editor/WaveSetupTools.cs`, `SO/WaveConfig_1~7.asset`, `SO/WaveSystemConfig_Default.asset`, `Scenes/Main.unity` | ⭕ | **웨이브·전투 구조 = 이양빈 담당 영역** — 기존 지시 연장선. 코어 루프(타이틀→전투→인터벌→보스 스텁→결과) 최초 관통 |
+
 ## 3. 협업·페어 작업 기록
 | 일차 | 작업 | 참여 | 분업 방식 (누가 무엇을) | 결과 |
 |---|---|---|---|---|
