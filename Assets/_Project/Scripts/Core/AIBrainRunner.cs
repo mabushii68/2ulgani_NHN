@@ -92,13 +92,17 @@ namespace Luddite.Core
         {
             GameEvents.ProjectileHitPlayer += OnProjectileHitPlayer;
             GameEvents.RunStarted += ResetRun;
+            GameEvents.WaveEnded += HandleWaveEnded;
         }
 
         private void OnDisable()
         {
             GameEvents.ProjectileHitPlayer -= OnProjectileHitPlayer;
             GameEvents.RunStarted -= ResetRun;
+            GameEvents.WaveEnded -= HandleWaveEnded;
         }
+
+        private void HandleWaveEnded(int waveNumber) => OnWaveEnded();
 
         private void Start()
         {
@@ -189,7 +193,7 @@ namespace Luddite.Core
 
         /// <summary>
         /// 웨이브 종료 시 지수 감쇠 (§7.2). 🔴 관측 카운트만 줄어든다.
-        /// TODO(D4): WaveManager가 웨이브 전멸 판정 직후 호출하도록 연결.
+        /// <see cref="GameEvents.WaveEnded"/> 구독으로 호출된다 (디버그 메뉴도 직접 호출 가능).
         /// </summary>
         public void OnWaveEnded()
         {

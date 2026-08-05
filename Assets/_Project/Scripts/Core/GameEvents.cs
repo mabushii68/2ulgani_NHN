@@ -79,6 +79,21 @@ namespace Luddite.Core
         }
 
         /// <summary>
+        /// 웨이브가 전멸로 종료됐다 (§6.1 — 전멸형 종료가 🔴 계약). 인자는 끝난 웨이브 번호(1-based).
+        /// <para>
+        /// 발행: <see cref="WaveManager"/>. 구독: <see cref="AIBrainRunner"/> —
+        /// §7.2 "매 웨이브 종료 시 관측 카운트 ×0.8 감쇠"의 트리거.
+        /// 웨이브 시스템이 AIBrain을 알 필요가 없도록 버스를 경유한다.
+        /// </para>
+        /// </summary>
+        public static event Action<int> WaveEnded;
+
+        public static void RaiseWaveEnded(int waveNumber)
+        {
+            WaveEnded?.Invoke(waveNumber);
+        }
+
+        /// <summary>
         /// 플레이어가 예측탄을 회피했다 — "게임에서 가장 중요한 1초" (§10.3).
         /// <para>
         /// 발행: <see cref="AIBrainRunner"/> — 예측탄 위기 이벤트가 회피 성공으로 확정되는 곳.
@@ -105,6 +120,7 @@ namespace Luddite.Core
             PlayerDied = null;
             RunStarted = null;
             PredictionFailed = null;
+            WaveEnded = null;
         }
     }
 }
