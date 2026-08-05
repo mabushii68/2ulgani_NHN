@@ -51,6 +51,8 @@
 
 | D2 | 11 | 김정준 | **(D5 작업 선행)** 매크로 DDA — 판정·30% 상한 치환·COUNTER PROTOCOL 표기 + 인터벌 레이아웃 겹침 수정(사람 발견 버그) | `Scripts/Data/DdaConfigSO.cs`, `Scripts/Core/WaveManager.cs`, `Scripts/UI/CounterProtocolLabel.cs`, `Scripts/Editor/{DdaSetupTools,GameFlowSetupTools,UpgradeSetupTools}.cs`, `SO/DdaConfig_Default.asset`, `Scenes/Main.unity` | ⭕ | **DDA·웨이브 구성 = 이양빈 담당 영역** (수치는 §6.3 표 그대로). 패널 표기·레이아웃 = 김정준 담당 |
 
+| D3 | 1 | 김정준 | 역카운터 판정(🔴 §7.5) — 탄에 예측 방향 탑재, 순수 C# 판정 + 테스트 6건, 러너 집계 | `Scripts/AIBrain/{ThreatEventTracker,ThreatSample}.cs`, `Scripts/Combat/Projectile.cs`, `Scripts/Enemies/{EnemyGun,EliteModifier}.cs`, `Scripts/Core/AIBrainRunner.cs`, `Scripts/Editor/AIBrainSelfTest.cs` | ⭕ | **AIBrain·🔴 계약 = 이양빈 담당 영역** — 기존 지시 연장선 |
+
 ## 3. 협업·페어 작업 기록
 | 일차 | 작업 | 참여 | 분업 방식 (누가 무엇을) | 결과 |
 |---|---|---|---|---|
