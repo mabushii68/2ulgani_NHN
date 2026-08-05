@@ -47,6 +47,8 @@
 
 | D2 | 9 | 김정준 | **(D4 작업 선행)** 업그레이드 8종 — SO·추첨 규칙·배수 적용·3택 카드 UI. AI 상호작용 2종은 전용 API 경유 | `Scripts/Data/UpgradeSO.cs`, `Scripts/Player/{PlayerUpgrades,PlayerController,PlayerHealth}.cs`, `Scripts/Core/UpgradeManager.cs`, `Scripts/UI/UpgradePanel.cs`, `Scripts/Combat/BasicWeapon.cs`, `Scripts/Editor/UpgradeSetupTools.cs`, `SO/Upgrade_*.asset` ×8, `Scenes/Main.unity` | ⭕ | 카드 UI = 김정준 담당, **밸런스 수치·전투 배수 = 이양빈 담당 영역** (수치는 GDD §8 표 그대로, 결정 없음). 전공 심화는 D6 의존으로 풀 미편입 |
 
+| D2 | 10 | 김정준 | **(D5 작업 선행)** 플레이 스타일 프로파일러 — §6.4 수집기 (순수 C# + 자체 테스트 18건), 적 레지스트리, 어댑터 확장 | `Scripts/AIBrain/PlayStyleProfiler.cs`, `Scripts/Core/AIBrainRunner.cs`, `Scripts/Enemies/EnemyBase.cs`, `Scripts/Player/PlayerController.cs`, `Scripts/Editor/AIBrainSelfTest.cs` | ⭕ | **AIBrain = 이양빈 담당 영역** — 기존 지시 연장선 |
+
 ## 3. 협업·페어 작업 기록
 | 일차 | 작업 | 참여 | 분업 방식 (누가 무엇을) | 결과 |
 |---|---|---|---|---|
