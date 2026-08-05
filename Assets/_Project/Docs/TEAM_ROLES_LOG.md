@@ -55,6 +55,8 @@
 
 | D3 | 2 | 김정준 | 결과 화면 §13 — 별명 3축 룰 테이블(SO), AI ANALYSIS 블록, 히스토그램, ResultPanel 재배치 | `Scripts/Data/NicknameTableSO.cs`, `Scripts/UI/ResultProfile.cs`, `Scripts/Editor/{ResultSetupTools,GameFlowSetupTools}.cs`, `SO/NicknameTable_Default.asset`, `Scenes/Main.unity` | ⭕ | 화면 = 김정준 담당. **별명 11종 초안 = 이양빈(기획) 검토 대상** — SO에서 문구 수정 가능 |
 
+| D3 | 3 | 김정준 | 보스 P1(§9) — 3전공 패턴 순환·소환·P2 전환 스텁·웨이브 7 실연결, 투사체 관통 지원 | `Scripts/Enemies/{BossLLM,EnemyBase}.cs`, `Scripts/Data/BossConfigSO.cs`, `Scripts/Combat/Projectile.cs`, `Scripts/Core/WaveManager.cs`, `Scripts/Editor/{BossSetupTools,GameFeelDebugTools}.cs`, `Prefabs/BossLLM.prefab`, `SO/{EnemyStats_Boss,BossConfig_Default,WaveConfig_7}.asset` | ⭕ | **보스 = 이양빈 담당 영역.** 패턴 데미지 초안 = 기획 검토 대상. 실플레이 검증은 사람 지시로 생략(D4 이월) |
+
 ## 3. 협업·페어 작업 기록
 | 일차 | 작업 | 참여 | 분업 방식 (누가 무엇을) | 결과 |
 |---|---|---|---|---|
