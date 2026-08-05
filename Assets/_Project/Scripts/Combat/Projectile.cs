@@ -32,6 +32,7 @@ namespace Luddite.Combat
         private float _damage;
         private float _lifeRemaining;
         private bool _consumed;
+        private bool _invincibleTouchReported;
 
         private void Awake()
         {
@@ -82,6 +83,7 @@ namespace Luddite.Combat
             _ownerRoot = owner;
             _targetFaction = targetFaction;
             _consumed = false;
+            _invincibleTouchReported = false;
             IsPredictive = false;
 
             // 콜라이더 반지름은 원본 기준으로 두고 스케일로 최종 크기를 맞춘다 (스프라이트와 히트박스 동시 반영)
@@ -120,7 +122,18 @@ namespace Luddite.Combat
 
             // 무적·사망 상태는 탄을 소모하지 않고 통과시킨다.
             // 소모시키면 스폰 텔레그래프 중인 적이 방패가 되고, 무적 중인 플레이어가 탄을 지워버린다.
-            if (!target.CanBeDamaged) return;
+            if (!target.CanBeDamaged)
+            {
+                // 단, 무적 중이라도 플레이어 몸에 닿은 탄은 §7.1의 "피격"이다 (D2 해석 확정: 닿으면 피격).
+                // 관통을 회피 성공으로 두면 안 피했는데 피한 것으로 기록되는 표본 오염이 생긴다.
+                // 데미지·탄 소모 없이 AIBrain 통보만 한다. 사망 후 시체 접촉은 통보하지 않는다.
+                if (_targetFaction == Faction.Player && target.IsAlive && !_invincibleTouchReported)
+                {
+                    _invincibleTouchReported = true; // 탄환당 1회 — 겹친 채 재접촉해도 중복 통보 없음
+                    GameEvents.RaiseProjectileHitPlayer(GetInstanceID());
+                }
+                return;
+            }
 
             _consumed = true;
             target.TakeDamage(_damage, _body.linearVelocity.normalized);
