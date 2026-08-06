@@ -50,12 +50,17 @@ namespace Luddite.EditorTools
 
             // 투사체는 원본 스프라이트 지름을 함께 갱신해야 한다 — Projectile.Launch가 이 값으로
             // "SO가 지정한 지름"에 맞는 스케일을 역산하기 때문에, 스프라이트만 바꾸면 크기가 어긋난다.
-            changed += BindProjectile(PREFABS + "Projectile.prefab", "Projectiles/MagicMissile") ? 1 : 0;
+            changed += BindProjectile(PREFABS + "Projectile.prefab", "Projectiles/FireballBig") ? 1 : 0;
             changed += BindProjectile(PREFABS + "EnemyProjectile.prefab", "Projectiles/EnergyBall") ? 1 : 0;
 
             changed += BindPredictiveSprite() ? 1 : 0;
             changed += BindPlayer() ? 1 : 0;
+            changed += BindArena() ? 1 : 0;
+            changed += BindUi() ? 1 : 0;
 
+            // 씬 저장은 여기서 한 번. BindPlayer 안에서만 저장하면 그 뒤의 아레나·UI 변경이
+            // 메모리에만 남아, 다음 도메인 리로드에서 조용히 사라진다.
+            EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());
             AssetDatabase.SaveAssets();
             Debug.Log($"[SpriteBinding] 배선 완료 — 대상 {changed}건");
         }
@@ -246,11 +251,267 @@ namespace Luddite.EditorTools
 
             if (player.GetComponent<PlayerSpriteView>() == null) player.AddComponent<PlayerSpriteView>();
 
+            BindAimIndicator(player);
+
             EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
             EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());
             Debug.Log("[SpriteBinding] Player ← Sorcerer_idle / Sorcerer_walk (자동 구동 off)");
             return true;
         }
+
+        /// <summary>
+        /// 조준 표식을 화살표 스프라이트로 교체. 회색 박스 시절엔 늘어난 사각형("Barrel")이었다.
+        /// 오브젝트 이름·계층은 그대로 둔다 — <c>AimPivot</c>이 조준 방향을 들고 있고
+        /// 적 애니메이터가 참조하는 것과 같은 구조라, 이름을 바꾸면 배선 추적이 어려워진다.
+        /// </summary>
+        private static void BindAimIndicator(GameObject player)
+        {
+            Transform barrel = player.transform.Find("AimPivot/Barrel");
+            if (barrel == null) return;
+
+            SpriteRenderer renderer = barrel.GetComponent<SpriteRenderer>();
+            if (renderer == null) return;
+
+            Sprite arrow = AssetDatabase.LoadAssetAtPath<Sprite>(SPRITES + "UI/AimArrow.png");
+            if (arrow == null)
+            {
+                Debug.LogError("[SpriteBinding] AimArrow.png 없음");
+                return;
+            }
+
+            renderer.sprite = arrow;
+            // 0.75배 = 4배 확대 × 0.75 = 화면 3픽셀이라 정수 배율이 유지된다 (0.8 같은 값은 흔들린다)
+            barrel.localScale = new Vector3(0.75f, 0.75f, 1f);
+            barrel.localPosition = new Vector3(0.6f, 0f, 0f);
+        }
+
+        // ────────────────────────────────── 아레나
+
+        /// <summary>
+        /// 바닥·벽을 타일 스프라이트로. GDD §11 "배경: 어두운 단색 + 미세 그리드"를
+        /// 단색 사각형 대신 <b>타일링된 돌바닥</b>으로 만든다 — 격자가 그려져 있어 거리감이 생긴다.
+        ///
+        /// <para>
+        /// ⚠️ 벽은 <c>BoxCollider2D</c>가 <c>transform.scale</c>로 늘어나 있었다. 타일 렌더링은
+        /// scale이 아니라 <c>SpriteRenderer.size</c>로 크기를 잡아야 하므로 scale을 1로 되돌리는데,
+        /// <b>그대로 두면 벽 충돌이 사라진다</b>. 그래서 콜라이더 크기에 기존 scale을 곱해 옮겨 담아
+        /// 월드 기준 충돌 범위가 정확히 같게 유지한다 (밸런스·물리 무변경).
+        /// </para>
+        /// </summary>
+        private static bool BindArena()
+        {
+            Sprite floor = AssetDatabase.LoadAssetAtPath<Sprite>(SPRITES + "Arena/Floors1.png");
+            Sprite block = AssetDatabase.LoadAssetAtPath<Sprite>(SPRITES + "Arena/BlockTile1.png");
+            if (floor == null || block == null)
+            {
+                Debug.LogError("[SpriteBinding] 아레나 타일 스프라이트 없음");
+                return false;
+            }
+
+            GameObject background = GameObject.Find("Arena/Background");
+            if (background == null)
+            {
+                Debug.LogError("[SpriteBinding] Arena/Background 없음");
+                return false;
+            }
+
+            SpriteRenderer bg = background.GetComponent<SpriteRenderer>();
+            Vector2 arenaSize = new Vector2(
+                background.transform.localScale.x,
+                background.transform.localScale.y);
+            if (bg.drawMode == SpriteDrawMode.Tiled) arenaSize = bg.size;   // 재실행 시 이미 옮겨 담긴 상태
+
+            bg.sprite = floor;
+            bg.drawMode = SpriteDrawMode.Tiled;
+            bg.tileMode = SpriteTileMode.Continuous;
+            bg.size = arenaSize;
+            bg.color = FLOOR_TINT;
+            background.transform.localScale = Vector3.one;   // 벽과 같은 이유로 마지막에 (아래 주석 참조)
+
+            GameObject wallsRoot = GameObject.Find("Arena/Walls");
+            int wallCount = 0;
+            if (wallsRoot != null)
+            {
+                for (int i = 0; i < wallsRoot.transform.childCount; i++)
+                {
+                    Transform wall = wallsRoot.transform.GetChild(i);
+                    SpriteRenderer renderer = wall.GetComponent<SpriteRenderer>();
+                    BoxCollider2D collider = wall.GetComponent<BoxCollider2D>();
+                    if (renderer == null) continue;
+
+                    // 재실행 판정: 이미 타일 모드면 콜라이더가 월드 크기를 들고 있다.
+                    // 이 가드가 없으면 실행할 때마다 scale이 한 번 더 곱해져 벽이 26배씩 커진다.
+                    bool alreadyMigrated = renderer.drawMode == SpriteDrawMode.Tiled;
+                    Vector2 worldSize;
+                    if (collider == null) worldSize = new Vector2(wall.localScale.x, wall.localScale.y);
+                    else if (alreadyMigrated) worldSize = collider.size;
+                    else worldSize = new Vector2(collider.size.x * wall.localScale.x, collider.size.y * wall.localScale.y);
+
+                    if (collider != null) collider.size = worldSize;
+
+                    renderer.sprite = block;
+                    renderer.drawMode = SpriteDrawMode.Tiled;
+                    renderer.tileMode = SpriteTileMode.Continuous;
+                    renderer.size = worldSize;
+                    renderer.color = WALL_TINT;
+
+                    // scale 초기화는 반드시 마지막에. drawMode를 Tiled로 바꾸는 순간 Unity가
+                    // 스프라이트 원본 크기(16px/PPU)를 트랜스폼 스케일에 얹어 버린다 — 먼저 1로 만들어 두면 덮어써진다.
+                    wall.localScale = Vector3.one;
+                    wallCount++;
+                }
+            }
+
+            EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+            Debug.Log($"[SpriteBinding] 아레나 ← Floors1 타일 {arenaSize.x}×{arenaSize.y}u, 벽 {wallCount}면 ← BlockTile1");
+            return true;
+        }
+
+        // ────────────────────────────────── UI
+
+        /// <summary>
+        /// HUD·패널·버튼에 UI 팩 프레임을 입힌다. 스프라이트는 회색조로 반입했고 색은 여기서 준다 —
+        /// 원본이 갈색 나무 판타지 UI라 "AI 터미널" 정체성과 싸우기 때문이다. 무채색 위에 틴트를 얹으면
+        /// 팔레트를 코드 한 곳에서 바꿀 수 있고, 나무 질감 그대로가 좋으면 원본 재복사만 하면 된다.
+        /// 전면 패널의 어두운 배경은 손대지 않는다 — 전체 화면에 나무 상자를 까는 건 터미널 미학과 반대다.
+        /// </summary>
+        private static bool BindUi()
+        {
+            Sprite box = AssetDatabase.LoadAssetAtPath<Sprite>(SPRITES + "UI/BGbox_01A.png");
+            Sprite button = AssetDatabase.LoadAssetAtPath<Sprite>(SPRITES + "UI/Button_01A_Normal.png");
+            Sprite sliderBox = AssetDatabase.LoadAssetAtPath<Sprite>(SPRITES + "UI/Slider01_Box.png");
+            if (box == null || button == null || sliderBox == null)
+            {
+                Debug.LogError("[SpriteBinding] UI 스프라이트 없음");
+                return false;
+            }
+
+            GameObject canvas = GameObject.Find("GameScreensCanvas");
+            if (canvas == null)
+            {
+                Debug.LogError("[SpriteBinding] GameScreensCanvas 없음");
+                return false;
+            }
+
+            int skinned = 0;
+            skinned += SkinImage(canvas, "TitlePanel/StartButton", button, BUTTON_TINT, BUTTON_SLICE);
+            skinned += SkinImage(canvas, "MajorSelectPanel/LiberalArtsButton", box, MAJOR_LIBERAL_ARTS, BOX_SLICE);
+            skinned += SkinImage(canvas, "MajorSelectPanel/ScienceButton", box, MAJOR_SCIENCE, BOX_SLICE);
+            skinned += SkinImage(canvas, "MajorSelectPanel/ArtsButton", box, MAJOR_ARTS, BOX_SLICE);
+            skinned += SkinImage(canvas, "WaveIntervalPanel/NextWaveButton", button, BUTTON_TINT, BUTTON_SLICE);
+            skinned += SkinImage(canvas, "WaveIntervalPanel/UpgradeCard0", box, CARD_TINT, BOX_SLICE);
+            skinned += SkinImage(canvas, "WaveIntervalPanel/UpgradeCard1", box, CARD_TINT, BOX_SLICE);
+            skinned += SkinImage(canvas, "WaveIntervalPanel/UpgradeCard2", box, CARD_TINT, BOX_SLICE);
+            skinned += SkinImage(canvas, "ResultPanel/ToTitleButton", button, BUTTON_TINT, BUTTON_SLICE);
+            skinned += SkinImage(canvas, "PausePanel/ResumeButton", button, BUTTON_TINT, BUTTON_SLICE);
+            skinned += SkinImage(canvas, "PausePanel/ToTitleButton", button, BUTTON_TINT, BUTTON_SLICE);
+            skinned += SkinImage(canvas, "HudPanel/AiMiniPanel/Content", box, PANEL_TINT, THIN_SLICE);
+            skinned += SkinImage(canvas, "HudPanel/HpBar/Background", sliderBox, HPBAR_FRAME_TINT, THIN_SLICE);
+
+            // HP 채움은 스프라이트를 쓰지 않는다. 팩의 Slider01_Bar01~08은 "채움 레벨"이 아니라
+            // 48×16 캔버스 안에 2px짜리 막대만 그려진 <b>바 스타일 변형</b>이라, 세로로 늘려도
+            // 막대는 얇게 남아 체력이 안 보인다. 프레임만 픽셀 아트로 두고 안쪽은 단색으로 채우는 편이
+            // 터미널 미학에도 맞는다. 프레임 테두리(약 7px)를 덮지 않도록 여백도 다시 잡는다.
+            RectTransform fill = canvas.transform.Find("HudPanel/HpBar/Fill") as RectTransform;
+            if (fill != null)
+            {
+                var fillImage = fill.GetComponent<UnityEngine.UI.Image>();
+                if (fillImage != null)
+                {
+                    fillImage.sprite = null;
+                    fillImage.type = UnityEngine.UI.Image.Type.Simple;
+                    fill.sizeDelta = new Vector2(-16f, -14f);
+                    fill.anchoredPosition = new Vector2(8f, 0f);
+                    skinned++;
+                }
+            }
+
+            skinned += BindMajorIcons(canvas);
+
+            EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+            Debug.Log($"[SpriteBinding] UI 스킨 {skinned}건");
+            return true;
+        }
+
+        /// <summary>전공 아이콘 3종을 HpBar에 물린다. 아이콘은 컬러 원본이라 전공색 틴트를 걷어낸다.</summary>
+        private static int BindMajorIcons(GameObject canvas)
+        {
+            Transform hpBar = canvas.transform.Find("HudPanel/HpBar");
+            if (hpBar == null) return 0;
+
+            var bar = hpBar.GetComponent<Luddite.UI.HpBar>();
+            if (bar == null) return 0;
+
+            SerializedObject so = new SerializedObject(bar);
+            so.FindProperty("_liberalArtsIcon").objectReferenceValue =
+                AssetDatabase.LoadAssetAtPath<Sprite>(SPRITES + "Icons/Icon_248_Scroll.png");
+            so.FindProperty("_scienceIcon").objectReferenceValue =
+                AssetDatabase.LoadAssetAtPath<Sprite>(SPRITES + "Icons/Icon_235_Equal.png");
+            so.FindProperty("_artsIcon").objectReferenceValue =
+                AssetDatabase.LoadAssetAtPath<Sprite>(SPRITES + "Icons/Icon_261_Brush.png");
+            so.ApplyModifiedPropertiesWithoutUndo();
+
+            // HpBar는 플레이 모드에서만 아이콘을 갈아 끼운다. 에디터에서 흰 사각형으로 보이면
+            // 배선이 안 된 것처럼 읽히므로, 기본값(문과)을 미리 넣어 둔다.
+            Transform icon = hpBar.Find("MajorIcon");
+            if (icon != null)
+            {
+                var iconImage = icon.GetComponent<UnityEngine.UI.Image>();
+                if (iconImage != null && iconImage.sprite == null)
+                {
+                    iconImage.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(SPRITES + "Icons/Icon_248_Scroll.png");
+                    iconImage.color = Color.white;
+                }
+            }
+            return 1;
+        }
+
+        /// <summary>
+        /// 9슬라이스로 스킨을 입힌다.
+        ///
+        /// <para>
+        /// <paramref name="pixelsPerUnitMultiplier"/>는 <b>클수록 테두리가 얇아진다</b> —
+        /// 화면상 테두리 두께 ≈ <c>(테두리px ÷ (스프라이트PPU × 배수)) × 캔버스 referencePixelsPerUnit</c>.
+        /// UI 스프라이트를 PPU 16으로 반입했고 캔버스 기준이 100이므로,
+        /// 16px 테두리 · 배수 2.5 → 화면 40px가 된다. 여기를 작게 주면 테두리가 위젯보다 커져
+        /// 9슬라이스가 무너지고 박스가 찌그러진 팔각형처럼 뭉친다.
+        /// </para>
+        /// </summary>
+        private static int SkinImage(GameObject root, string path, Sprite sprite, Color tint, float pixelsPerUnitMultiplier)
+        {
+            Transform target = root.transform.Find(path);
+            if (target == null)
+            {
+                Debug.LogWarning($"[SpriteBinding] UI 경로 없음 — {path}");
+                return 0;
+            }
+
+            var image = target.GetComponent<UnityEngine.UI.Image>();
+            if (image == null) return 0;
+
+            image.sprite = sprite;
+            image.type = UnityEngine.UI.Image.Type.Sliced;
+            image.pixelsPerUnitMultiplier = pixelsPerUnitMultiplier;
+            image.color = tint;
+            return 1;
+        }
+
+        // ────────────────────────────────── 연출 팔레트 (한 곳에서 조정)
+
+        // 9슬라이스 테두리 배수 — 클수록 얇다 (SkinImage 주석의 계산식 참조)
+        private const float BOX_SLICE = 2.5f;      // 큰 박스: 화면 40px 테두리
+        private const float BUTTON_SLICE = 1.5f;   // 버튼: 가로 33px / 세로 17px
+        private const float THIN_SLICE = 3.5f;     // HP 바처럼 높이 28px밖에 안 되는 위젯
+
+        private static readonly Color FLOOR_TINT = new Color(0.26f, 0.28f, 0.34f, 1f);
+        private static readonly Color WALL_TINT = new Color(0.42f, 0.44f, 0.52f, 1f);
+        private static readonly Color PANEL_TINT = new Color(0.16f, 0.17f, 0.22f, 0.94f);
+        private static readonly Color HPBAR_FRAME_TINT = new Color(0.58f, 0.60f, 0.68f, 1f);
+        private static readonly Color CARD_TINT = new Color(0.22f, 0.23f, 0.30f, 1f);
+        private static readonly Color BUTTON_TINT = new Color(0.34f, 0.36f, 0.44f, 1f);
+        private static readonly Color MAJOR_LIBERAL_ARTS = new Color(0.30f, 0.48f, 0.90f, 1f);
+        private static readonly Color MAJOR_SCIENCE = new Color(0.32f, 0.72f, 0.42f, 1f);
+        private static readonly Color MAJOR_ARTS = new Color(0.88f, 0.74f, 0.32f, 1f);
 
         // ────────────────────────────────── 공통
 

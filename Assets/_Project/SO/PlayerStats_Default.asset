@@ -20,4 +20,4 @@ MonoBehaviour:
   _projectileSpeed: 14
   _fireInterval: 0.2
   _projectileLifetime: 2
-  _projectileDiameter: 0.25
+  _projectileDiameter: 0.44

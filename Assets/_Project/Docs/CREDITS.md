@@ -22,15 +22,16 @@
 | 에셋 | 출처 (URL) | 라이선스 | 사용 위치 | 반입 커밋 |
 |---|---|---|---|---|
 | **x10y12pxDenkiChipHangul (전기칩 한글)** — `Fonts/x10y12pxDenkiChipHangul.ttf` + TMP Font Asset | 제작: Lee Minseo (quiple@quiple.dev) / 원본 기반 폰트: The x8y12pxDenkiChip Project Authors — https://github.com/hicchicc/x8y12pxDenkiChip (제작자 患者長ひっく) | **SIL Open Font License 1.1** | 게임 내 모든 UI 텍스트 (TMP 기본 폰트). 12px 한글·일본어 픽셀 폰트, Adobe-KR-9 보충 0 한글 2,780자 + 일본 한자 640자 지원 | `6161749` (D3) |
-| **Fantasy RPG Heroes pack v2.0 (by Franuka)** — `Sprites/Characters/` 16파일 + `Sprites/Projectiles/MagicMissile*` 3파일 | https://franuka.itch.io/rpg-heroes-pack | 독자 라이선스 (상업·비상업 이용 ⭕ / 수정 ⭕ / **팩 원본 재배포·재판매 ❌** / itch 페이지 링크 크레딧 필수) | 플레이어 전공 3종 스프라이트 — 문과=Sorcerer, 이과=Gladiator, 예체능=Swashbuckler (idle/walk/cast/hit/death + 그림자) / 플레이어 투사체 | `9081db7` (D3, 아래 반입 메모) |
-| **Fantasy RPG Monster pack v1.6 (by Franuka)** — `Sprites/Enemies/` 20파일 + `Sprites/Projectiles/{EnergyBall,DarkOrb}*` 5파일 | https://franuka.itch.io/rpg-monster-pack | 위와 동일 | 적 4종 — 챗봇 드론·엘리트=Beholder / 그림봇=Wizard / 코딩봇=Imp / 보스 거대 LLM=Djinn (idle/walk/attack/hit/die) / 적 투사체=EnergyBall, **🔴 예측탄=DarkOrb** | `9081db7` (D3) |
+| **Fantasy RPG Heroes pack v2.0 (by Franuka)** — `Sprites/Characters/` 16파일 + `Sprites/Projectiles/MagicMissile*` 3파일 + `Sprites/UI/AimArrow.png` | https://franuka.itch.io/rpg-heroes-pack | 독자 라이선스 (상업·비상업 이용 ⭕ / 수정 ⭕ / **팩 원본 재배포·재판매 ❌** / itch 페이지 링크 크레딧 필수) | 플레이어 전공 3종 스프라이트 — 문과=Sorcerer, 이과=Gladiator, 예체능=Swashbuckler (idle/walk/cast/hit/death + 그림자) / 조준 표식(팩의 Arrow 전용) | `9081db7`·`(D3 세션 7)` |
+| **Fantasy RPG Monster pack v1.6 (by Franuka)** — `Sprites/Enemies/` 20파일 + `Sprites/Projectiles/{EnergyBall,DarkOrb,FireballBig}*` 8파일 | https://franuka.itch.io/rpg-monster-pack | 위와 동일 | 적 4종 — 챗봇 드론·엘리트=Beholder / 그림봇=Wizard / 코딩봇=Imp / 보스 거대 LLM=Djinn (idle/walk/attack/hit/die) / 적 투사체=EnergyBall, **🔴 예측탄=DarkOrb**, 플레이어 투사체=FireballBig | `9081db7`·`(D3 세션 7)` |
 | **Fantasy RPG Elemental Dungeons (Fire) pack v1.0 (by Franuka)** — `Sprites/Arena/` 6파일 | https://franuka.itch.io/elemental-dungeons-fire | 위와 동일 | 아레나 바닥·벽 타일, 4분할 구분 타일, 보스 P2 장판 텔레그래프(Fire_Spawn/Loop/End) | `9081db7` (D3) |
 | **RPG UI pack v1.6 (by Franuka)** — `Sprites/UI/` 16파일 | https://franuka.itch.io/rpg-ui-pack | 위와 동일 | HP 바(Slider01), 패널 배경(BGbox), 버튼, 아이템 슬롯, 커서 | `9081db7` (D3) — **팩 동봉 픽셀 폰트 `Fonts/`는 반입하지 않음** (전기칩 한글로 확정) |
 | **Fantasy RPG Icon pack v2.2 (by Franuka)** — `Sprites/Icons/` 10파일 | https://franuka.itch.io/rpg-icon-pack | **CC BY 4.0** (https://creativecommons.org/licenses/by/4.0/) | AI 위협 상징(190), 전공 아이콘 3종(248 두루마리/235 등호/261 붓), 업그레이드·HUD 아이콘 6종 | `9081db7` (D3) |
 | <!-- 예: Kenney UI Pack --> | <!-- kenney.nl/assets/... --> | CC0 1.0 | | |
 
 **Franuka 팩 준수 메모 (D3 픽셀 아트 반입)**: 5개 팩 모두 저작자 Franuka(franukai@gmail.com)의 단일 창작물이며, 아이콘 팩만 CC BY 4.0이고 나머지 4개는 동일 문구의 독자 라이선스다. 준수 방법 3가지 —
-> ① **재배포 금지 대응**: 팩 원본(총 약 16,000 파일)을 리포에 넣지 않고 **실제로 게임에 쓰는 76파일만** 선별 반입했다. 또한 아이콘 팩을 제외한 전 파일은 GDD §10.4 색 위계(적 무채색 / AI 위협 마젠타)에 맞춰 **회색조로 변환한 파생물**이라 "as is" 재배포에 해당하지 않는다. 원본 컬러 파일은 리포에 존재하지 않는다.
+> ① **재배포 금지 대응**: 팩 원본(총 약 16,000 파일)을 리포에 넣지 않고 **실제로 게임에 쓰는 80파일만** 선별 반입했다. 또한 아이콘 팩을 제외한 전 파일은 GDD §10.4 색 위계(적 무채색 / AI 위협 마젠타 / 플레이어 전공색)에 맞춰 **회색조로 변환한 파생물**이라 "as is" 재배포에 해당하지 않는다. 원본 컬러 파일은 리포에 존재하지 않는다.
+> ↳ D3 세션 7 정정: **아이콘 10종은 컬러 원본을 사용한다.** 전공 아이콘 색(문과 파랑 / 이과 초록 / 예체능 노랑)이 GDD §4.1에 지정된 정보라 회색조로 만들면 안 되는 것이었다. 아이콘 팩은 CC BY 4.0이라 파생물 여부와 무관하게 출처 표기만으로 충족한다.
 > ② **크레딧 링크 의무**: 위 표에 팩별 itch 페이지 URL을 기재했고, `README.md`와 제출물 #4(AI 활용 기술 문서)의 출처 절에도 동일 링크를 싣는다.
 > ③ **CC BY 4.0 (아이콘 팩)**: 저작자 표시만으로 충족 — 위 표에 저작자·라이선스 URL 명시.
 > 사용한 것은 각 팩의 **1x(100%) 버전**이다. 2x·3x는 단순 정수 배율 업스케일이므로 Unity 임포터의 Pixels Per Unit으로 대체했다.
