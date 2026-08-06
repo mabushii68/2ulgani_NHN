@@ -84,7 +84,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 5
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 22524cfbde0c931488d4f718bb9aae46, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 908e1c5ef59fb9046a557e0de9a64112, type: 3}
   m_Color: {r: 0.43529412, g: 0.65882355, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -169,4 +169,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b79248f8990ec924ba844e0fb22e14cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Luddite.Combat.Projectile
-  _spriteBaseDiameter: 1
+  _spriteBaseDiameter: 0.5555556

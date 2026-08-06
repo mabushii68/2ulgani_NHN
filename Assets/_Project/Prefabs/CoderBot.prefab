@@ -81,8 +81,8 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -1919261834486626869, guid: 0552f86e10ab4e940b020c537c62f0a1, type: 3}
-  m_Color: {r: 0.55, g: 0.57, b: 0.6, a: 1}
+  m_Sprite: {fileID: -6216173859024888133, guid: ae682028aa3cbe34cae80d2ebd3c019a, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -103,6 +103,7 @@ GameObject:
   - component: {fileID: 1200887558955837125}
   - component: {fileID: 7159664205791273040}
   - component: {fileID: 2516333753904780065}
+  - component: {fileID: 8713234812469581480}
   m_Layer: 0
   m_Name: CoderBot
   m_TagString: Untagged
@@ -208,3 +209,69 @@ MonoBehaviour:
   _knockbackDuration: 0.15
   _aimPivot: {fileID: 3134048397806921468}
   _telegraphCrouch: 0.25
+--- !u!114 &8713234812469581480
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6685479808194299784}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5059b93928bb39843b7955673bec1839, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Luddite.Core.DirectionalSpriteAnimator
+  _renderer: {fileID: 8639804607853019140}
+  _clips:
+  - _name: idle
+    _rows:
+    - _frames:
+      - {fileID: -6216173859024888133, guid: ae682028aa3cbe34cae80d2ebd3c019a, type: 3}
+      - {fileID: -5964685844854434035, guid: ae682028aa3cbe34cae80d2ebd3c019a, type: 3}
+      - {fileID: 4389563979818821060, guid: ae682028aa3cbe34cae80d2ebd3c019a, type: 3}
+      - {fileID: 995662860184778277, guid: ae682028aa3cbe34cae80d2ebd3c019a, type: 3}
+    - _frames:
+      - {fileID: 74703847907971336, guid: ae682028aa3cbe34cae80d2ebd3c019a, type: 3}
+      - {fileID: -1338873923227011, guid: ae682028aa3cbe34cae80d2ebd3c019a, type: 3}
+      - {fileID: 6439760799106494236, guid: ae682028aa3cbe34cae80d2ebd3c019a, type: 3}
+      - {fileID: -8995330790778518619, guid: ae682028aa3cbe34cae80d2ebd3c019a, type: 3}
+    - _frames:
+      - {fileID: 3249522832301326824, guid: ae682028aa3cbe34cae80d2ebd3c019a, type: 3}
+      - {fileID: 7446241138516390440, guid: ae682028aa3cbe34cae80d2ebd3c019a, type: 3}
+      - {fileID: -7992253930510416172, guid: ae682028aa3cbe34cae80d2ebd3c019a, type: 3}
+      - {fileID: 2436443514163020724, guid: ae682028aa3cbe34cae80d2ebd3c019a, type: 3}
+    - _frames:
+      - {fileID: 694195244941245272, guid: ae682028aa3cbe34cae80d2ebd3c019a, type: 3}
+      - {fileID: -8224706025096730235, guid: ae682028aa3cbe34cae80d2ebd3c019a, type: 3}
+      - {fileID: -8739104539229276992, guid: ae682028aa3cbe34cae80d2ebd3c019a, type: 3}
+      - {fileID: 7325202064548330592, guid: ae682028aa3cbe34cae80d2ebd3c019a, type: 3}
+    _fps: 6
+    _loop: 1
+  - _name: walk
+    _rows:
+    - _frames:
+      - {fileID: 2217607343341921676, guid: 915b72917120f2a4b9e7ae78b23b016d, type: 3}
+      - {fileID: -3748721722758625039, guid: 915b72917120f2a4b9e7ae78b23b016d, type: 3}
+      - {fileID: 4572187389729175662, guid: 915b72917120f2a4b9e7ae78b23b016d, type: 3}
+      - {fileID: 6598383954537356050, guid: 915b72917120f2a4b9e7ae78b23b016d, type: 3}
+    - _frames:
+      - {fileID: -451631159449495940, guid: 915b72917120f2a4b9e7ae78b23b016d, type: 3}
+      - {fileID: 6263414266231635759, guid: 915b72917120f2a4b9e7ae78b23b016d, type: 3}
+      - {fileID: 4436288906544089654, guid: 915b72917120f2a4b9e7ae78b23b016d, type: 3}
+      - {fileID: -939864201286438270, guid: 915b72917120f2a4b9e7ae78b23b016d, type: 3}
+    - _frames:
+      - {fileID: -1743674990038209747, guid: 915b72917120f2a4b9e7ae78b23b016d, type: 3}
+      - {fileID: -3201750656385348826, guid: 915b72917120f2a4b9e7ae78b23b016d, type: 3}
+      - {fileID: 6190083102898906076, guid: 915b72917120f2a4b9e7ae78b23b016d, type: 3}
+      - {fileID: -4137782431698266300, guid: 915b72917120f2a4b9e7ae78b23b016d, type: 3}
+    - _frames:
+      - {fileID: -6212801586275392507, guid: 915b72917120f2a4b9e7ae78b23b016d, type: 3}
+      - {fileID: -8736813201125485393, guid: 915b72917120f2a4b9e7ae78b23b016d, type: 3}
+      - {fileID: -5837101211423655736, guid: 915b72917120f2a4b9e7ae78b23b016d, type: 3}
+      - {fileID: 8089287453707485642, guid: 915b72917120f2a4b9e7ae78b23b016d, type: 3}
+    _fps: 10
+    _loop: 1
+  _defaultClip: idle
+  _autoDriveFromBody: 1
+  _moveThreshold: 0.05
+  _facingSource: {fileID: 0}

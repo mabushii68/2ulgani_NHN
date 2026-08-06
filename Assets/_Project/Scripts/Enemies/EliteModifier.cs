@@ -43,6 +43,9 @@ namespace Luddite.Enemies
         [Tooltip("예측탄 색 — 🔴 §10.4: 마젠타는 AI가 나를 읽고 행하는 것 전용. 일반탄에 쓰지 말 것")]
         [SerializeField] private Color _predictiveColor = Color.magenta;
 
+        [Tooltip("예측탄 전용 스프라이트. 비워 두면 일반탄과 같은 모양으로 색만 마젠타가 된다")]
+        [SerializeField] private Sprite _predictiveSprite;
+
         /// <summary>살아 있는 엘리트 수. HUD AI 미니 패널이 "엘리트 생존 시만" 조건(§10.1)에 읽는다.</summary>
         public static int ActiveCount { get; private set; }
 
@@ -161,6 +164,7 @@ namespace Luddite.Enemies
                 // 발사 시점의 우세 방향이 이 탄의 "예측" — 역카운터(§7.5)는 이것의 반대로 피했는지를 본다
                 shot.MarkAsPredictive(_brain.DominantDirection);
                 PredictiveShotsFired++;
+                ApplyPredictiveSprite(shot);
                 AttachTrail(shot);
             }
 
@@ -169,6 +173,19 @@ namespace Luddite.Enemies
 
         /// <summary>조준이 중단됐을 때(사망 등) 텔레그래프 정리. 파괴 시에는 자식이라 함께 사라진다.</summary>
         public void CancelPredictiveAim() => EndAim();
+
+        /// <summary>
+        /// 예측탄만 모양까지 다르게 한다 (🔴 §10.4). 색은 <see cref="EnemyGun"/>이 이미 입혔고,
+        /// 여기서는 실루엣만 바꾼다 — 색맹 접근성 측면에서도 "마젠타 = 위협"을 색 하나에만 걸지 않는 편이 낫다.
+        /// 스프라이트 원본 크기가 일반탄과 달라 화면상 조금 더 크게 보이는데, 위협 신호로는 의도한 방향이다.
+        /// </summary>
+        private void ApplyPredictiveSprite(Projectile shot)
+        {
+            if (_predictiveSprite == null) return;
+
+            SpriteRenderer renderer = shot.GetComponent<SpriteRenderer>();
+            if (renderer != null) renderer.sprite = _predictiveSprite;
+        }
 
         private void AttachTrail(Projectile shot)
         {

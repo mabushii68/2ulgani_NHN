@@ -59,6 +59,7 @@
 
 | D3 | 4 | 김정준 | 한글 폰트 반입(§10.5) — 폰트 세팅 빌더 4메뉴, `Fonts/` 신설, 씬 텍스트 33개 폰트·머티리얼 교체, CREDITS 첫 외부 에셋 기록 | `Scripts/Editor/FontSetupTools.cs`, `Fonts/*`, `Scenes/Main.unity`, `Docs/CREDITS.md`, `CLAUDE.md` | ❌ | **아트 = 김정준 담당 영역** (첫 아트 반입). SDF 애셋은 사람이 Font Asset Creator로 직접 구움 — Claude Code는 진단·배선·문서 담당. 빌드 사이즈 16MB 이슈는 D6 WebGL 검증으로 이월 |
 | D3 | 5 | 김정준 | 픽셀 아트 반입 — Franuka 5개 팩에서 76파일 선별, PPU 18·Point·Uncompressed 임포트 설정, 시트 슬라이스(실측 격자), 적·UI 회색조 변환(🔴 §10.4 방어), CREDITS 라이선스 기록 | `Sprites/{Characters,Enemies,Projectiles,Arena,UI,Icons}/*`, `Docs/CREDITS.md` | ❌ | **아트 = 김정준 담당 영역.** 프리팹 배선·애니메이션은 다음 세션. GDD §11 "픽셀아트 ❌" 갱신은 **기획 담당(이양빈) 결정 필요** — 문서만 표기하고 수정하지 않음 |
+| D3 | 6 | 김정준 | 픽셀 아트 프리팹 배선 — 4방향 스프라이트 애니메이터, 적 5종 + 투사체 2종 + 씬 플레이어 배선, 총구 플레이스홀더 정리, 🔴 §10.4 색 위계 성립 | `Scripts/Core/DirectionalSpriteAnimator.cs`, `Scripts/Player/PlayerSpriteView.cs`, `Scripts/Editor/SpriteBindingSetupTools.cs`, `Scripts/Enemies/EliteModifier.cs`, `Prefabs/*`(7종), `Scenes/Main.unity`, `Sprites/Enemies/Beholder_*` | ⭕ | **아트 = 김정준 담당.** 교차: `EliteModifier.cs`(이양빈 영역)에 예측탄 스프라이트 필드 1개 추가 — 로직 무변경, 시각 필드만. **적 FSM은 의도적으로 미수정** — 공격·사망 애니메이션은 FSM 훅이 필요해 이양빈 담당으로 남김 |
 
 ## 3. 협업·페어 작업 기록
 | 일차 | 작업 | 참여 | 분업 방식 (누가 무엇을) | 결과 |

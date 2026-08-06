@@ -1602,6 +1602,8 @@ GameObject:
   - component: {fileID: 623667967}
   - component: {fileID: 623667972}
   - component: {fileID: 623667973}
+  - component: {fileID: 623667975}
+  - component: {fileID: 623667974}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1747,6 +1749,87 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edf7b6dab9f189d4ca1a806eefde2fb6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Luddite.Player.PlayerUpgrades
+--- !u!114 &623667974
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 623667966}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 43f7ca62621e3dd4198d307a40f77a0e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Luddite.Player.PlayerSpriteView
+  _controller: {fileID: 0}
+  _animator: {fileID: 0}
+  _moveThreshold: 0.01
+--- !u!114 &623667975
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 623667966}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5059b93928bb39843b7955673bec1839, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Luddite.Core.DirectionalSpriteAnimator
+  _renderer: {fileID: 1834374606}
+  _clips:
+  - _name: idle
+    _rows:
+    - _frames:
+      - {fileID: -1669217411902873199, guid: 8bef5da848addac408c6fb1d07500872, type: 3}
+      - {fileID: 7976894047669095085, guid: 8bef5da848addac408c6fb1d07500872, type: 3}
+      - {fileID: -6764962126241590741, guid: 8bef5da848addac408c6fb1d07500872, type: 3}
+      - {fileID: -1462743168128505199, guid: 8bef5da848addac408c6fb1d07500872, type: 3}
+    - _frames:
+      - {fileID: 2855128008233724388, guid: 8bef5da848addac408c6fb1d07500872, type: 3}
+      - {fileID: -4426124432912168316, guid: 8bef5da848addac408c6fb1d07500872, type: 3}
+      - {fileID: -842201425558406426, guid: 8bef5da848addac408c6fb1d07500872, type: 3}
+      - {fileID: -4791621344701496682, guid: 8bef5da848addac408c6fb1d07500872, type: 3}
+    - _frames:
+      - {fileID: -2402685202701570595, guid: 8bef5da848addac408c6fb1d07500872, type: 3}
+      - {fileID: -592683886980255800, guid: 8bef5da848addac408c6fb1d07500872, type: 3}
+      - {fileID: -9012717639184274152, guid: 8bef5da848addac408c6fb1d07500872, type: 3}
+      - {fileID: 7185142809425611827, guid: 8bef5da848addac408c6fb1d07500872, type: 3}
+    - _frames:
+      - {fileID: -1861311760251651504, guid: 8bef5da848addac408c6fb1d07500872, type: 3}
+      - {fileID: -7229408187817207461, guid: 8bef5da848addac408c6fb1d07500872, type: 3}
+      - {fileID: -3618009657702281539, guid: 8bef5da848addac408c6fb1d07500872, type: 3}
+      - {fileID: 7523336597990936203, guid: 8bef5da848addac408c6fb1d07500872, type: 3}
+    _fps: 6
+    _loop: 1
+  - _name: walk
+    _rows:
+    - _frames:
+      - {fileID: -6517762609384180678, guid: 96c8307bb1164cf4cb8251a2936ee553, type: 3}
+      - {fileID: -7059054110077741554, guid: 96c8307bb1164cf4cb8251a2936ee553, type: 3}
+      - {fileID: -4529591008381403860, guid: 96c8307bb1164cf4cb8251a2936ee553, type: 3}
+      - {fileID: 5831536863192090960, guid: 96c8307bb1164cf4cb8251a2936ee553, type: 3}
+    - _frames:
+      - {fileID: 7761345817034777980, guid: 96c8307bb1164cf4cb8251a2936ee553, type: 3}
+      - {fileID: -884507218881466539, guid: 96c8307bb1164cf4cb8251a2936ee553, type: 3}
+      - {fileID: 6163120408978148958, guid: 96c8307bb1164cf4cb8251a2936ee553, type: 3}
+      - {fileID: -6862117726939133745, guid: 96c8307bb1164cf4cb8251a2936ee553, type: 3}
+    - _frames:
+      - {fileID: -4315507776155888287, guid: 96c8307bb1164cf4cb8251a2936ee553, type: 3}
+      - {fileID: 7749511624784135338, guid: 96c8307bb1164cf4cb8251a2936ee553, type: 3}
+      - {fileID: 2486552015072149331, guid: 96c8307bb1164cf4cb8251a2936ee553, type: 3}
+      - {fileID: -5140847605074252218, guid: 96c8307bb1164cf4cb8251a2936ee553, type: 3}
+    - _frames:
+      - {fileID: -1194899529911566361, guid: 96c8307bb1164cf4cb8251a2936ee553, type: 3}
+      - {fileID: -6467129959235070183, guid: 96c8307bb1164cf4cb8251a2936ee553, type: 3}
+      - {fileID: 4141171381577398043, guid: 96c8307bb1164cf4cb8251a2936ee553, type: 3}
+      - {fileID: 7970439288309255605, guid: 96c8307bb1164cf4cb8251a2936ee553, type: 3}
+    _fps: 10
+    _loop: 1
+  _defaultClip: idle
+  _autoDriveFromBody: 0
+  _moveThreshold: 0.05
+  _facingSource: {fileID: 0}
 --- !u!1 &670734475
 GameObject:
   m_ObjectHideFlags: 0
@@ -6703,7 +6786,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.8, y: 0.8, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 623667971}
@@ -6757,8 +6840,8 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 10
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 22524cfbde0c931488d4f718bb9aae46, type: 3}
-  m_Color: {r: 0.23921569, g: 0.48235294, b: 0.9098039, a: 1}
+  m_Sprite: {fileID: -1669217411902873199, guid: 8bef5da848addac408c6fb1d07500872, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
