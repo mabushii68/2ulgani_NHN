@@ -57,6 +57,8 @@
 
 | D3 | 3 | 김정준 | 보스 P1(§9) — 3전공 패턴 순환·소환·P2 전환 스텁·웨이브 7 실연결, 투사체 관통 지원 | `Scripts/Enemies/{BossLLM,EnemyBase}.cs`, `Scripts/Data/BossConfigSO.cs`, `Scripts/Combat/Projectile.cs`, `Scripts/Core/WaveManager.cs`, `Scripts/Editor/{BossSetupTools,GameFeelDebugTools}.cs`, `Prefabs/BossLLM.prefab`, `SO/{EnemyStats_Boss,BossConfig_Default,WaveConfig_7}.asset` | ⭕ | **보스 = 이양빈 담당 영역.** 패턴 데미지 초안 = 기획 검토 대상. 실플레이 검증은 사람 지시로 생략(D4 이월) |
 
+| D3 | 4 | 김정준 | 한글 폰트 반입(§10.5) — 폰트 세팅 빌더 4메뉴, `Fonts/` 신설, 씬 텍스트 33개 폰트·머티리얼 교체, CREDITS 첫 외부 에셋 기록 | `Scripts/Editor/FontSetupTools.cs`, `Fonts/*`, `Scenes/Main.unity`, `Docs/CREDITS.md`, `CLAUDE.md` | ❌ | **아트 = 김정준 담당 영역** (첫 아트 반입). SDF 애셋은 사람이 Font Asset Creator로 직접 구움 — Claude Code는 진단·배선·문서 담당. 빌드 사이즈 16MB 이슈는 D6 WebGL 검증으로 이월 |
+
 ## 3. 협업·페어 작업 기록
 | 일차 | 작업 | 참여 | 분업 방식 (누가 무엇을) | 결과 |
 |---|---|---|---|---|

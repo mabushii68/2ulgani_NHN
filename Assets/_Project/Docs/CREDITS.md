@@ -21,7 +21,10 @@
 ## 2. 외부 에셋
 | 에셋 | 출처 (URL) | 라이선스 | 사용 위치 | 반입 커밋 |
 |---|---|---|---|---|
+| **x10y12pxDenkiChipHangul (전기칩 한글)** — `Fonts/x10y12pxDenkiChipHangul.ttf` + TMP Font Asset | 제작: Lee Minseo (quiple@quiple.dev) / 원본 기반 폰트: The x8y12pxDenkiChip Project Authors — https://github.com/hicchicc/x8y12pxDenkiChip (제작자 患者長ひっく) | **SIL Open Font License 1.1** | 게임 내 모든 UI 텍스트 (TMP 기본 폰트). 12px 한글·일본어 픽셀 폰트, Adobe-KR-9 보충 0 한글 2,780자 + 일본 한자 640자 지원 | <!-- D3 반입 커밋 해시 --> |
 | <!-- 예: Kenney UI Pack --> | <!-- kenney.nl/assets/... --> | CC0 1.0 | | |
+
+**OFL 1.1 준수 메모 (전기칩 한글)**: 상업적 이용·임베드·수정·재배포 허용, 출처 표기는 의무 아님, **폰트 단독 유료 판매만 금지**(게임에 포함한 배포는 허용) — WebGL 빌드에 폰트 데이터를 동봉하는 우리 방식은 허용 범위 안이다. OFL 1.1 제2항이 요구하는 **라이선스 사본·저작권 고지 동봉**은 `Assets/_Project/Fonts/x10y12pxDenkiChipHangul - OFL.txt` 로 충족했다 (D3 반입, TMP가 `LiberationSans - OFL.txt`를 동봉한 것과 같은 형태). 폰트를 수정하지 않았으므로 제3항(Reserved Font Name)·제4항은 해당 없음.
 
 ## 3. 자체 생성 SFX
 | 사운드 | 도구 | 생성 방법 | 사용 위치 |

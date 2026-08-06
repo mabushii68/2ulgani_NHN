@@ -40,6 +40,7 @@ Assets/_Project/
 ├── SO/            # SO 인스턴스(.asset) = 밸런스 수치의 유일한 위치
 ├── Prefabs/       # 플레이어, 적, 투사체 프리팹
 ├── Sprites/       # 게임 내 스프라이트 (플레이스홀더 포함)
+├── Fonts/         # 폰트 원본(.ttf) + TMP Font Asset (D3 신설 — 한글 폰트 반입)
 ├── Materials/     # 머티리얼
 ├── Audio/         # SFX, BGM
 ├── Docs/          # AI_USAGE_LOG.md, TEAM_ROLES_LOG.md (세션마다 갱신), SUBMISSION.md, CREDITS.md, GDD.md
@@ -49,6 +50,7 @@ Assets/_Project/
 └── Settings/      # 미사용 (URP 렌더러·볼륨 애셋은 Assets/Settings/ 에 있음)
 ```
 - `Art/` · `Data/` · `Input/` · `Settings/` 4개는 프로젝트 초기 세팅 때 만들어졌으나 **현재 비어 있고 용도가 확정되지 않았다.** 새 파일을 여기에 넣지 말고, 필요하면 사람에게 용도를 물어 이 표를 먼저 갱신한다
+- **폰트는 `Fonts/`** (D3 확정). 한글 폰트 ttf는 `Art/`에 임시로 놓였다가 `Fonts/`로 이동했다 — 파일 이동은 반드시 `AssetDatabase.MoveAsset`으로 (탐색기로 옮기면 .meta가 남아 GUID 참조가 끊긴다). 폰트 세팅은 `Editor/FontSetupTools.cs` 빌더가 소유하며, **다른 Setup 빌더를 재실행한 뒤에는 이 빌더를 마지막에 다시 실행한다** (다른 빌더가 fontSize를 자기 값으로 되돌리기 때문)
 
 **`Scripts/Editor/` 규칙** (D1에 정식 승인 — 하루에 3번 만들고 3번 지운 뒤 결론):
 - `UnityEditor` 네임스페이스를 쓰는 **에디터 전용 코드만.** Unity가 `Editor/` 폴더를 자동으로 에디터 어셈블리로 분리하므로 **빌드·런타임 부담 0**이다 (Assembly Definition 불필요 — 환경 규칙 유지)
