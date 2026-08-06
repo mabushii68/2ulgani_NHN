@@ -88,3 +88,9 @@ crashlytics-build.properties
 /[Aa]ssets/_[Pp]roject/[Ss]prites.v2.meta
 /[Aa]ssets/_[Pp]roject/[Pp]refabs.v2/
 /[Aa]ssets/_[Pp]roject/[Pp]refabs.v2.meta
+
+# ─── Unity Version Control(Plastic) 부산물 ───────────────────────
+# com.unity.collab-proxy가 워크스페이스를 훑으며 원본의 옛 스냅샷을
+# "<파일>.private.0" 으로 떨궈 둔 것. git 히스토리에 실제 이력이 다 있으므로 불필요하다.
+*.private.0
+*.private.0.meta
