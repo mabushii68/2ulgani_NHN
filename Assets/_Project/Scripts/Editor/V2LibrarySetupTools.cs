@@ -22,9 +22,10 @@ namespace Luddite.EditorTools
     /// </para>
     ///
     /// <para>
-    /// PPU는 <b>1x 기준 값의 3배</b>로 둔다(캐릭터 54 = 18×3 등). 3x는 순수 정수 업스케일이라
-    /// 이렇게 두면 화면에 나오는 크기가 기존 <c>Sprites/</c> 자산과 정확히 같다 —
-    /// 승격할 때 크기를 다시 잡을 필요가 없다는 뜻이다.
+    /// ⚠️ <b>라이브러리는 D4에 3x → 1x 원본으로 교체됐다</b> (G드라이브 팩의 1x 폴더 기준).
+    /// 아래 상수들은 1x 기준이다 — 3x 시절 값(타일 48, PPU 54/96/48)으로 되돌리지 말 것.
+    /// 화면상 크기는 PPU가 함께 1/3이 되어 기존 <c>Sprites/</c> 자산과 동일하게 유지된다.
+    /// 기존 라이브러리의 일괄 전환은 V2LibraryRescaleTools가 담당했다 (재실행 안전).
     /// </para>
     /// </summary>
     public static class V2LibrarySetupTools
@@ -32,12 +33,12 @@ namespace Luddite.EditorTools
         private const string ROOT = "Assets/_Project/Sprites.v2";
         private const string PREFAB_ROOT = "Assets/_Project/Prefabs.v2";
 
-        /// <summary>1x 기준 타일 16px → 3x는 48px. 환경 타일셋 격자의 기본 단위.</summary>
-        private const int TILE = 48;
+        /// <summary>환경 타일셋 격자의 기본 단위. 1x 기준 16px.</summary>
+        private const int TILE = 16;
 
-        private const int PPU_WORLD = 54;   // 캐릭터·몬스터·환경·아이템 (1x 18 × 3)
-        private const int PPU_ICON = 96;    // 아이콘 (1x 32 × 3)
-        private const int PPU_UI = 48;      // UI (1x 16 × 3)
+        private const int PPU_WORLD = 18;   // 캐릭터·몬스터·환경·아이템
+        private const int PPU_ICON = 32;    // 아이콘
+        private const int PPU_UI = 16;      // UI
 
         /// <summary>4방향 시트 판정에 쓰는 행 수. Franuka 캐릭터·몬스터 시트의 공통 규약.</summary>
         private const int DIR_ROWS = 4;
@@ -295,8 +296,8 @@ namespace Luddite.EditorTools
         }
 
         /// <summary>
-        /// 열별 "완전 투명" 여부. 3x는 3×3 블록이 단색인 순수 업스케일이라
-        /// 세로 3픽셀마다 하나만 봐도 결과가 같다 — 4,000장 넘는 라이브러리에서 이 절약이 크다.
+        /// 열별 "완전 투명" 여부. 1x는 업스케일 블록이 없으므로 모든 행을 본다
+        /// (3x 시절에는 3픽셀 간격이었다 — 1x는 픽셀 수가 1/9이라 전수여도 더 싸다).
         /// </summary>
         private static bool[] ComputeEmptyColumns(Texture2D texture, int w, int h)
         {
@@ -305,7 +306,7 @@ namespace Luddite.EditorTools
             for (int x = 0; x < w; x++)
             {
                 bool isEmpty = true;
-                for (int y = 0; y < h; y += 3)
+                for (int y = 0; y < h; y++)
                 {
                     if (pixels[y * w + x].a != 0) { isEmpty = false; break; }
                 }
