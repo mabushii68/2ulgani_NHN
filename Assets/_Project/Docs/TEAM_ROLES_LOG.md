@@ -63,6 +63,16 @@
 | D3 | 7 | 김정준 | 아레나 타일 + UI 스킨 + 조준 표식·플레이어 탄 교체 — 바닥·벽 타일링(콜라이더 보존), 9슬라이스 UI 스킨, 전공 아이콘 컬러 복원, 조준 화살표, FireballBig 탄 | `Scripts/Editor/SpriteBindingSetupTools.cs`, `Scripts/UI/HpBar.cs`, `Scenes/Main.unity`, `Prefabs/Projectile.prefab`, `SO/PlayerStats_Default.asset`, `Sprites/{Icons,Projectiles,UI}/*`, `Docs/CREDITS.md` | ⭕ | UI·아트 = 김정준 담당 정면. 교차: **`SO/PlayerStats_Default.asset`의 `_projectileDiameter` 0.25→0.44는 밸런스 수치**(이양빈 영역) — 사람이 "탄이 너무 작다"고 명시 요청, 콜라이더를 겸하는 값이라 시각만 키울 수 없어 함께 조정. 되돌리려면 SO 한 곳 |
 | D3 | 8 | 김정준 | 아트 후보 라이브러리 — 팩 18종 3x 전량(4,893파일) 카테고리 분류·임포트·격자 자동 슬라이스·프리팹, `.gitignore` 격리 | `Scripts/Editor/V2LibrarySetupTools.cs`, `Sprites.v2/*`(미커밋), `Prefabs.v2/*`(미커밋), `.gitignore`, `Docs/CREDITS.md` | ❌ | **아트 = 김정준 담당 정면.** 게임 코드·씬 무변경, 빌드 영향 0. **라이선스 판단**: 팩 전량 커밋은 "as is 재배포 금지" 위반 소지 → 로컬 열람용으로 격리하고 승격 시에만 리포 반입. **프리팹 216개는 미완**(동기 실행이 메인 스레드를 잡아 중단) — 다음 세션에서 배치 분할 후 재실행 |
 
+| D4 | — | 김정준 | ⚠️ **세션 기록 누락.** 커밋만 존재: `1e193d1`(v2 라이브러리 3x→1x 전환 + 임포트 복구 도구) / `4278d68`(SYSTEMS.md 구현 현황 문서 신설) / `aeab4c6`(TMP 폴백 폰트 재직렬화) | `Scripts/Editor/V2LibraryRescaleTools.cs`, `Docs/SYSTEMS.md`, `Sprites.v2/*`(미커밋) | ❌ | 당시 세션에서 §2 append가 이뤄지지 않았다. §0 규칙상 사후 재구성을 하지 않으므로 커밋 기록으로만 남긴다 |
+| D5 | 1 | 김정준 | 개정안 v1.1 검토 + `CLAUDE.md` 델타 병합 — 추적 카메라 계약이 산수상 무효임을 실측 반증, `CLAUDE_v1.1.md` 회귀 8건 차단, 일정·판정 기준 현행화 | `CLAUDE.md`, `Docs/GDD_AMENDMENT_v1.1.md`(편입) | ⭕ | 규칙·일정 문서는 공동 자산. **개정안은 이양빈과 공동 소유 문서**이나 내용 변경 없이 실측 반증과 구현 현황만 덧붙임. 계약 #1·#4는 승인 대기로 분리해 두었다가 다음 세션에 사람이 확정 |
+| D5 | 2 | 김정준 | 회색조 폐기 → 컬러 복원 53파일, 던전 타일셋 7파일 승격(PPU 16 슬라이스 168장), 방 24×14→32×18 확대, `CameraFollow` 신설 | `Sprites/{Arena,Enemies,Projectiles,UI}/*`, `Sprites/Dungeon/*`, `Scripts/Core/CameraFollow.cs`, `SO/WaveSystemConfig_Default.asset`, `Scenes/Main.unity`, `Docs/CREDITS.md` | ⭕ | 아트 = 담당 정면. 교차: **`WaveSystemConfig`의 스폰 링 12×7→16×9는 밸런스 수치**(이양빈 영역) — 방 확대에 강제로 딸려오는 값이라 함께 조정, 되돌리려면 SO 한 곳. 🔴 §10.4 조문("무채색~주황")을 근거로 계약 위반 없이 컬러화. CREDITS 라이선스 준수 논거 정정 포함 |
+| D5 | 3 | 김정준 | 던전 체인 골격 — `DungeonConfigSO`·`Door`·`Chest`·`Room`·`DungeonManager` + 결정론 빌더 + 스모크 49건 | `Scripts/Core/{Door,Chest,Room,DungeonManager}.cs`, `Scripts/Data/DungeonConfigSO.cs`, `Scripts/Core/WaveManager.cs`, `Scripts/Editor/{DungeonSetupTools,DungeonSmokeTest}.cs`, `SO/DungeonConfig_Default.asset`, `Scenes/Main.unity` | ⭕ | **`WaveManager` 수술 = 이양빈 담당 영역**(웨이브·전멸 판정). 기존 지시("담당 상관없이") 연장선. 변경은 전부 가산이라 기본값이 D4 동작과 동일 — 폴백을 코드 구조로 보장 |
+| D5 | 4~6 | 김정준 | 사람 발견 결함 3건 수정 — ①전투방 입구 문이 처음부터 잠겨 진입 불가 ②복도에서 카메라 정지 ③카메라 여유 부족으로 문이 화면 밖 | `Scripts/Core/{Room,DungeonManager,CameraFollow}.cs`, `Scripts/Editor/{DungeonSetupTools,DungeonSmokeTest}.cs`, `Scenes/Main.unity` | ❌ | 던전·카메라 = 담당 정면. 스모크에 통행 물리 프로브를 추가해 같은 계열이 배선 검사를 통과해도 잡히게 함(49→51건) |
+| D5 | 7 | 김정준 | 물리 보간 누락 수정 — 렌더 410fps / 물리 50Hz에서 캐릭터가 계단식으로 튀던 진동 | `Scripts/Player/PlayerController.cs`, `Scripts/Enemies/EnemyBase.cs`, `Scripts/Combat/Projectile.cs` | ⭕ | **`EnemyBase`·`Projectile` = 이양빈 담당 영역** — 로직 변경 없이 렌더 설정 1행씩. 카메라가 움직이는 상태에서는 적·탄도 같이 떨려 플레이어만 고치면 증상이 남는다. 🔴 AIBrain 영향 없음을 자체 검증 75건으로 확인 |
+| D5 | 8 | 김정준 | `MAP_SPEC.md` 정렬 — 맵 바깥 어둠 복원(암반 철회)·조도 0.88·락인 후 0.5s 스폰·`SetLocked` API, 스펙 §2 좌표 표 실측 10행으로 채움 + §11 구현 현황 신설 | `Scripts/Core/{Door,DungeonManager}.cs`, `Scripts/Editor/DungeonSetupTools.cs`, `Docs/MAP_SPEC.md`, `Scenes/Main.unity` | ⭕ | **`MAP_SPEC.md`는 김정준×이양빈 공동 문서.** 스펙이 옳은 곳은 구현을, 비어 있거나 낡은 곳은 문서를 고치는 양방향 정렬. 미구현 7항목을 사유와 함께 문서에 남김 |
+| D5 | 9 | 김정준 | Sorting Layer 9종 정의 + 벽 높이 착시 + 꺾인 체인(꺾임 4회)·복도 폭 3~7 변주 + 기둥 28·소품 55 배치 | `ProjectSettings/TagManager.asset`, `Scripts/Editor/{DungeonSetupTools,SortingLayerSetupTools}.cs`, `Sprites/Dungeon/Decor/*`, `Scenes/Main.unity` | ⭕ | ⚠️ **`ProjectSettings/` 변경은 CLAUDE.md 금지 목록(사람 수행)이나 사람이 직접 지시해 수행.** 🔴 기둥·장식은 **전부 비충돌** — 계약 #2·MAP_SPEC §7의 금지 사유(적 FSM 장애물 회피 없음 / 탄 차단 시 학습 표본 오염)가 실제 고장이라, 충돌 기둥은 이양빈 승인 대상으로 분리 |
+| D6 | 1 | 김정준 | 제출 문서 3종 초안 + 누락된 D4·D5 세션 로그 소급 정리 | `Docs/{AI_USAGE_LOG,TEAM_ROLES_LOG}.md`, `Docs/SUBMIT_*.md`(신규 3종) | — | 제출 문서 = 공동. D4 로그는 §0 규칙(사후 재구성 금지)에 따라 커밋 기록으로만 표기 |
+
 ## 3. 협업·페어 작업 기록
 | 일차 | 작업 | 참여 | 분업 방식 (누가 무엇을) | 결과 |
 |---|---|---|---|---|
@@ -73,7 +83,10 @@
 
 - (예시) main 단일 브랜치 + 세션 단위 커밋(`[D일차][타입]`)으로 충돌 최소화
 - **D1 확정: main 단일 브랜치 → 담당자별 작업 브랜치 + main 병합**. 김정준 작업분은 `JungJoon` 브랜치에서 진행한다. 초기 계획(main 단일)은 2인 팀의 충돌 최소화를 노린 것이었으나, 담당 영역이 '뇌'(AIBrain·전투)와 '얼굴'(아트·UI)로 뚜렷이 갈려 브랜치 분리가 실제로는 충돌을 더 줄인다고 판단. `CLAUDE.md`도 같은 커밋에서 갱신
--
+- **문서가 협업의 실제 매개였다.** 2인이 같은 시간에 붙어 있지 않아도 되도록, 의사결정을 대화가 아니라 문서에 남기는 방식으로 운영했다 — 설계는 `GDD.md`, 개편은 `GDD_AMENDMENT_v1.1.md`, 맵 세부는 `MAP_SPEC.md`, 현재 구현 상태는 `SYSTEMS.md`, 작업 규칙은 `CLAUDE.md`. 특히 **`CLAUDE.md`의 🔴 계약 절이 "혼자 바꾸면 안 되는 것"의 목록** 역할을 해서, 담당이 아닌 영역을 건드릴 때 무엇을 승인받아야 하는지가 자동으로 드러났다.
+- **담당 교차를 막지 않고 '표시'했다.** 7일 일정에서 담당별로 칸막이를 세우면 기능이 안 굴러간다(예: 최소 전투를 만들려면 아트 담당이 투사체·데미지를 함께 짜야 한다). 그래서 교차 자체는 허용하되 **이 문서 §2의 `교차` 열에 ⭕로 표시하고, 상대 영역에서 무엇을 어디까지 건드렸는지 비고에 남기는 규칙**으로 운영했다. 되돌릴 때 어느 파일 한 곳만 보면 되는지가 기록에 남는다.
+- **결정이 필요한 것은 구현하지 않고 분리해 올렸다.** GDD 미명시 값(`ThreatMissRadius`), 별명 11종 초안, 보스 패턴 데미지, 던전 방 안 충돌 기둥 등은 담당(이양빈)의 결정 사항이라 **선택지와 파급 범위만 정리해 대기 항목으로 남겼다.** 반대로 사람이 명시 지시한 것은 담당 영역이 아니어도 진행하고 커밋에 그 사실을 적었다.
+- **사람의 역할은 '실플레이 검증'에 집중됐다.** Unity 창이 백그라운드면 게임 루프가 돌지 않고 키보드·마우스 주입도 불가하므로, 자동 검증은 `[MenuItem]` 스모크(코드 경로 직접 호출)까지만 가능하다. D5에 발견된 결함 4건(문 잠금·복도 카메라·문 가시성·물리 진동)은 **전부 사람이 실제로 플레이하다 발견**했고, 그때마다 스모크에 회귀 테스트를 추가해 같은 계열이 다음에는 자동으로 잡히게 했다.
 
 ## 5. D10 최종 문서 변환 체크리스트
 - [ ] §1 + §2 집계 → 팀원별 "실제 구현 영역" 절 (계획 대비 실제 차이가 있으면 실제 기준으로)
