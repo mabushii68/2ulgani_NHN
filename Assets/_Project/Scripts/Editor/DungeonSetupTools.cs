@@ -125,6 +125,16 @@ namespace Luddite.EditorTools
                     MakeTiled(cor.transform, "Floor", floor, Vector2.zero, new Vector2(cl, cw), -10, false);
                     MakeTiled(cor.transform, "Wall_Top", wall, new Vector2(0f, cw * 0.5f + t * 0.5f), new Vector2(cl, t), 0, true);
                     MakeTiled(cor.transform, "Wall_Bottom", wall, new Vector2(0f, -(cw * 0.5f + t * 0.5f)), new Vector2(cl, t), 0, true);
+
+                    // 복도 위·아래의 방 사이 빈 공간을 벽으로 메운다. 안 메우면 복도를 지나는 동안
+                    // 화면 위아래에 검은 구멍이 뚫려 보인다 (카메라가 복도 구간에서 넓게 잡기 때문)
+                    float fillH = (hy + t) - (cw * 0.5f + t);          // 복도 바깥벽 ~ 방 바깥벽까지
+                    if (fillH > 0f)
+                    {
+                        float fillC = cw * 0.5f + t + fillH * 0.5f;
+                        MakeTiled(cor.transform, "Fill_Upper", wall, new Vector2(0f, fillC), new Vector2(cl, fillH), -1, false);
+                        MakeTiled(cor.transform, "Fill_Lower", wall, new Vector2(0f, -fillC), new Vector2(cl, fillH), -1, false);
+                    }
                 }
             }
 

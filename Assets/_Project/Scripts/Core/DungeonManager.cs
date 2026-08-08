@@ -61,6 +61,7 @@ namespace Luddite.Core
             {
                 if (_rooms[i] == null) continue;
                 _rooms[i].PlayerEntered += OnPlayerEnteredRoom;
+                _rooms[i].PlayerExited += OnPlayerExitedRoom;
                 if (_rooms[i].Chest != null)
                 {
                     _rooms[i].Chest.Configure(_config.AutoOpenChest, _config.ChestInteractRadius, _player);
@@ -79,6 +80,15 @@ namespace Luddite.Core
         {
             GameEvents.RunStarted -= OnRunStarted;
             if (_waveManager != null) _waveManager.RoomCleared -= OnRoomCleared;
+            if (_rooms != null)
+            {
+                for (int i = 0; i < _rooms.Length; i++)
+                {
+                    if (_rooms[i] == null) continue;
+                    _rooms[i].PlayerEntered -= OnPlayerEnteredRoom;
+                    _rooms[i].PlayerExited -= OnPlayerExitedRoom;
+                }
+            }
         }
 
         /// <summary>재플레이 리셋 — 문 잠금 복구·상자 회수·플레이어를 시작방으로.</summary>
@@ -115,6 +125,28 @@ namespace Luddite.Core
             // 스폰 링을 이 방 중심으로 옮긴 뒤 웨이브 시작
             _waveManager.SetSpawnOrigin(room.Center);
             _waveManager.BeginWaveNow(room.WaveNumber);
+        }
+
+        /// <summary>
+        /// 방 → 복도로 나갔다. 카메라 바운드를 <b>이 방 ~ 다음 방 전체</b>로 넓혀 복도를 지나는 동안에도
+        /// 플레이어를 따라가게 한다. 방 바운드에 묶어 두면 카메라가 방 경계에서 멈추고
+        /// 플레이어만 화면 밖으로 걸어 나가 "복도를 지나는 중"이라는 게 안 보인다.
+        ///
+        /// <para>넓힌 바운드는 좌우 양쪽 방 내부를 함께 비추므로 복도 바깥이 검게 뚫려 보이지 않는다.
+        /// 다음 방 트리거에 닿는 순간 다시 그 방으로 좁혀진다.</para>
+        /// </summary>
+        private void OnPlayerExitedRoom(Room room)
+        {
+            if (!_active || room == null || _cameraFollow == null || _config == null) return;
+
+            Room next = FindRoom(room.ChainIndex + 1);
+            Room prev = FindRoom(room.ChainIndex - 1);
+            Room other = next != null ? next : prev;      // 마지막 방이면 뒤쪽 복도로 넓힌다
+            if (other == null) return;
+
+            Vector2 mid = (room.Center + other.Center) * 0.5f;
+            float halfSpan = Mathf.Abs(other.Center.x - room.Center.x) * 0.5f + _config.RoomHalfExtents.x;
+            _cameraFollow.SetRoom(mid, new Vector2(halfSpan, _config.RoomHalfExtents.y));
         }
 
         private void OnRoomCleared(int waveNumber)

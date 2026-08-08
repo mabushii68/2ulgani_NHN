@@ -31,6 +31,12 @@ namespace Luddite.Core
         /// <summary>플레이어가 이 방에 처음 들어왔을 때 1회. 인자는 체인 인덱스.</summary>
         public event System.Action<Room> PlayerEntered;
 
+        /// <summary>
+        /// 플레이어가 방 밖(=복도)으로 나갔을 때. 매번 발행한다 —
+        /// 카메라 바운드를 복도 구간으로 넓히는 신호다 (방에 고정하면 복도에서 플레이어를 놓친다).
+        /// </summary>
+        public event System.Action<Room> PlayerExited;
+
         public int ChainIndex => _chainIndex;
         public bool IsCombatRoom => _isCombatRoom;
         public Door EntryDoor => _entryDoor;
@@ -73,6 +79,14 @@ namespace Luddite.Core
             if (other.GetComponentInParent<Luddite.Player.PlayerController>() == null) return;
             _entered = true;
             if (PlayerEntered != null) PlayerEntered(this);
+        }
+
+        private void OnTriggerExit2D(Collider2D other)
+        {
+            // _entered는 되돌리지 않는다 — 재진입으로 웨이브가 다시 시작되면 안 되기 때문.
+            // 이 이벤트는 카메라 전환 전용이다
+            if (other.GetComponentInParent<Luddite.Player.PlayerController>() == null) return;
+            if (PlayerExited != null) PlayerExited(this);
         }
 
         private void OnDrawGizmosSelected()
