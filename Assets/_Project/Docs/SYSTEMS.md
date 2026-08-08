@@ -1,5 +1,6 @@
 # SYSTEMS.md — 구현 현황 문서
-> **코드가 진실이고 이 문서는 스냅숏이다.** 기준 시점: **2026-08-07 (D4)**, 브랜치 `JungJoon`.
+> **코드가 진실이고 이 문서는 스냅숏이다.** 기준 시점: **2026-08-09 (D6)**, 브랜치 `JungJoon`.
+> ⚠️ §1~13은 D4 기준으로 작성됐고, **D5~D6에 바뀐 것은 §15에 모아 두었다** — 충돌하면 §15가 우선.
 > 설계 의도·미래 계획은 `GDD.md`, 이 문서는 "지금 실제로 돌아가는 것"만 기술한다.
 > 큰 시스템이 추가·변경되면 해당 절만 갱신한다 (전면 재작성 불필요).
 
@@ -212,3 +213,97 @@ P(dir) = (obs_dir + 1) / (obs_L + obs_R + 2)      // 가상 카운트 (1,1) 고�
 - MED 신뢰도 단계 없음 — 내부는 HIGH/not-HIGH 불리언, UI 3표기(LEARNING/LOW/HIGH)는 HUD 소관. GDD와 대조 시 참고.
 - `_threatMissRadius`(2u)는 GDD 미명시 값 — 코드에 "사람 확인 필요" 표시.
 - 보스 P1은 실플레이 검증이 생략된 채 커밋됨 (`d2aeac9`, 사유는 AI_USAGE_LOG D3 세션 3) — **재생 검증 대기 중**.
+
+---
+
+## 15. D5~D6 변경분 (2026-08-08 ~ 08-09) — §1~13보다 우선
+
+### 15.1 던전 체인 (개정안 v1.1 / MAP_SPEC)
+
+**🔴 안전판이 먼저다.** `SO/DungeonConfig_Default.asset`의 `_enabled`를 끄면 `DungeonManager`가
+`Awake`에서 자기 자신을 비활성화하고 조기 반환한다 → `WaveManager`는 D4 경로(Combat 진입 = 웨이브 시작,
+전멸 = 인터벌)를 그대로 탄다. 던전은 **y = −200**에 따로 지어져 있고 **기존 `Arena`(원점)는 무손상**이다.
+⚠️ **토글 OFF 실주행은 아직 검증되지 않았다** (§15.6).
+
+```
+시작방 ─복도─ 전투방1 ─복도─ 전투방2 ⤴복도⤴ 전투방3 ─복도─ 전투방4 ⤵복도⤵ 전투방5 ─복도─ 전투방6 ─복도─ 보스방
+   (방 8개 = 시작 1 + 전투 6 + 보스 1 / 복도 7개 / 꺾임 4회, 분기 없음)
+```
+
+| 컴포넌트 | 위치 | 역할 |
+|---|---|---|
+| `DungeonConfigSO` | `Scripts/Data/` | 토글 · 방 규격 · 체인 길이 · 상자 정책 |
+| `Room` | `Scripts/Core/` | 구성 요소 + 진입/이탈 신호만. 판단하지 않음 |
+| `Door` | `Scripts/Core/` | 잠김 = BoxCollider2D + `ProjectileBlocker` 활성. `Lock()`/`Unlock()`/`SetLocked(bool)` |
+| `Chest` | `Scripts/Core/` | `GameManager.BeginWaveInterval()`만 호출 — 3택 카드·TARGET PROFILE·COUNTER PROTOCOL은 D4 패널 그대로 재사용 |
+| `DungeonManager` | `Scripts/Core/` | 체인 진행 단독 소유. `RunStarted`에서 문 잠금 복구·상자 회수·시작방 복귀 |
+
+**루프**: 방 진입(트리거) → 입구·출구 잠김 → **0.5s 후** 스폰(`_lockInDelay`, 문 닫히는 연출 시간) →
+전멸 → `WaveManager.RoomCleared` → 출구 개방 + 상자 등장 → 상자 오픈 → 인터벌 패널 → 다음 방.
+**감쇠·프로파일 스냅숏·DDA 판정은 여전히 `WaveEnded` 시점** — AIBrain 무변경.
+
+**`WaveManager` 변경 (전부 가산 — 기본값이 D4 동작과 동일)**
+- `SetSpawnOrigin(Vector2)` — 스폰 링 평행이동. 원점이면 기존 좌표와 완전 동일
+- `SetExternalWaveControl(bool)` — Combat 진입 자동 시작 억제. **단 `previous == BossIntro`는 예외**
+  (막으면 인트로가 시작을 가로챈 뒤 보스가 영영 스폰되지 않는다)
+- `event Action<int> RoomCleared` — 구독자가 있으면 인터벌을 직접 열지 않는다
+
+**방 규격 32×18** (🔴 계약 #2 개정, 사람 지시). 스폰 링 반폭 **16×9**(인셋 1 → 링 15×8).
+24×14이던 이유와 바꾼 이유는 `MAP_SPEC.md` §2 참조 — 화면(26.67×15)보다 커야 추적 카메라가 작동한다.
+
+### 15.2 카메라 (`Scripts/Core/CameraFollow.cs`)
+
+**고정 카메라 계약은 폐기됐다.** 플레이어를 추적한다.
+- **축별 조건부 클램프** — 방(+여유)이 화면보다 큰 축만 추적. 작으면 방 중심 고정
+  (반대로 하면 `Mathf.Clamp(min > max)`로 좌표가 역전된다)
+- **`_edgePeek` 6u 필수** — 여유가 없으면 벽에 붙은 플레이어가 화면 가장자리에 못 박혀 **문·복도가 화면 밖**으로 나간다.
+  현재 이동 범위 X ±8.67 / Y ±7.50
+- **복도 구간**: `Room.PlayerExited` → `DungeonManager`가 바운드를 "현재 방 ~ 다음 방"으로 확장.
+  `PlayerExited`는 **카메라 전용 신호**이고 `_entered`를 되돌리지 않는다(되돌리면 재진입으로 웨이브 재시작)
+- 화면 밖 위협 보정(가장자리 화살표)은 **미구현** — 추적 카메라의 동반 계약이다
+
+### 15.3 아트 / 렌더
+
+- **회색조 규칙 폐기** (사람 결정). `Sprites/` 53파일을 v2 컬러 원본으로 복원(`.png`만 덮어써 GUID·슬라이스 보존).
+  🔴 §10.4는 유지 — 조문이 "그 외 위협은 무채색~**주황**"이라 컬러화가 위반이 아니다.
+  **예약 색역**: 마젠타·핫핑크·고채도 보라(AI 전용) / 파랑·초록·노랑(전공색 전용)
+- **던전 타일셋** `Sprites/Dungeon/` — `DungeonTileset`(448×96 → 16px 격자 168장) · 문 · 상자 · 횃불,
+  **PPU 16**(16px = 1u), Point, Uncompressed, **FullRect**(Tiled 렌더 필수). 장식은 `Dungeon/Decor/` 13종
+- **Sorting Layer 9종** (`ProjectSettings/TagManager.asset`):
+  `Ground < Decor < Shadow < Units < Walls < WallTops < Projectiles < VFX < UI`
+  - ⚠️ **`Default`는 `Ground`보다 아래다.** 던전 빌더를 돌린 뒤 **반드시 `Luddite/Setup/Sorting Layer 배정`을 함께 실행**
+    (`FontSetupTools`를 마지막에 재실행하는 것과 같은 관계). 안 하면 액터가 바닥 밑으로 깔린다
+  - ⚠️ 레이어를 새로 추가하면 **Global Light 2D의 Target Sorting Layers도 갱신**해야 한다. 안 하면 그 레이어가 빛을 못 받아 검게 나온다
+- 카메라 Background `#0A0A0F`, Global Light 2D intensity **0.88**, **맵 바깥은 무렌더 어둠**(암반 배경 깔지 않음 — MAP_SPEC §5-1)
+- **물리 보간** — 플레이어·적·탄 전부 `RigidbodyInterpolation2D.Interpolate`. 없으면 물리 50Hz vs 렌더 수백 fps에서 계단식 진동으로 보인다. 렌더 전용이라 🔴 AIBrain 판정에 영향 없음
+
+### 15.4 에디터 도구 (§13에 추가)
+
+| 도구 | 메뉴 | 비고 |
+|---|---|---|
+| `DungeonSetupTools` | `Luddite/Setup/던전 체인 생성 (멱등)` | `Dungeon` 루트를 통째로 재생성. **그 아래는 손편집 금지** |
+| `SortingLayerSetupTools` | `Luddite/Setup/Sorting Layer 배정 (멱등)` | **던전 빌더 직후 반드시 실행** |
+| `DungeonSmokeTest` | `Luddite/Dev/던전 루프 스모크` | 51건. 통행 물리 프로브 포함 |
+
+### 15.5 D5~D6에 고친 결함 (전부 사람이 실플레이로 발견)
+
+| 증상 | 원인 |
+|---|---|
+| 복도를 통과 못 함 | `ResetRoom()`이 입구 문까지 잠갔다. 락인은 *들어온 뒤*에 걸려야 한다 |
+| 복도에서 카메라가 멈춤 | 바운드가 현재 "방"에 고정 → 복도가 바운드 밖 |
+| 문이 어디 있는지 안 보임 | 클램프 여유 0 → 플레이어가 화면 가장자리에 고정 |
+| 캐릭터가 진동 | `Rigidbody2D.interpolation = None` |
+| (빌더) 웨이브 7 미시작 | 보스방이 전투방 조건에서 빠짐 |
+
+### 15.6 🔴 다음 세션이 먼저 볼 것 (미검증·미구현)
+
+1. **엘리트·보스 P2 마젠타화 경로** — 회색조 시절엔 무채색 위 곱셈 틴트만으로 마젠타가 나왔다.
+   **컬러 스프라이트 위에서는 곱셈이 안 먹는다.** 🔴 §10.4 계약 사안이고 **컬러 전환 이후 한 번도 검증되지 않았다.**
+   제출 문서(#3·#4)가 마젠타 예측탄을 게임의 얼굴로 쓰고 있어 실물과 어긋나면 곤란하다
+2. **토글 OFF 폴백 실주행** — `Awake`가 플레이 모드에서만 도므로 미검증. **안전판의 유일한 구멍**
+3. **보스 P2 `PATTERN: YOU`** — 여전히 HP 60%에서 3초 무적 + 로그뿐 (§14)
+4. **보스 P1 실플레이 검증** — D3부터 이월 중
+5. 화면 밖 위협 보정(가장자리 화살표) — 추적 카메라 동반 계약인데 미구현
+6. Dungeon Tileset 팩 URL·라이선스 — `CREDITS.md`에 ⚠️ 표시. **실격 리스크 직결**
+7. 적 3종(Beholder·Djinn·Wizard)이 파랑·시안 계열 — 예약 색역(전공색 파랑)과 겹친다
+8. UI 한국어 교체 / 오디오 전무 / 영상 촬영 — D6~D7 몫
