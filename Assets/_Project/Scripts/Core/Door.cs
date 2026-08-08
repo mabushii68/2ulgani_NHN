@@ -51,6 +51,16 @@ namespace Luddite.Core
             Apply();
         }
 
+        /// <summary>
+        /// MAP_SPEC §6이 규정한 공개 API. 문은 스스로 판단하지 않는다 —
+        /// 방 상태 로직(<see cref="Room"/>/<see cref="DungeonManager"/>)만 호출한다.
+        /// </summary>
+        public void SetLocked(bool locked)
+        {
+            _locked = locked;
+            Apply();
+        }
+
         private void Apply()
         {
             if (_blocker != null) _blocker.enabled = _locked;

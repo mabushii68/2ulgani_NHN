@@ -25,6 +25,9 @@ namespace Luddite.Core
         [Tooltip("체인 순서대로. 0 = 시작방, 마지막 = 보스방")]
         [SerializeField] private Room[] _rooms;
 
+        [Tooltip("문이 잠긴 뒤 스폰까지의 지연(초). MAP_SPEC §6 = 0.5. 연출 타이밍이라 SO 아닌 인스펙터 노출")]
+        [SerializeField] private float _lockInDelay = 0.5f;
+
         private Room _currentRoom;
         private bool _active;
 
@@ -121,6 +124,16 @@ namespace Luddite.Core
             // 방 락인 (🔴 전멸형 종료 계약의 방 단위 번역)
             if (room.EntryDoor != null) room.EntryDoor.Lock();
             if (room.ExitDoor != null) room.ExitDoor.Lock();
+
+            // MAP_SPEC §6: 문이 닫히는 것을 볼 시간을 준 뒤 스폰한다.
+            // 즉시 스폰하면 "갇혔다"는 인지보다 적이 먼저 와서 락인 연출이 죽는다
+            StartCoroutine(BeginWaveAfterLockIn(room));
+        }
+
+        private System.Collections.IEnumerator BeginWaveAfterLockIn(Room room)
+        {
+            yield return new WaitForSeconds(_lockInDelay);
+            if (!_active || room == null) yield break;
 
             // 스폰 링을 이 방 중심으로 옮긴 뒤 웨이브 시작
             _waveManager.SetSpawnOrigin(room.Center);
