@@ -46,6 +46,35 @@ namespace Luddite.Core
         private float _spawnTimer;
         private DdaDecision _plannedAdjustment = DdaDecision.None;
 
+        // ── 던전 모드 훅 (개정안 v1.1). 전부 기본값이 D4까지의 동작과 같다 — 🔴 폴백 보존 ──
+        private Vector2 _spawnOrigin = Vector2.zero;
+        private bool _externalWaveControl;
+
+        /// <summary>
+        /// 배정 적 전멸 시 발행. <b>구독자가 있으면 인터벌을 직접 열지 않는다</b> —
+        /// 던전 모드에서는 <see cref="DungeonManager"/>가 문 개방·상자를 대신 처리하고,
+        /// 인터벌 패널은 상자를 열어야 뜬다 (개정안 §4). 구독자가 없으면 D4 경로 그대로.
+        /// </summary>
+        public event System.Action<int> RoomCleared;
+
+        /// <summary>스폰 링의 중심. 던전 모드에서 방 중심으로 옮긴다 (기본 원점 = 기존 아레나).</summary>
+        public void SetSpawnOrigin(Vector2 origin) { _spawnOrigin = origin; }
+
+        /// <summary>
+        /// true면 <c>Combat</c> 진입만으로 웨이브를 시작하지 않는다 — 방 진입이 시작 신호가 된다.
+        /// <b>BossIntro 복귀는 예외</b>다 (인트로가 웨이브 시작을 한 번 가로채므로 재개가 필요).
+        /// </summary>
+        public void SetExternalWaveControl(bool enabled) { _externalWaveControl = enabled; }
+
+        /// <summary>던전 모드에서 방 진입 시 호출. 방↔웨이브 1:1을 여기서 확정한다.</summary>
+        public void BeginWaveNow(int waveNumber)
+        {
+            if (_waveActive) return;
+            if (_waves == null || _waves.Length == 0) return;
+            _waveIndex = Mathf.Clamp(waveNumber - 1, 0, _waves.Length - 1);
+            BeginWave();
+        }
+
         /// <summary>현재 웨이브 번호 (1-based). HUD "WAVE n/7" 표기용.</summary>
         public int CurrentWaveNumber => Mathf.Min(_waveIndex + 1, TotalWaves);
 
@@ -95,7 +124,14 @@ namespace Luddite.Core
         private void OnGameStateChanged(GameState previous, GameState next)
         {
             // Combat 진입이 웨이브 시작 신호다. 일시정지 복귀(_waveActive 유지)는 건드리지 않는다
-            if (next == GameState.Combat && !_waveActive) BeginWave();
+            if (next != GameState.Combat || _waveActive) return;
+
+            // 던전 모드에서는 방 진입이 시작 신호다 (DungeonManager.BeginWaveNow).
+            // 단 BossIntro 복귀는 반드시 자동 재개해야 한다 — 인트로가 시작을 한 번 가로챘기 때문에
+            // 여기서 막으면 보스가 영영 스폰되지 않는다
+            if (_externalWaveControl && previous != GameState.BossIntro) return;
+
+            BeginWave();
         }
 
         private void BeginWave()
@@ -196,6 +232,10 @@ namespace Luddite.Core
                 Debug.Log($"[WaveManager] DDA 판정: {_plannedAdjustment} (직전 평균 거리 " +
                           $"{_brain.LastWaveAverageEngageDistance:F2})");
 
+            // 던전 모드: 인터벌을 여기서 열지 않는다. 문 개방 + 상자를 거쳐 상자 오픈 시 열린다 (개정안 §4).
+            // 감쇠·프로파일 스냅숏·DDA 판정은 위에서 이미 끝났으므로 AIBrain 쪽 타이밍은 무변경이다
+            if (RoomCleared != null) { RoomCleared(cleared); return; }
+
             _gameManager.BeginWaveInterval();        // 학습 패널 + 업그레이드 (§1.1)
         }
 
@@ -253,7 +293,11 @@ namespace Luddite.Core
             _plannedAdjustment = DdaDecision.None;   // 1회성 — 다음 판정은 다음 웨이브 종료 시
         }
 
-        /// <summary>§2: 아레나 가장자리, 벽 안쪽 1유닛 링 위의 랜덤 점.</summary>
+        /// <summary>
+        /// §2: 방 가장자리, 벽 안쪽 1유닛 링 위의 랜덤 점.
+        /// <see cref="_spawnOrigin"/>만큼 평행이동한다 — 던전 모드에서 현재 방 중심으로 옮겨지고,
+        /// 폴백(원점)에서는 D4까지와 완전히 같은 좌표가 나온다.
+        /// </summary>
         private Vector2 RandomEdgePosition()
         {
             float w = _systemConfig.RingHalfWidth;
@@ -263,13 +307,20 @@ namespace Luddite.Core
             float vertical = 2f * h;
             float t = Random.value * (horizontal + vertical) * 2f;
 
-            if (t < horizontal) return new Vector2(-w + t, -h);                              // 아래변
-            t -= horizontal;
-            if (t < horizontal) return new Vector2(-w + t, h);                               // 위변
-            t -= horizontal;
-            if (t < vertical) return new Vector2(-w, -h + t);                                // 왼변
-            t -= vertical;
-            return new Vector2(w, -h + t);                                                   // 오른변
+            Vector2 local;
+            if (t < horizontal) local = new Vector2(-w + t, -h);                             // 아래변
+            else
+            {
+                t -= horizontal;
+                if (t < horizontal) local = new Vector2(-w + t, h);                          // 위변
+                else
+                {
+                    t -= horizontal;
+                    if (t < vertical) local = new Vector2(-w, -h + t);                       // 왼변
+                    else { t -= vertical; local = new Vector2(w, -h + t); }                  // 오른변
+                }
+            }
+            return local + _spawnOrigin;
         }
 
         private void DespawnAll()
