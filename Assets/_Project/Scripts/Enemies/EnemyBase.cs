@@ -90,6 +90,11 @@ namespace Luddite.Enemies
             _body.freezeRotation = true;
             _body.linearDamping = _knockbackDamping;
 
+            // 물리 50Hz vs 렌더 60~144Hz — 보간이 없으면 화면상 계단식 진동으로 보인다.
+            // 추적 카메라가 매 프레임 움직이면서 드러났다 (D5). 렌더 전용이며 물리 좌표
+            // (_body.position)는 그대로라 FSM·판정에 영향 없다
+            _body.interpolation = RigidbodyInterpolation2D.Interpolate;
+
             if (_stats == null)
             {
                 Debug.LogError($"[{GetType().Name}] EnemyStatsSO 미지정 — {name}", this);

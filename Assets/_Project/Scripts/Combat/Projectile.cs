@@ -45,6 +45,11 @@ namespace Luddite.Combat
             _body.gravityScale = 0f;
             _body.linearDamping = 0f;
             _body.freezeRotation = true;
+
+            // 탄은 빠르게 직선 이동해 보간 없으면 진동이 가장 크게 보인다. 렌더 전용이며
+            // AIBrain이 읽는 Position/Velocity는 물리 좌표라 🔴 TTI·위기 이벤트 판정에 영향 없다
+            _body.interpolation = RigidbodyInterpolation2D.Interpolate;
+
             _hitbox.isTrigger = true;
         }
 

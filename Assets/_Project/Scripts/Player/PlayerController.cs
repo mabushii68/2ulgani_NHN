@@ -56,6 +56,12 @@ namespace Luddite.Player
             _body.gravityScale = 0f;
             _body.freezeRotation = true;
 
+            // 이동은 FixedUpdate(물리 50Hz)인데 렌더는 60~144Hz다. 보간이 없으면 트랜스폼이
+            // 물리 스텝에 계단식으로 스냅해 화면상 진동으로 보인다. 추적 카메라가 매 프레임
+            // 부드럽게 움직이면서 이 상대 흔들림이 그대로 드러난다 (D5 사람 발견).
+            // 물리 좌표(_body.position)는 보간과 무관하므로 회피 변위 판정(§7.1)에 영향 없다.
+            _body.interpolation = RigidbodyInterpolation2D.Interpolate;
+
             _weapon = GetComponentInChildren<IWeapon>();
             _upgrades = GetComponent<PlayerUpgrades>();
 
