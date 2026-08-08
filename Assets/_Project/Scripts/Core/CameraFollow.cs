@@ -28,6 +28,10 @@ namespace Luddite.Core
         [Tooltip("방 내부 반경(유닛). 아레나 32×18 → (16, 9)")]
         [SerializeField] private Vector2 _roomHalfExtents = new Vector2(16f, 9f);
 
+        [Tooltip("방 경계 너머로 더 따라가는 여유(유닛). 0이면 플레이어가 벽에 붙었을 때 화면 " +
+                 "가장자리에 못 박혀 문·복도가 화면 밖으로 나간다. 방 밖을 비추므로 암반 배경이 필요하다")]
+        [SerializeField] private float _edgePeek = 6f;
+
         private Camera _camera;
         private Vector3 _velocity;
 
@@ -70,18 +74,20 @@ namespace Luddite.Core
             float viewHalfHeight = _camera.orthographicSize;
             float viewHalfWidth = viewHalfHeight * _camera.aspect;
 
-            float x = ClampAxis(_target.position.x, _roomCenter.x, _roomHalfExtents.x, viewHalfWidth);
-            float y = ClampAxis(_target.position.y, _roomCenter.y, _roomHalfExtents.y, viewHalfHeight);
+            float x = ClampAxis(_target.position.x, _roomCenter.x, _roomHalfExtents.x + _edgePeek, viewHalfWidth);
+            float y = ClampAxis(_target.position.y, _roomCenter.y, _roomHalfExtents.y + _edgePeek, viewHalfHeight);
             return new Vector3(x, y, transform.position.z);   // z(카메라 깊이)는 절대 건드리지 않는다
         }
 
         /// <summary>
-        /// 방이 화면보다 큰 축만 추적한다. 작으면 방 중심 고정 —
+        /// 방(+여유)이 화면보다 큰 축만 추적한다. 작으면 방 중심 고정 —
         /// 이 분기가 없으면 Mathf.Clamp(min &gt; max)가 되어 카메라가 튄다.
         /// </summary>
-        private static float ClampAxis(float targetValue, float center, float roomHalf, float viewHalf)
+        /// <param name="boundHalf">방 반경 + <see cref="_edgePeek"/>. 여유가 없으면 벽에 붙은 플레이어가
+        /// 화면 가장자리에 고정되어 진행 방향(문·복도)이 보이지 않는다.</param>
+        private static float ClampAxis(float targetValue, float center, float boundHalf, float viewHalf)
         {
-            float slack = roomHalf - viewHalf;
+            float slack = boundHalf - viewHalf;
             if (slack <= 0f) return center;
             return Mathf.Clamp(targetValue, center - slack, center + slack);
         }

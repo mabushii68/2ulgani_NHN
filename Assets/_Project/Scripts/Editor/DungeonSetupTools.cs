@@ -64,6 +64,15 @@ namespace Luddite.EditorTools
             int total = config.TotalRooms;          // 시작방 + 전투방 N + 보스방
             int last = total - 1;
 
+            // 암반 배경 — 카메라 여유(_edgePeek) 때문에 방 밖까지 비추므로, 깔아 두지 않으면
+            // 벽 너머가 검게 뚫려 보인다. 전 체인을 덮는 단일 타일 필드 (평탄한 어두운 타일)
+            Sprite bedrock = FindSprite(TilesetPath, "DungeonTileset_113") ?? wall;
+            float chainSpan = (total - 1) * spacing + hx * 2f;
+            var bed = MakeTiled(root.transform, "Bedrock", bedrock,
+                new Vector2((total - 1) * spacing * 0.5f, 0f),
+                new Vector2(chainSpan + 60f, hy * 2f + 60f), -20, false);
+            bed.GetComponent<SpriteRenderer>().color = new Color(0.45f, 0.42f, 0.5f, 1f);   // 더 어둡게 눌러 배경으로
+
             var rooms = new Room[total];
             for (int i = 0; i < total; i++)
             {
