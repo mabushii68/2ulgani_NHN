@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1cde2860c214f97439cce68c6c72da53, type: 3}
+  m_Name: BossConfig_Default
+  m_EditorClassIdentifier: Assembly-CSharp::Luddite.Data.BossConfigSO
+  _patternTelegraph: 1
+  _patternCooldown: 2
+  _holdDistance: 7
+  _pierceShotCount: 3
+  _pierceSpreadAngle: 12
+  _pierceDamage: 10
+  _pierceSpeed: 6
+  _pierceDiameter: 0.6
+  _pierceLifetime: 5
+  _laserDamage: 15
+  _laserWidth: 0.8
+  _laserRange: 30
+  _laserFlashDuration: 0.15
+  _ringBulletCount: 12
+  _ringDamage: 8
+  _ringSpeed: 5
+  _ringDiameter: 0.35
+  _ringLifetime: 4
+  _ringRotationStep: 15
+  _summonCount: 3
+  _summonHpInterval: 0.25
+  _summonPrefab: {fileID: 9062277469145971132, guid: e4fdb9edc4bc2664784d9fd2efee3b1e, type: 3}
+  _summonRadius: 2.5
+  _phase2HpFraction: 0.6
+  _transitionInvulnerability: 3

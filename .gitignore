@@ -76,3 +76,21 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# ─── 아트 후보 라이브러리 (D3 세션 8) ─────────────────────────────
+# Franuka 팩 3x 전량을 카테고리별로 모아 둔 로컬 열람용 라이브러리.
+# 리포에 올리지 않는 이유: 팩 라이선스가 "as is 재배포 금지"인데 이 저장소는
+# GitHub Pages로 공개된다. CREDITS.md에 "실사용분만 선별 반입"이라고 적어 둔
+# 근거가 무너지고 공모전 실격 리스크에 직접 걸린다.
+# 여기서 고른 것을 Sprites/·Prefabs/로 승격시킬 때만 커밋된다.
+# 재생성: scratchpad/copy_v2.ps1 + Luddite/Setup/v2 라이브러리 임포트
+/[Aa]ssets/_[Pp]roject/[Ss]prites.v2/
+/[Aa]ssets/_[Pp]roject/[Ss]prites.v2.meta
+/[Aa]ssets/_[Pp]roject/[Pp]refabs.v2/
+/[Aa]ssets/_[Pp]roject/[Pp]refabs.v2.meta
+
+# ─── Unity Version Control(Plastic) 부산물 ───────────────────────
+# com.unity.collab-proxy가 워크스페이스를 훑으며 원본의 옛 스냅샷을
+# "<파일>.private.0" 으로 떨궈 둔 것. git 히스토리에 실제 이력이 다 있으므로 불필요하다.
+*.private.0
+*.private.0.meta

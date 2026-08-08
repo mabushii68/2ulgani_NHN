@@ -8,10 +8,15 @@
 ## 🎮 바로 플레이
 | | 링크 |
 |---|---|
-| **웹 플레이 (설치 불필요)** | 🔗 <!-- GitHub Pages URL — D4 스모크 빌드 후 기입 --> |
-| **플레이 영상 (30~60초)** | ▶️ <!-- YouTube URL — D9 기입 --> |
+| **웹 플레이 (설치 불필요)** | 🔗 **https://mabushii68.github.io/2ulgani_NHN/** |
+| **플레이 영상 (30~60초)** | ▶️ <!-- YouTube URL — D6 기입 --> |
 
-<!-- D9: 대표 스크린샷 1~2장 (PREDICTION FAILED 순간 + WaveInterval 패널 권장) -->
+> ⚠️ **현재 배포된 빌드는 개발 중 상태입니다 (2026-08-04 / D1).**
+> 지금 링크에서 플레이할 수 있는 것은 **플레이어 이동·조준·자동 연사와 아레나뿐**입니다 —
+> 아트는 회색 박스 플레이스홀더이고, 적·웨이브·AI 학습·보스는 아직 들어가지 않았습니다.
+> 아래 「게임 방법」은 최종 목표 사양이며, 완성 빌드는 마감(2026-08-10)까지 같은 주소에 갱신됩니다.
+
+<!-- D6: 대표 스크린샷 1~2장 (PREDICTION FAILED 순간 + WaveInterval 패널 권장) -->
 
 ## 조작
 | 입력 | 동작 |
@@ -32,9 +37,12 @@
 - 플레이 타임: 약 12분
 
 ## 로컬 실행 / 빌드
-- Unity **6 LTS (6000.0.x)**, 추가 패키지: URP, TextMeshPro
+- Unity **6000.3.7f1**, URP 2D Renderer + TextMeshPro (프로젝트는 URP 2D 템플릿 기반)
 - `Assets/_Project/Scenes/Main.unity` 단일 씬 — 열고 Play
-- WebGL 빌드: Compression **Gzip + Decompression Fallback** (GitHub Pages 호환)
+- 입력은 구 Input Manager API 사용 (Player Settings의 Active Input Handling = `Both`)
+- WebGL 빌드: Compression **Gzip + Decompression Fallback**, 캔버스 1280×720
+  - GitHub Pages는 `Content-Encoding: br`을 제공하지 않아 **Brotli를 쓰면 로딩이 실패합니다**
+- 배포: `gh-pages` 브랜치(빌드 산출물 전용, orphan 커밋). 소스는 `main` / 작업 브랜치
 
 ## 제출물 (NHN 게임 AI 공모전)
 | # | 제출물 | 위치 |

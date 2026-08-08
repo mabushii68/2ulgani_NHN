@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f08ae2e528615e5469715c46eb054bd5, type: 3}
+  m_Name: PlayerStats_Default
+  m_EditorClassIdentifier: Assembly-CSharp::Luddite.Data.PlayerStatsSO
+  _maxHp: 100
+  _invincibleDuration: 0.5
+  _hitboxDiameter: 0.8
+  _moveSpeed: 6
+  _projectileDamage: 10
+  _projectileSpeed: 14
+  _fireInterval: 0.2
+  _projectileLifetime: 2
+  _projectileDiameter: 0.44
