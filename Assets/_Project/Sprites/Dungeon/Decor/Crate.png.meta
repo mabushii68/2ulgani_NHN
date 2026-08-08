@@ -1,19 +1,10 @@
 fileFormatVersion: 2
-guid: 7f2b829ec018b0342a5a8f2a476b0e03
+guid: a9548994af1bc1344a00c4e8295b8542
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 4660892462312565606
-    second: Chest_Small_0
-  - first:
-      213: 6128743112458229804
-    second: Chest_Small_1
-  - first:
-      213: -1344231032361358120
-    second: Chest_Small_2
-  - first:
-      213: -7124150695291721467
-    second: Chest_Small_3
+      213: -1362058913294850930
+    second: Crate_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -55,8 +46,8 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
-  spriteExtrude: 0
+  spriteMode: 1
+  spriteExtrude: 1
   spriteMeshType: 0
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
@@ -148,89 +139,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Chest_Small_0
+      name: Crate_0
       rect:
         serializedVersion: 2
-        x: 0
+        x: 1
         y: 0
-        width: 16
+        width: 14
         height: 16
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: 0
+      tessellationDetail: -1
       bones: []
-      spriteID: df46da6faa2bda2428fa30041d686609
-      internalID: 4660892462312565606
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Chest_Small_1
-      rect:
-        serializedVersion: 2
-        x: 16
-        y: 0
-        width: 16
-        height: 16
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: f341ad86821f4204b933add7a789bd43
-      internalID: 6128743112458229804
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Chest_Small_2
-      rect:
-        serializedVersion: 2
-        x: 32
-        y: 0
-        width: 16
-        height: 16
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: feb2503f4d0f0424fb43d96e00cc67df
-      internalID: -1344231032361358120
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Chest_Small_3
-      rect:
-        serializedVersion: 2
-        x: 48
-        y: 0
-        width: 16
-        height: 16
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: dae83948842f8714883a702a8a5599c9
-      internalID: -7124150695291721467
+      spriteID: e84e7e582aef81de0800000000000000
+      internalID: -1362058913294850930
       vertices: []
       indices: 
       edges: []
@@ -239,7 +164,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 41a86cef0bd9a3a44a34af5df6c9534f
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -249,10 +174,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Chest_Small_0: 4660892462312565606
-      Chest_Small_1: 6128743112458229804
-      Chest_Small_2: -1344231032361358120
-      Chest_Small_3: -7124150695291721467
+      Crate_0: -1362058913294850930
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
