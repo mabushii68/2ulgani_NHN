@@ -41,12 +41,22 @@ namespace Luddite.Core
         /// <summary>웨이브 번호 = 체인 인덱스 (전투방 1 → 웨이브 1).</summary>
         public int WaveNumber => _chainIndex;
 
-        /// <summary>재플레이 리셋 — 문 잠금 복구 + 상자 회수. 이게 없으면 2회차가 깨진다.</summary>
+        /// <summary>
+        /// 재플레이 리셋 — 문 상태 복구 + 상자 회수. 이게 없으면 2회차가 깨진다.
+        ///
+        /// <para><b>입구 문은 열어 둔다.</b> 락인은 "들어온 뒤에" 걸리는 것이지 처음부터 잠가 두는 게 아니다 —
+        /// 초기 상태로 잠그면 플레이어가 방에 들어갈 수조차 없다. 나가는 문만 잠근다(전투방에 한해).
+        /// 시작방처럼 전투가 없는 방은 나가는 문도 열어 둔다.</para>
+        /// </summary>
         public void ResetRoom()
         {
             _entered = false;
-            if (_entryDoor != null) _entryDoor.Lock();
-            if (_exitDoor != null) _exitDoor.Lock();
+            if (_entryDoor != null) _entryDoor.Unlock();
+            if (_exitDoor != null)
+            {
+                if (_isCombatRoom) _exitDoor.Lock();
+                else _exitDoor.Unlock();
+            }
             if (_chest != null) _chest.Disarm();
         }
 

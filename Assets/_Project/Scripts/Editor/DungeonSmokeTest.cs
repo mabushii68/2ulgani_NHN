@@ -79,6 +79,8 @@ namespace Luddite.EditorTools
                 if (combat.Chest != null) combat.Chest.Opened += handler;
 
                 Check(log, ref pass, ref fail, "리셋 후 출구문 잠김", combat.ExitDoor != null && combat.ExitDoor.IsLocked);
+                // 락인은 '들어온 뒤'에 걸린다. 입구를 처음부터 잠그면 방에 들어갈 수조차 없다 (D5에 실제로 낸 버그)
+                Check(log, ref pass, ref fail, "리셋 후 입구문 열림 (락인은 진입 후)", combat.EntryDoor != null && !combat.EntryDoor.IsLocked);
                 Check(log, ref pass, ref fail, "리셋 후 상자 비활성", combat.Chest != null && !combat.Chest.gameObject.activeSelf);
 
                 combat.OnCleared();
@@ -89,6 +91,30 @@ namespace Luddite.EditorTools
 
                 if (combat.Chest != null) combat.Chest.Opened -= handler;
                 combat.ResetRoom();
+            }
+
+            // 통행 프로브 — 시작방 중심 → 전투방1 중심까지 실제로 걸어갈 수 있는가.
+            // 문 상태 버그는 배선 검사로는 안 잡히고 이 프로브에서만 드러난다
+            if (rooms.Length >= 2)
+            {
+                for (int i = 0; i < rooms.Length; i++) rooms[i].ResetRoom();
+                Vector2 from = rooms[0].Center, to = rooms[1].Center;
+                string blockers = "";
+                int steps = Mathf.CeilToInt(Mathf.Abs(to.x - from.x) / 0.5f);
+                for (int s = 0; s <= steps; s++)
+                {
+                    Vector2 p = Vector2.Lerp(from, to, steps == 0 ? 0f : (float)s / steps);
+                    var hits = Physics2D.OverlapCircleAll(p, 0.4f);   // 플레이어 반지름 0.4
+                    for (int k = 0; k < hits.Length; k++)
+                    {
+                        if (hits[k].isTrigger) continue;
+                        if (hits[k].GetComponentInParent<Luddite.Player.PlayerController>() != null) continue;
+                        string who = (hits[k].transform.parent != null ? hits[k].transform.parent.name + "/" : "") + hits[k].name;
+                        if (!blockers.Contains(who)) blockers += who + " ";
+                    }
+                }
+                Check(log, ref pass, ref fail,
+                    "시작방 → 전투방1 통행 가능" + (blockers == "" ? "" : " (막는 것: " + blockers + ")"), blockers == "");
             }
 
             // 🔴 폴백 경로: 토글 OFF에서 기존 아레나가 그대로 있는가
