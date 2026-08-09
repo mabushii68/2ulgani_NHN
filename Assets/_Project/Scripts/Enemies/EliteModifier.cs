@@ -106,6 +106,7 @@ namespace Luddite.Enemies
             if (!IsOnScreen()) return false;   // 🔴 계약 #4 — 아래 주석 참조
 
             _aiming = true;
+            AudioDirector.Play(GameSfx.PredictionShot);   // §12 조준음 — 텔레그래프 시작과 동시
             UpdatePredictiveAim();
             return true;
         }

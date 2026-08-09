@@ -115,6 +115,7 @@ namespace Luddite.Player
 
             _hp = Mathf.Max(0f, _hp - amount);
             _invincibleRemaining = _stats.InvincibleDuration;
+            AudioDirector.Play(GameSfx.PlayerHit);   // 실데미지 시에만 — 무적 관통은 CanBeDamaged가 걸렀다
 
             Debug.Log($"[PlayerHealth] 피격 {amount} → HP {_hp}/{MaxHp}");
 

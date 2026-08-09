@@ -191,6 +191,7 @@ namespace Luddite.Enemies
         protected virtual void Die()
         {
             // TODO(D4 웨이브): 사망을 WaveManager가 집계해야 웨이브 전멸 판정이 된다 (GDD §6.1)
+            Luddite.Core.AudioDirector.Play(Luddite.Core.GameSfx.EnemyDeath);
             Debug.Log($"[{GetType().Name}] {_stats.DisplayName} 격파");
             Destroy(gameObject);
         }

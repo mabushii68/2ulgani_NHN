@@ -339,3 +339,13 @@ P(dir) = (obs_dir + 1) / (obs_L + obs_R + 2)      // 가상 카운트 (1,1) 고�
 3. `Luddite/Dev/보스 P2 스모크` — 배선·§9 수치·이벤트 경로 자동 검사
 4. 플레이: `보스 웨이브로 점프` → `보스 HP를 P2 직전(61%)으로` → 전환 연출·마젠타·거리 복제·장판·예측탄 확인
 5. **토글 OFF(`DungeonConfig_Default._enabled=false`) 웨이브 1 완주** — §15.6-2 겸 이번 소프트락 정정 실검증
+
+### 16.4 오디오 (§12 — D7 세션 2, 전무 → 충족)
+- `Audio/` WAV 10개 = §12 최소 세트 8종 + BossPhase + BGM 루프(19.2s, Am-Am-F-G).
+  **자체 절차 합성** (`Audio/Generator~/generate_sfx.py` — 고정 시드 결정론, Unity 무시 폴더에 보존)
+- `Core/AudioDirector.cs` — 오디오 단독 소유자. GameEvents 구독(PredictionFailed 글리치 / WaveClear /
+  BossPhase / 인터벌 진입 AiAnalyze / BGM 시작·정지) + 소유 컴포넌트 훅 5줄(발사·피격·격파·조준음·버튼).
+  **씬에 없으면 전부 무음 no-op.** 볼륨·연사음 간격은 인스펙터 노출
+- BGM: Combat 진입 시 시작, 런 내내 유지(인터벌·일시정지 포함), Title/Result 정지
+- 배선: `Luddite/Setup/오디오 배선 (§12)` (멱등 — 누락 클립은 LogError로 드러남)
+- 품질 교체 경로: WAV 파일만 갈아끼우면 됨 (AudioDirector는 출처 무관)

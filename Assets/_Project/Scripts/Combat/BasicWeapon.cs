@@ -1,4 +1,5 @@
 using UnityEngine;
+using Luddite.Core;
 using Luddite.Data;
 using Luddite.Player;
 
@@ -49,6 +50,7 @@ namespace Luddite.Combat
             float sizeMultiplier = _upgrades != null ? _upgrades.ProjectileSizeMultiplier : 1f;
 
             _cooldownRemaining = _stats.FireInterval / Mathf.Max(fireRateMultiplier, 0.01f);
+            AudioDirector.Play(GameSfx.PlayerShoot);   // 씬에 AudioDirector 없으면 무음 no-op
 
             Vector2 spawnPoint = origin + aimDirection * _muzzleOffset;
             Projectile shot = Instantiate(_projectilePrefab, spawnPoint, Quaternion.identity);

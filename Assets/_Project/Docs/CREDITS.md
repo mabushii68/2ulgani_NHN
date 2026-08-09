@@ -45,12 +45,12 @@
 ## 3. 자체 생성 SFX
 | 사운드 | 도구 | 생성 방법 | 사용 위치 |
 |---|---|---|---|
-| <!-- 예: PredictionFailed 글리치음 --> | jsfxr / Bfxr | 파라미터 자체 튜닝 | |
+| `Audio/Sfx_*.wav` 9종 (PlayerShoot / PlayerHit / EnemyDeath / AiAnalyze / PredictionShot / **PredictionFailed 글리치** / WaveClear / UiButton / BossPhase) | **자체 제작 절차 합성 스크립트** (`Audio/Generator~/generate_sfx.py` — 팀 저작물, 순수 수식 신스. jsfxr/Bfxr류의 레트로 신스 접근을 코드로 직접 구현, 외부 소스·AI 생성 모델 미사용) | 사각파/삼각파/노이즈 + 엔벨로프·스윕·스터터 게이트·비트크러시. 고정 시드 결정론 — 재실행 시 동일 파일 (D7) | `AudioDirector`가 GameEvents·전투 훅으로 재생 (GDD §12 최소 세트 충족) |
 
 ## 4. BGM
 | 트랙 | 출처 | 라이선스 | 비고 |
 |---|---|---|---|
-| | | | |
+| `Audio/Bgm_CombatLoop.wav` (19.2s 루프 — 100 BPM, Am-Am-F-G 펄스 베이스 + 아르페지오) | 위와 동일한 자체 절차 합성 스크립트 (팀 저작물) | 팀 저작 — 라이선스 이슈 없음 | 전투 BGM 1트랙 (§12). Combat 진입 시 시작, Title/Result에서 정지. 보스 전용 BGM은 P3 컷 유지 |
 
 ## 5. AI 생성 에셋 (비게임플레이 요소만)
 | 에셋 | 도구 | 프롬프트 (원문) | 사용 위치 | AI_USAGE_LOG 반영 |

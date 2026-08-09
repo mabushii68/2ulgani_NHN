@@ -16,17 +16,13 @@ namespace Luddite.UI
     /// 버튼 배선은 인스펙터 UnityEvent가 아니라 코드로 한다 (규칙 4 — UnityEvent 남발 금지).
     /// </para>
     ///
-    /// <para>
-    /// TODO(D3 폰트): TMP 기본 폰트(LiberationSans)에 한글 글리프가 없어 지금은 전 텍스트가
-    /// 영문 터미널체다. OFL 한글 폰트 반입(CREDITS 같은 커밋) 후 §1.4 승패 문구·§10.5 한국어
-    /// 병기를 원문으로 교체할 것.
-    /// </para>
     /// </summary>
     public class GameScreens : MonoBehaviour
     {
-        // §1.4 승패 문구 — 한글 폰트 반입 전까지의 영문 대응 표기
-        private const string RESULT_WIN = "CONGRATULATIONS.\nHUMAN NECESSITY EXTENDED BY 24 HOURS.";
-        private const string RESULT_LOSE = "YOUR JOB HAS BEEN REPLACED.";
+        // §1.4 승패 문구 — 인간 세계 = 한국어 원문 (§10.5, D3 반입 한글 폰트 전제).
+        // 아랫줄 영어는 AI 시스템 발화 병기 (§10.5의 병기 규칙을 역방향으로 적용)
+        private const string RESULT_WIN = "축하합니다. 인간의 필요성이 24시간 연장되었습니다.\n<size=60%>HUMAN NECESSITY EXTENDED BY 24 HOURS.</size>";
+        private const string RESULT_LOSE = "당신의 직업은 대체되었습니다.\n<size=60%>YOUR JOB HAS BEEN REPLACED.</size>";
 
         [SerializeField] private GameManager _gameManager;
 
@@ -78,7 +74,9 @@ namespace Luddite.UI
 
         private static void Wire(Button button, UnityEngine.Events.UnityAction action)
         {
-            if (button != null) button.onClick.AddListener(action);
+            if (button == null) return;
+            button.onClick.AddListener(() => AudioDirector.Play(GameSfx.UiButton));   // 모든 버튼 공통 클릭음 (§12)
+            button.onClick.AddListener(action);
         }
 
         private void OnGameStateChanged(GameState previous, GameState next)
