@@ -757,7 +757,7 @@
   - **영어 유지 (의도)**: TARGET PROFILE / COUNTER PROTOCOL / AI MODEL: LEARNING / PREDICTION FAILED / INITIALIZING / AI ANALYSIS 통계 블록 — 전부 AI 시스템 발화(§10.5). 인터벌 BodyText에 한국어 요약 1줄 병기(§10.2 형식).
   - **v1.1 "표기만 방/ROOM" 이행**: `WaveLabel`이 던전 모드에서만 `ROOM n/7`, 폴백에서는 `WAVE n/7` — 내부 상태·API는 Wave 계열 그대로 (계약 준수).
 - **검증**: 코드 경로는 컴파일 대기(사람). 씬 텍스트는 빌더 재실행 필요 — **재실행 순서: GameState 골격 → (기존 규칙대로) 폰트 빌더 마지막** (EnsureText가 fontSize를 되돌리므로).
-- **커밋 해시**: (아래 chore에서 백필)
+- **커밋 해시**: `bf2d891` (브랜치 `main`)
 
 ---
 
