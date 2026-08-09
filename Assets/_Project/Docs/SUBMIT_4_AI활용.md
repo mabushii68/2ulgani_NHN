@@ -157,7 +157,7 @@ D5에 발견된 결함 4건(전투방 문이 잠겨 진입 불가 / 복도에서
 |---|---|---|---|
 | 폰트 | **x10y12pxDenkiChipHangul** (제작 Lee Minseo / 원본 The x8y12pxDenkiChip Project) | **SIL OFL 1.1** | 게임 내 모든 UI 텍스트 |
 | 스프라이트 | **Franuka** — RPG Heroes / RPG Monster / Elemental Dungeons(Fire) / RPG UI pack | 독자 라이선스 (상업·비상업 ⭕ / 수정 ⭕ / **팩 원본 재배포 ❌** / 출처 링크 필수) | 플레이어·적·투사체·아레나·UI |
-| 아이콘 | **Franuka** — RPG Icon pack | **CC BY 4.0** | AI 위협 상징, 전공 아이콘, 업그레이드 아이콘 |
+| 아이콘 | **Franuka** — RPG Icon pack | **CC BY 4.0** | AI 위협 상징, 전공 아이콘, 업그레이드 아이콘, 세부전공 탄막 4종(동전·두루마리·플러스·붓) — 나머지 탄막 5종(연필·번개·모니터·공·음표)은 자체 절차 생성 (팀 저작물) |
 | 타일셋 | **Franuka** — Dungeon Asset Pack (https://franuka.itch.io/dungeon-asset-pack) | 독자 라이선스 (상업 ⭕ / 재배포·재판매 ❌ / 크레딧 권장) | 던전 방·복도 바닥/벽, 문, 상자, 횃불, 장식 |
 | 엔진·패키지 | Unity 6000.3.7f1, Universal RP, TextMeshPro | Unity Companion License | — |
 

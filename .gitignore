@@ -94,3 +94,6 @@ crashlytics-build.properties
 # "<íŒŒì¼>.private.0" ìœ¼ë¡œ ë–¨ê¶ˆ ë‘” ê²ƒ. git íˆìŠ¤í† ë¦¬ì— ì‹¤ì œ ì´ë ¥ì´ ë‹¤ ìˆìœ¼ë¯€ë¡œ ë¶ˆí•„ìš”í•˜ë‹¤.
 *.private.0
 *.private.0.meta
+
+# WebGL ºôµå »êÃâ¹° (¹èÆ÷´Â gh-pages orphan Ä¿¹ÔÀ¸·Î)
+/[Bb]uilds/

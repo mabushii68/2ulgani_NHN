@@ -6,7 +6,7 @@
 ## 제출 링크 모음 (최종 확정본만 기입)
 | # | 제출물 | 링크/파일 | 확정 |
 |---|---|---|---|
-| 1 | 빌드 + 소스 (GitHub) | | ☐ |
+| 1 | 빌드 + 소스 (GitHub) | 소스 `https://github.com/mabushii68/2ulgani_NHN` / 플레이 `https://mabushii68.github.io/2ulgani_NHN/` | ☐ |
 | 2 | 플레이 영상 (YouTube) | | ☐ |
 | 3 | 게임 소개 문서 (PDF) | | ☐ |
 | 4 | AI 활용 기술 문서 (PDF) | | ☐ |
