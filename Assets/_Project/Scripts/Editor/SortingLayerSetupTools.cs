@@ -45,21 +45,36 @@ namespace Luddite.EditorTools
                 log.AppendLine("  Arena → 바닥 Ground / 벽 Walls");
             }
 
-            // 3) 적·보스 프리팹 → Units, 조준선·마커 → Projectiles (벽 위에 그려져야 한다)
-            string[] enemyPrefabs = { "ChatbotDrone", "PainterBot", "CoderBot", "BossLLM", "EliteChatbot" };
+            // 3) 적·보스 프리팹 → Units, 조준선·마커·탄 궤적 → Projectiles (벽 위에 그려져야 한다)
+            string[] enemyPrefabs = { "ChatbotDrone", "PainterBot", "CoderBot", "BossLLM", "EliteDrone" };
             for (int i = 0; i < enemyPrefabs.Length; i++)
             {
                 string path = "Assets/_Project/Prefabs/" + enemyPrefabs[i] + ".prefab";
                 var pf = AssetDatabase.LoadAssetAtPath<GameObject>(path);
-                if (pf == null) continue;
+                if (pf == null)
+                {
+                    // 조용히 continue하면 오타 하나로 프리팹이 통째로 Default에 남는다 (D6에 실제로 났다:
+                    // 이름이 "EliteChatbot"이라 EliteDrone의 조준선·마커가 전부 바닥 밑에 깔렸다)
+                    Debug.LogError("[Sorting 배정] 프리팹 없음 — " + path + " (이름 오타? 목록을 고칠 것)");
+                    continue;
+                }
                 int before = n;
                 n += SetAll(pf, LUnits, log, enemyPrefabs[i]);
-                // 예측탄 조준선·마커는 벽 위로
+                // 예측탄 조준선·마커·궤적은 벽 위로.
+                // sortingOrder는 손으로 배정한 값(AimLine 10 > TargetMarker 9 > Trail 8 > 탄 5)을 보존한다 —
+                // 1로 평탄화하면 마젠타 조준선이 탄 아래로 들어가 심리전 정보가 가려진다
                 var lrs = pf.GetComponentsInChildren<LineRenderer>(true);
                 for (int k = 0; k < lrs.Length; k++)
                 {
                     if (lrs[k].sortingLayerName == LProjectiles) continue;
-                    lrs[k].sortingLayerName = LProjectiles; lrs[k].sortingOrder = 1; n++;
+                    lrs[k].sortingLayerName = LProjectiles; n++;
+                }
+                // 예측탄에 붙는 궤적 — 탄의 자식으로 Instantiate되므로 탄과 같은 레이어여야 한다
+                var trs = pf.GetComponentsInChildren<TrailRenderer>(true);
+                for (int k = 0; k < trs.Length; k++)
+                {
+                    if (trs[k].sortingLayerName == LProjectiles) continue;
+                    trs[k].sortingLayerName = LProjectiles; n++;
                 }
                 var em = pf.GetComponent<Luddite.Enemies.EliteModifier>();
                 if (em != null)
@@ -68,15 +83,38 @@ namespace Luddite.EditorTools
                     if (marker != null)
                     {
                         var msr = marker.GetComponent<SpriteRenderer>();
-                        if (msr != null) { msr.sortingLayerName = LProjectiles; msr.sortingOrder = 1; n++; }
+                        if (msr != null && msr.sortingLayerName != LProjectiles)
+                        {
+                            msr.sortingLayerName = LProjectiles; n++;
+                        }
                     }
                 }
                 if (n != before) EditorUtility.SetDirty(pf);
             }
 
-            // 4) 투사체 → Projectiles
-            var projPf = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Projectile.prefab");
-            if (projPf != null) { n += SetAll(projPf, LProjectiles, log, "Projectile"); EditorUtility.SetDirty(projPf); }
+            // 4) 투사체 → Projectiles.
+            // ⚠️ 적 탄(EnemyProjectile)을 빠뜨리지 말 것 — 콜라이더는 살아 있어서 데미지는 들어오는데
+            // 화면에는 안 보이는, 진단이 가장 어려운 형태의 버그가 된다 (D6 실제 사례)
+            string[] projectilePrefabs = { "Projectile", "EnemyProjectile" };
+            for (int i = 0; i < projectilePrefabs.Length; i++)
+            {
+                string path = "Assets/_Project/Prefabs/" + projectilePrefabs[i] + ".prefab";
+                var projPf = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                if (projPf == null)
+                {
+                    Debug.LogError("[Sorting 배정] 프리팹 없음 — " + path + " (이름 오타? 목록을 고칠 것)");
+                    continue;
+                }
+                int before = n;
+                n += SetAll(projPf, LProjectiles, log, projectilePrefabs[i]);
+                var ptrs = projPf.GetComponentsInChildren<TrailRenderer>(true);
+                for (int k = 0; k < ptrs.Length; k++)
+                {
+                    if (ptrs[k].sortingLayerName == LProjectiles) continue;
+                    ptrs[k].sortingLayerName = LProjectiles; n++;
+                }
+                if (n != before) EditorUtility.SetDirty(projPf);
+            }
 
             AssetDatabase.SaveAssets();
             EditorSceneManager.MarkSceneDirty(UnityEngine.SceneManagement.SceneManager.GetActiveScene());
