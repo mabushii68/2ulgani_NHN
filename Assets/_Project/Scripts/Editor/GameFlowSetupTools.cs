@@ -75,9 +75,10 @@ namespace Luddite.EditorTools
 
             GameObject majorPanel = EnsurePanel(canvasObject, "MajorSelectPanel", PANEL_BG);
             EnsureText(majorPanel, "HeaderText", "전공을 선택하세요", 56, TEXT_MAIN, new Vector2(0f, 260f), new Vector2(1200f, 90f));
-            GameObject liberalButton = EnsureButton(majorPanel, "LiberalArtsButton", "문과\n<size=60%>펜은 칼보다 강하다</size>", MAJOR_BLUE, new Vector2(-420f, -40f), new Vector2(360f, 180f));
+            // 간격 560: 버튼 폭 360 + 여백 200 — 박스 스프라이트 스킨이 시각적으로 붙어 보이던 문제 (D7)
+            GameObject liberalButton = EnsureButton(majorPanel, "LiberalArtsButton", "문과\n<size=60%>펜은 칼보다 강하다</size>", MAJOR_BLUE, new Vector2(-560f, -40f), new Vector2(360f, 180f));
             GameObject scienceButton = EnsureButton(majorPanel, "ScienceButton", "이과\n<size=60%>증명 끝. (Q.E.D.)</size>", MAJOR_GREEN, new Vector2(0f, -40f), new Vector2(360f, 180f));
-            GameObject artsButton = EnsureButton(majorPanel, "ArtsButton", "예체능\n<size=60%>영혼은 학습되지 않는다</size>", MAJOR_YELLOW, new Vector2(420f, -40f), new Vector2(360f, 180f));
+            GameObject artsButton = EnsureButton(majorPanel, "ArtsButton", "예체능\n<size=60%>영혼은 학습되지 않는다</size>", MAJOR_YELLOW, new Vector2(560f, -40f), new Vector2(360f, 180f));
 
             // 세로 배치 (위→아래): Header 330 / Body 258 / CounterProtocol 150 (DdaSetupTools) /
             // 업그레이드 카드 -110 (UpgradeSetupTools) / NextWave -320. 서로 겹치지 않게 예약된 띠.

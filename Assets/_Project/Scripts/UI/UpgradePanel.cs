@@ -46,6 +46,18 @@ namespace Luddite.UI
         {
             if (_upgradeManager == null) return;
 
+            // 첫 인터벌은 세부전공 선택이 대신한다 (D7 — SubMajorPanel). 같은 오브젝트에
+            // SubMajorPanel이 실제로 배선돼 있을 때만 양보한다 — 없으면 숨기기만 하고
+            // 고를 것이 없는 소프트락이 되기 때문.
+            if (_gameManager != null && _gameManager.SelectedSubMajor == SubMajor.None
+                && TryGetComponent(out SubMajorPanel _))
+            {
+                foreach (Button button in _cardButtons)
+                    if (button != null) button.gameObject.SetActive(false);
+                if (_nextWaveButton != null) _nextWaveButton.gameObject.SetActive(false);
+                return;
+            }
+
             _choices.Clear();
             _choices.AddRange(_upgradeManager.DrawChoices(CARD_COUNT));
 

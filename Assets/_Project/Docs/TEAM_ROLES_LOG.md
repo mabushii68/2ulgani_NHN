@@ -81,6 +81,7 @@
 | D7 | 6 | 이양빈 (Git `VJL02` — 본인 확인 요) | 제출 문서 PDF 변환 파이프라인 — 인쇄용 HTML 3종 + 자동 컷 절 처리 | `Docs/PDF~/build_pdf_html.py`, `Docs/PDF~/SUBMIT_*.html` ×3 | — | 제출 문서 = 공동. PDF 제작이 Ctrl+P 1회로 축소 |
 | D7 | 7 | 이양빈 (Git `VJL02` — 본인 확인 요) | 과목 탄막 스프라이트 5종 절차 생성 (펜·컴퓨터·번개·공·음표 — 팀 저작물) | `Scripts/Editor/SubjectBulletSpriteTools.cs`, `Sprites/Icons/Procedural/Proc_*.png` ×5 | ⭕ | 아트 = 김정준 담당 영역이나 위임 지시로 수행. 나머지 4테마(책·돈·숫자·붓)는 기존 Franuka 아이콘 재사용 |
 | D7 | 8 | 이양빈 (Git `VJL02` — 본인 확인 요) | 전공 버튼 한국어 씬 반영 — 세션 3 이월분 빌더 재실행 (코드 변경 0) | `Scenes/Main.unity` | ⭕ | UI = 김정준 담당 영역이나 위임 지시로 수행. GameState 골격 → 폰트 빌더 순서 규칙 준수 |
+| D7 | 9 | 이양빈 (Git `VJL02` — 본인 확인 요) | 세부전공 선택 (첫 인터벌 대체, 9종) + 전공 버튼 간격 확대 | `Scripts/Core/{SubMajor,GameManager}.cs`, `Scripts/UI/{SubMajorPanel,UpgradePanel}.cs`, `Scripts/Editor/{SubMajorSetupTools,GameFlowSetupTools,SpriteBindingSetupTools}.cs`, `Scenes/Main.unity` | ⭕ | 게임 플로우 = 이양빈 / UI·레이아웃 = 김정준 영역 교차. 탄막 차별화는 보류(선택 저장까지) |
 
 ## 3. 협업·페어 작업 기록
 | 일차 | 작업 | 참여 | 분업 방식 (누가 무엇을) | 결과 |

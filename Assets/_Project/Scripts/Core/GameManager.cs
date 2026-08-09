@@ -34,6 +34,13 @@ namespace Luddite.Core
         /// <summary>MajorSelect에서 확정된 전공. 무기 차별화(D6)·전공색이 읽는다.</summary>
         public Major SelectedMajor { get; private set; } = Major.LiberalArts;
 
+        /// <summary>
+        /// 첫 WaveInterval에서 확정되는 세부전공 (D7). None = 미선택 —
+        /// UpgradePanel·SubMajorPanel이 이 값으로 첫 인터벌 여부를 판정한다.
+        /// 세부전공별 탄막 차별화는 후속 작업 (지금은 저장만).
+        /// </summary>
+        public SubMajor SelectedSubMajor { get; private set; } = SubMajor.None;
+
         /// <summary>이번 런의 승패 — Result 화면 메시지 분기 (§1.4). 승리 = 보스 격파.</summary>
         public bool RunWon { get; private set; }
 
@@ -120,9 +127,33 @@ namespace Luddite.Core
             if (!GuardTransition(GameState.MajorSelect, nameof(SelectMajor))) return;
 
             SelectedMajor = major;
+            SelectedSubMajor = SubMajor.None;   // 새 런 — 첫 인터벌에서 다시 고른다
             RunWon = false;
             GameEvents.RaiseRunStarted();
             ApplyState(GameState.Combat);
+        }
+
+        /// <summary>
+        /// 첫 WaveInterval의 세부전공 카드가 호출 (SubMajorPanel). 저장만 하고
+        /// 전투 진행은 UI가 <see cref="ContinueToNextWave"/>로 이어간다 — 업그레이드 카드와 같은 흐름.
+        /// </summary>
+        public void SelectSubMajor(SubMajor subMajor)
+        {
+            if (!GuardTransition(GameState.WaveInterval, nameof(SelectSubMajor))) return;
+
+            if (subMajor == SubMajor.None || SubMajorInfo.MajorOf(subMajor) != SelectedMajor)
+            {
+                Debug.LogWarning($"[GameManager] 세부전공 {subMajor}은(는) 전공 {SelectedMajor} 소속이 아님 — 무시");
+                return;
+            }
+
+            if (SelectedSubMajor != SubMajor.None)
+            {
+                Debug.LogWarning($"[GameManager] 세부전공은 런당 1회만 선택 (현재: {SelectedSubMajor}) — 무시");
+                return;
+            }
+
+            SelectedSubMajor = subMajor;
         }
 
         /// <summary>Combat → WaveInterval. TODO(D4): WaveManager가 웨이브 전멸 판정 직후 호출.</summary>

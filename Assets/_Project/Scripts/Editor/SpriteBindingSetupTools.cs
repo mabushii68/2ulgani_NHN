@@ -402,6 +402,9 @@ namespace Luddite.EditorTools
             skinned += SkinImage(canvas, "WaveIntervalPanel/UpgradeCard0", box, CARD_TINT, BOX_SLICE);
             skinned += SkinImage(canvas, "WaveIntervalPanel/UpgradeCard1", box, CARD_TINT, BOX_SLICE);
             skinned += SkinImage(canvas, "WaveIntervalPanel/UpgradeCard2", box, CARD_TINT, BOX_SLICE);
+            skinned += SkinImage(canvas, "WaveIntervalPanel/SubMajorCard0", box, CARD_TINT, BOX_SLICE);
+            skinned += SkinImage(canvas, "WaveIntervalPanel/SubMajorCard1", box, CARD_TINT, BOX_SLICE);
+            skinned += SkinImage(canvas, "WaveIntervalPanel/SubMajorCard2", box, CARD_TINT, BOX_SLICE);
             skinned += SkinImage(canvas, "ResultPanel/ToTitleButton", button, BUTTON_TINT, BUTTON_SLICE);
             skinned += SkinImage(canvas, "PausePanel/ResumeButton", button, BUTTON_TINT, BUTTON_SLICE);
             skinned += SkinImage(canvas, "PausePanel/ToTitleButton", button, BUTTON_TINT, BUTTON_SLICE);
