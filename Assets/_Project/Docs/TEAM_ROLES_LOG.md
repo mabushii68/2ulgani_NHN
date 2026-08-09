@@ -77,6 +77,7 @@
 | D7 | 2 | 이양빈 (Git `VJL02` — 본인 확인 요) | 오디오 전량(§12 — 자체 절차 합성 SFX 9종 + BGM + AudioDirector·배선 빌더) | `Audio/*`(신규 11), `Scripts/Core/AudioDirector.cs`, `Scripts/Editor/AudioSetupTools.cs`, 훅 5파일, `Docs/CREDITS.md` | ⭕ | 오디오·CREDITS = 김정준 담당 영역이나 위임 지시("계속 쭉 진행해")로 수행. 소스는 팀 저작 절차 합성 — 라이선스 이슈 0. 품질 교체는 WAV 파일만 갈아끼우면 됨 |
 | D7 | 3 | 이양빈 (Git `VJL02` — 본인 확인 요) | UI 한국어 교체(§10.5) — 카드·별명·승패·씬 텍스트 한국어 원문, AI 발화 영어 유지, ROOM/WAVE 표기 분기 | `Scripts/UI/{UpgradePanel,ResultProfile,GameScreens,WaveLabel}.cs`, `Scripts/Editor/GameFlowSetupTools.cs` | ⭕ | UI = 김정준 담당 영역이나 위임 지시로 수행. 씬 반영은 `GameState 골격` 빌더 재실행 + 폰트 빌더 마지막 재실행 필요 |
 | D7 | 4 | 이양빈 (Git `VJL02` — 본인 확인 요) | 화면 밖 위협 화살표(개정안 §3 보정 ① — 추적 카메라 동반 계약 완결) | `Scripts/UI/OffscreenThreatIndicator.cs`, `Scripts/Editor/OffscreenThreatSetupTools.cs` | ⭕ | HUD = 김정준 담당 영역이나 위임 지시로 수행. 엘리트·보스 마젠타 / 일반 무채색 (§10.4) |
+| D7 | 5 | 이양빈 (Git `VJL02` — 본인 확인 요) | Dungeon Tileset 출처 특정 — Franuka Dungeon Asset Pack URL·라이선스 확정 (실격 리스크 해소) | `Docs/{CREDITS,SUBMIT_4_AI활용,SYSTEMS}.md` | ⭕ | CREDITS = 김정준 담당 영역이나 위임 지시로 수행. 웹 검색 + 승격 파일 이미지 대조로 특정 |
 
 ## 3. 협업·페어 작업 기록
 | 일차 | 작업 | 참여 | 분업 방식 (누가 무엇을) | 결과 |
