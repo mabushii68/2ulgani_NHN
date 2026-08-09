@@ -26,6 +26,13 @@ namespace Luddite.Core
         [Tooltip("클리어 보상 상자. 시작방·보스방은 비워 둔다")]
         [SerializeField] private Chest _chest;
 
+        [Header("카메라 바운드 (빌더가 채운다)")]
+        [Tooltip("방 실루엣 바운딩 박스의 중심 — 방 로컬 오프셋. 비대칭 확장이 있는 방은 방 중심과 다르다")]
+        [SerializeField] private Vector2 _camLocalCenter;
+
+        [Tooltip("방 실루엣 바운딩 박스의 반경. (0,0)이면 DungeonConfig의 방 규격으로 폴백한다")]
+        [SerializeField] private Vector2 _camHalfExtents;
+
         private bool _entered;
 
         /// <summary>플레이어가 이 방에 처음 들어왔을 때 1회. 인자는 체인 인덱스.</summary>
@@ -43,6 +50,18 @@ namespace Luddite.Core
         public Door ExitDoor => _exitDoor;
         public Chest Chest => _chest;
         public Vector2 Center => transform.position;
+
+        /// <summary>
+        /// 카메라가 클램프할 사각형의 중심. 방 실루엣이 비대칭이면 <see cref="Center"/>와 다르다 —
+        /// 방 중심에 대칭 반경을 쓰면 확장이 없는 쪽으로 카메라가 넘어가 벽 밖 어둠을 비춘다.
+        /// </summary>
+        public Vector2 CameraCenter => (Vector2)transform.position + _camLocalCenter;
+
+        /// <summary>카메라 클램프 반경. (0,0)이면 빌더가 안 채운 것이므로 호출부가 설정값으로 폴백한다.</summary>
+        public Vector2 CameraHalfExtents => _camHalfExtents;
+
+        /// <summary>이 방이 카메라 바운드를 자기 값으로 갖고 있는가 (아니면 DungeonConfig 폴백).</summary>
+        public bool HasCameraBounds => _camHalfExtents.x > 0.01f && _camHalfExtents.y > 0.01f;
 
         /// <summary>웨이브 번호 = 체인 인덱스 (전투방 1 → 웨이브 1).</summary>
         public int WaveNumber => _chainIndex;

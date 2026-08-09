@@ -157,9 +157,19 @@ namespace Luddite.Core
             Room other = next != null ? next : prev;      // 마지막 방이면 뒤쪽 복도로 넓힌다
             if (other == null) return;
 
-            Vector2 mid = (room.Center + other.Center) * 0.5f;
-            float halfSpan = Mathf.Abs(other.Center.x - room.Center.x) * 0.5f + _config.RoomHalfExtents.x;
-            _cameraFollow.SetRoom(mid, new Vector2(halfSpan, _config.RoomHalfExtents.y));
+            // 두 방의 카메라 사각형을 통째로 감싼다. 이전 구현은 x축 간격만 봤는데,
+            // 체인에 세로 구간(⤴⤵)이 있어 y로 떨어진 두 방에서는 바운드가 복도를 못 덮었다.
+            Bounds b = CameraBox(room);
+            b.Encapsulate(CameraBox(other));
+            _cameraFollow.SetRoom(b.center, b.extents);
+        }
+
+        /// <summary>방의 카메라 클램프 사각형. 빌더가 실루엣을 안 채웠으면 설정값 규격으로 폴백한다.</summary>
+        private Bounds CameraBox(Room room)
+        {
+            Vector2 c = room.HasCameraBounds ? room.CameraCenter : room.Center;
+            Vector2 e = room.HasCameraBounds ? room.CameraHalfExtents : _config.RoomHalfExtents;
+            return new Bounds(c, e * 2f);
         }
 
         private void OnRoomCleared(int waveNumber)
@@ -182,7 +192,8 @@ namespace Luddite.Core
         private void MoveCameraTo(Room room)
         {
             if (_cameraFollow == null || _config == null) return;
-            _cameraFollow.SetRoom(room.Center, _config.RoomHalfExtents);
+            Bounds b = CameraBox(room);
+            _cameraFollow.SetRoom(b.center, b.extents);
         }
 
         private Room FindRoom(int chainIndex)
