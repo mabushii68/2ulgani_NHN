@@ -61,6 +61,38 @@ namespace Luddite.Data
         [Tooltip("전환 무적(초). §9 = 3초")]
         [SerializeField] private float _transitionInvulnerability = 3f;
 
+        [Header("P2 — PATTERN: YOU (§9. 데미지·탄수는 P1 패턴 값을 그대로 복제)")]
+        [Tooltip("P2 이동 속도. §5.1 보스 열 = 3.5")]
+        [SerializeField] private float _p2MoveSpeed = 3.5f;
+
+        [Tooltip("거리 복제 허용 오차(유닛) — 이 밴드 안이면 정지·공격. 초안 (§9 미명시)")]
+        [SerializeField] private float _p2DistanceTolerance = 0.75f;
+
+        [Tooltip("거리 복제 하한(유닛) — 근접형 프로필이라도 이 밑으로는 붙지 않는다. 초안")]
+        [SerializeField] private float _p2MinEngageDistance = 2.5f;
+
+        [Tooltip("거리 복제 상한(유닛) — 방 크기를 넘는 유지 거리 방지. 초안")]
+        [SerializeField] private float _p2MaxEngageDistance = 12f;
+
+        [Header("P2 구역 장판 (§9: favoriteQuadrant, 2s 텔레그래프 → 3s 지속, 8/s)")]
+        [Tooltip("장판 생성 주기(초). §9 '주기적' — 주기 값은 미명시라 초안, 기획 검토 대상")]
+        [SerializeField] private float _zoneInterval = 6f;
+
+        [Tooltip("장판 텔레그래프(초). §9 = 2초")]
+        [SerializeField] private float _zoneTelegraph = 2f;
+
+        [Tooltip("장판 지속(초). §9 = 3초")]
+        [SerializeField] private float _zoneActiveDuration = 3f;
+
+        [Tooltip("장판 데미지(초당). §9 = 8")]
+        [SerializeField] private float _zoneDamagePerSecond = 8f;
+
+        [Tooltip("장판 반경(유닛). 초안")]
+        [SerializeField] private float _zoneRadius = 2.2f;
+
+        [Tooltip("폴백 아레나(던전 OFF)에서 4분할 계산에 쓰는 반폭. 던전 ON이면 방 규격을 쓴다")]
+        [SerializeField] private Vector2 _fallbackArenaHalfExtents = new Vector2(12f, 7f);
+
         public float PatternTelegraph => _patternTelegraph;
         public float PatternCooldown => _patternCooldown;
         public float HoldDistance => _holdDistance;
@@ -91,5 +123,17 @@ namespace Luddite.Data
 
         public float Phase2HpFraction => _phase2HpFraction;
         public float TransitionInvulnerability => _transitionInvulnerability;
+
+        public float P2MoveSpeed => _p2MoveSpeed;
+        public float P2DistanceTolerance => _p2DistanceTolerance;
+        public float P2MinEngageDistance => _p2MinEngageDistance;
+        public float P2MaxEngageDistance => _p2MaxEngageDistance;
+
+        public float ZoneInterval => _zoneInterval;
+        public float ZoneTelegraph => _zoneTelegraph;
+        public float ZoneActiveDuration => _zoneActiveDuration;
+        public float ZoneDamagePerSecond => _zoneDamagePerSecond;
+        public float ZoneRadius => _zoneRadius;
+        public Vector2 FallbackArenaHalfExtents => _fallbackArenaHalfExtents;
     }
 }

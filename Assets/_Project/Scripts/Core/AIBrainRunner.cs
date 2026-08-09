@@ -52,6 +52,14 @@ namespace Luddite.Core
 
         private int _pendingHitProjectileId = ThreatEventTracker.NO_BULLET;
 
+        /// <summary>
+        /// 프로파일 좌표계의 원점. §6.4의 4분할(favoriteQuadrant)은 "아레나 중심 기준"인데
+        /// 던전 체인은 y=−200에 있어 월드 원점 기준으로는 전 구역이 남쪽으로 오염된다 —
+        /// <see cref="DungeonManager"/>가 방 진입마다 그 방의 중심을 넣는다. 폴백 아레나는 원점(기본값).
+        /// 교전 거리·이동 히스토그램은 상대량이라 영향 없다.
+        /// </summary>
+        private Vector2 _profileOrigin;
+
         // ── 읽기 전용 노출 (HUD §10.1 / WaveInterval 패널 §10.2 / 결과 화면 §13) ──
 
         public bool IsReady => _predictor != null && _tracker != null;
@@ -187,6 +195,9 @@ namespace Luddite.Core
             TickProfiler();
         }
 
+        /// <summary>현재 방(아레나) 중심을 프로파일 좌표계의 원점으로 지정. 던전 전용 훅 — 폴백은 원점 유지.</summary>
+        public void SetProfileOrigin(Vector2 origin) => _profileOrigin = origin;
+
         /// <summary>§6.4 프로파일 수집. timeScale 0(인터벌·일시정지)에서는 deltaTime이 0이라 자연히 멈춘다.</summary>
         private void TickProfiler()
         {
@@ -195,14 +206,15 @@ namespace Luddite.Core
             for (int i = 0; i < enemies.Count; i++)
             {
                 if (enemies[i] != null && enemies[i].IsAlive)
-                    _enemyPositionBuffer.Add(ToVec2(enemies[i].transform.position));
+                    _enemyPositionBuffer.Add(ToVec2((Vector2)enemies[i].transform.position - _profileOrigin));
             }
 
             PlayerController controller = PlayerControllerRef;
             Vec2 moveInput = controller != null ? ToVec2(controller.MoveInput) : Vec2.Zero;
             bool isFiring = controller != null && controller.IsFiring;
 
-            _profiler.Tick(Time.deltaTime, ToVec2(_player.position),
+            // 플레이어·적 모두 같은 원점을 빼므로 교전 거리(상대량)는 불변, 4분할만 방 중심 기준이 된다
+            _profiler.Tick(Time.deltaTime, ToVec2((Vector2)_player.position - _profileOrigin),
                 _enemyPositionBuffer, moveInput, isFiring);
         }
 

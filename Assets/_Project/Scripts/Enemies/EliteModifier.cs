@@ -20,7 +20,8 @@ namespace Luddite.Enemies
     ///
     /// <para>
     /// AIBrain은 <b>읽기만</b> 한다 (규칙 7과 같은 정신) — 이 컴포넌트는 모델을 절대 수정하지 않는다.
-    /// 마젠타는 예측탄·조준선·마커 전용 (🔴 §10.4). TODO(D5): 보스 P1이 이 컴포넌트를 재사용.
+    /// 마젠타는 예측탄·조준선·마커 전용 (🔴 §10.4). 보스 P2(<see cref="BossLLM"/>)가 이 컴포넌트를
+    /// 재사용한다 — 부착만 하면 HUD AI 패널의 "생존 시 표시" 조건(ActiveCount)도 함께 충족된다.
     /// </para>
     /// </summary>
     public class EliteModifier : MonoBehaviour
@@ -102,10 +103,28 @@ namespace Luddite.Enemies
             if (_config == null || _gun == null || _brain == null || _player == null) return false;
             if (!_brain.IsHighConfidence) return false;
             if (_attackCount % _config.AttacksPerPredictive != 0) return false;
+            if (!IsOnScreen()) return false;   // 🔴 계약 #4 — 아래 주석 참조
 
             _aiming = true;
             UpdatePredictiveAim();
             return true;
+        }
+
+        /// <summary>
+        /// 🔴 예측탄 온스크린 게이트 (개정안 v1.1 신규 계약 #4): 엘리트·보스는 <b>자신이 화면 안에
+        /// 있을 때만</b> 예측탄을 쏜다 — 조준선을 못 보면 심리전이 아니라 억까다. 일반탄은 화면 안팎
+        /// 무관 발사·전부 학습 (표본량 확보, 감쇠가 자정). 방이 화면보다 작은 동안은 항상 통과하며,
+        /// 방 확대 시 즉시 유효해진다.
+        /// </summary>
+        private bool IsOnScreen()
+        {
+            Camera cam = Camera.main;
+            if (cam == null) return true;   // 카메라 없는 테스트 씬 — 게이트 무력화가 안전한 기본값
+
+            Vector3 viewport = cam.WorldToViewportPoint(transform.position);
+            return viewport.z > 0f
+                && viewport.x >= 0f && viewport.x <= 1f
+                && viewport.y >= 0f && viewport.y <= 1f;
         }
 
         /// <summary>

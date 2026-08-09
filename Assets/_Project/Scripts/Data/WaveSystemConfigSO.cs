@@ -26,5 +26,8 @@ namespace Luddite.Data
 
         public float RingHalfWidth => _arenaHalfWidth - _spawnInset;
         public float RingHalfHeight => _arenaHalfHeight - _spawnInset;
+
+        /// <summary>벽 안쪽 여유(§2 = 1). 던전 모드가 방 규격에서 링을 계산할 때도 같은 값을 쓴다.</summary>
+        public float SpawnInset => _spawnInset;
     }
 }

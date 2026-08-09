@@ -48,6 +48,7 @@ namespace Luddite.Core
 
         // ── 던전 모드 훅 (개정안 v1.1). 전부 기본값이 D4까지의 동작과 같다 — 🔴 폴백 보존 ──
         private Vector2 _spawnOrigin = Vector2.zero;
+        private Vector2? _ringHalfOverride;   // 던전 방 규격에서 계산된 링 반폭. null = SO(폴백 아레나) 값
         private bool _externalWaveControl;
 
         /// <summary>
@@ -59,6 +60,21 @@ namespace Luddite.Core
 
         /// <summary>스폰 링의 중심. 던전 모드에서 방 중심으로 옮긴다 (기본 원점 = 기존 아레나).</summary>
         public void SetSpawnOrigin(Vector2 origin) { _spawnOrigin = origin; }
+
+        /// <summary>
+        /// 던전 모드 전용: 스폰 영역을 방 중심 + <b>방 내부 반폭</b>으로 지정한다. 링은 여기서
+        /// 벽 안쪽 여유(§2 인셋)를 빼고 계산된다 — 링 크기가 SO 전역값이 아니라 <b>방의 속성</b>이 된다.
+        /// 호출하지 않으면(폴백) SO의 아레나 반폭을 쓴다. D5에 SO 값을 방 규격(16×9)으로 바꿔 두는
+        /// 방식은 폴백 아레나(반폭 12×7)에서 적이 벽 밖에 스폰되는 소프트락을 만들었다 — 그 정정.
+        /// </summary>
+        public void SetSpawnArea(Vector2 origin, Vector2 roomHalfExtents)
+        {
+            _spawnOrigin = origin;
+            float inset = _systemConfig != null ? _systemConfig.SpawnInset : 1f;
+            _ringHalfOverride = new Vector2(
+                Mathf.Max(roomHalfExtents.x - inset, 1f),
+                Mathf.Max(roomHalfExtents.y - inset, 1f));
+        }
 
         /// <summary>
         /// true면 <c>Combat</c> 진입만으로 웨이브를 시작하지 않는다 — 방 진입이 시작 신호가 된다.
@@ -300,8 +316,8 @@ namespace Luddite.Core
         /// </summary>
         private Vector2 RandomEdgePosition()
         {
-            float w = _systemConfig.RingHalfWidth;
-            float h = _systemConfig.RingHalfHeight;
+            float w = _ringHalfOverride.HasValue ? _ringHalfOverride.Value.x : _systemConfig.RingHalfWidth;
+            float h = _ringHalfOverride.HasValue ? _ringHalfOverride.Value.y : _systemConfig.RingHalfHeight;
 
             float horizontal = 2f * w;
             float vertical = 2f * h;

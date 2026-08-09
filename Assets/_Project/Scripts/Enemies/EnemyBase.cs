@@ -64,6 +64,9 @@ namespace Luddite.Enemies
         /// <summary>남은 체력. HUD·디버그용.</summary>
         public float Hp => _hp;
 
+        /// <summary>최대 체력. HUD 보스 바·디버그용 — 수치 소유는 여전히 SO(읽기 전용 노출).</summary>
+        public float MaxHp => _stats != null ? _stats.MaxHp : 0f;
+
         /// <summary>넉백이 이동을 덮어쓰는 중인지. 이 동안 <see cref="SetMoveVelocity"/>는 무시된다.</summary>
         public bool IsKnockedBack => _knockbackRemaining > 0f;
 

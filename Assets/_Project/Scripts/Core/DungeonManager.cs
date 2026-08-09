@@ -30,11 +30,15 @@ namespace Luddite.Core
 
         private Room _currentRoom;
         private bool _active;
+        private AIBrainRunner _brainRunner;
 
         /// <summary>던전 모드가 실제로 켜져 있는가. 폴백 판정의 단일 기준.</summary>
         public bool Active => _active;
 
         public Room CurrentRoom => _currentRoom;
+
+        /// <summary>방 내부 반폭. 보스 P2 구역 장판이 4분할 좌표 계산에 읽는다.</summary>
+        public Vector2 RoomHalfExtents => _config != null ? _config.RoomHalfExtents : Vector2.zero;
 
         private void Awake()
         {
@@ -50,6 +54,7 @@ namespace Luddite.Core
             if (_waveManager == null) _waveManager = FindFirstObjectByType<WaveManager>();
             if (_gameManager == null) _gameManager = FindFirstObjectByType<GameManager>();
             if (_cameraFollow == null) _cameraFollow = FindFirstObjectByType<CameraFollow>();
+            _brainRunner = FindFirstObjectByType<AIBrainRunner>();   // 프로필 4분할 원점 보정용 (없으면 무시)
             if (_waveManager == null || _gameManager == null)
             {
                 Debug.LogError("[DungeonManager] WaveManager/GameManager 없음 — 던전 비활성화", this);
@@ -110,6 +115,7 @@ namespace Luddite.Core
                 // 시작방은 전투가 없으므로 나가는 문을 바로 연다
                 if (start.ExitDoor != null) start.ExitDoor.Unlock();
                 _currentRoom = start;
+                if (_brainRunner != null) _brainRunner.SetProfileOrigin(start.Center);
             }
         }
 
@@ -118,6 +124,9 @@ namespace Luddite.Core
             if (!_active || room == null) return;
             _currentRoom = room;
             MoveCameraTo(room);
+
+            // §6.4 4분할은 "방 중심 기준"이어야 한다 — 던전은 y=−200이라 월드 원점 기준이면 전부 남쪽으로 오염
+            if (_brainRunner != null) _brainRunner.SetProfileOrigin(room.Center);
 
             if (!room.IsCombatRoom) return;
 
@@ -135,8 +144,9 @@ namespace Luddite.Core
             yield return new WaitForSeconds(_lockInDelay);
             if (!_active || room == null) yield break;
 
-            // 스폰 링을 이 방 중심으로 옮긴 뒤 웨이브 시작
-            _waveManager.SetSpawnOrigin(room.Center);
+            // 스폰 영역을 이 방(중심 + 방 규격)으로 옮긴 뒤 웨이브 시작 — 링 크기는 방의 속성이다.
+            // SO의 링 값은 폴백 아레나(12×7) 기준으로 남는다 (토글 OFF 소프트락 정정)
+            _waveManager.SetSpawnArea(room.Center, _config.RoomHalfExtents);
             _waveManager.BeginWaveNow(room.WaveNumber);
         }
 

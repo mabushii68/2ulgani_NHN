@@ -109,6 +109,21 @@ namespace Luddite.Core
         }
 
         /// <summary>
+        /// 보스가 P2 「PATTERN: YOU」로 전환됐다 (§9 — HP 60%, 전환 무적 시작 시점).
+        /// <para>
+        /// 발행: <c>Luddite.Enemies.BossLLM</c>. 구독: <c>Luddite.UI.BossPhaseOverlay</c> —
+        /// "USER MODEL LOADED / COPY COMPLETE / PATTERN: YOU" 연출. 보스가 UI를 알 필요가
+        /// 없도록 버스를 경유한다 (PredictionFailed와 같은 로직×비주얼 접점).
+        /// </para>
+        /// </summary>
+        public static event Action BossPhaseTwoStarted;
+
+        public static void RaiseBossPhaseTwoStarted()
+        {
+            BossPhaseTwoStarted?.Invoke();
+        }
+
+        /// <summary>
         /// 정적 이벤트는 도메인 리로드를 끄고 플레이 모드를 재시작하면 죽은 구독자를 물고 있다.
         /// 플레이 모드 진입 시점에 한 번 비워 그 사고를 막는다.
         /// </summary>
@@ -121,6 +136,7 @@ namespace Luddite.Core
             RunStarted = null;
             PredictionFailed = null;
             WaveEnded = null;
+            BossPhaseTwoStarted = null;
         }
     }
 }
