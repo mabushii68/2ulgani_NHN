@@ -72,6 +72,7 @@
 | D5 | 8 | 김정준 | `MAP_SPEC.md` 정렬 — 맵 바깥 어둠 복원(암반 철회)·조도 0.88·락인 후 0.5s 스폰·`SetLocked` API, 스펙 §2 좌표 표 실측 10행으로 채움 + §11 구현 현황 신설 | `Scripts/Core/{Door,DungeonManager}.cs`, `Scripts/Editor/DungeonSetupTools.cs`, `Docs/MAP_SPEC.md`, `Scenes/Main.unity` | ⭕ | **`MAP_SPEC.md`는 김정준×이양빈 공동 문서.** 스펙이 옳은 곳은 구현을, 비어 있거나 낡은 곳은 문서를 고치는 양방향 정렬. 미구현 7항목을 사유와 함께 문서에 남김 |
 | D5 | 9 | 김정준 | Sorting Layer 9종 정의 + 벽 높이 착시 + 꺾인 체인(꺾임 4회)·복도 폭 3~7 변주 + 기둥 28·소품 55 배치 | `ProjectSettings/TagManager.asset`, `Scripts/Editor/{DungeonSetupTools,SortingLayerSetupTools}.cs`, `Sprites/Dungeon/Decor/*`, `Scenes/Main.unity` | ⭕ | ⚠️ **`ProjectSettings/` 변경은 CLAUDE.md 금지 목록(사람 수행)이나 사람이 직접 지시해 수행.** 🔴 기둥·장식은 **전부 비충돌** — 계약 #2·MAP_SPEC §7의 금지 사유(적 FSM 장애물 회피 없음 / 탄 차단 시 학습 표본 오염)가 실제 고장이라, 충돌 기둥은 이양빈 승인 대상으로 분리 |
 | D6 | 1 | 김정준 | 제출 문서 3종 초안 + 누락된 D4·D5 세션 로그 소급 정리 | `Docs/{AI_USAGE_LOG,TEAM_ROLES_LOG}.md`, `Docs/SUBMIT_*.md`(신규 3종) | — | 제출 문서 = 공동. D4 로그는 §0 규칙(사후 재구성 금지)에 따라 커밋 기록으로만 표기 |
+| D6 | 2 | 김정준 | 적 탄·엘리트 마젠타 텔레그래프가 안 보이던 문제 — `Default` 정렬 레이어 잔류 2건 + 배정 빌더의 조용한 실패 2건 | `Prefabs/{EnemyProjectile,EliteDrone}.prefab`, `Scripts/Editor/SortingLayerSetupTools.cs`, `Docs/{AI_USAGE_LOG,TEAM_ROLES_LOG}.md` | ⭕ | 정렬 레이어·마젠타 시각 언어 = 김정준 담당 정면. **적·엘리트 프리팹은 이양빈 담당 영역**이나 변경은 렌더링 배정(`m_SortingLayerID`)에 한정 — FSM·전투 수치·SO 무변경. 빌더 오타(`EliteChatbot` → 실제 `EliteDrone`)가 로그 없이 `continue`해 `b0834ea`의 수정이 두 프리팹을 건너뛴 것이 재발 원인 |
 
 ## 3. 협업·페어 작업 기록
 | 일차 | 작업 | 참여 | 분업 방식 (누가 무엇을) | 결과 |
