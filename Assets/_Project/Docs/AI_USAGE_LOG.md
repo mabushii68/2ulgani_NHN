@@ -829,7 +829,7 @@
   - `Data/SubMajorBulletSetSO.cs`(9종 스프라이트 매핑 SO — 규칙 2) + 인스턴스 `SO/SubMajorBulletSet.asset`, `BasicWeapon` 발사 시점 교체(테마 탄은 흰색 무틴트 — 원색 아이콘에 전공색 틴트를 곱하면 팔레트가 죽는다 / 미선택·미배선이면 기본 탄+전공색 폴백), `SubMajorSetupTools`에 배선 메뉴 추가(SO 생성·스프라이트 9종·무기 참조).
   - 스프라이트 출처: 자체 제작 5종(세션 7 Proc_*) + Franuka 아이콘 4종(Coin/Scroll/Plus/Brush — CC BY 4.0, CREDITS 사용 위치 갱신 같은 커밋).
 - **검증**: 플레이 모드 발사 스모크 — 선택 전 FireballBig+전공색 틴트 / 상경계 선택 후 Coin 무틴트 / 새 런 예체능·음악 선택 후 Proc_Note 무틴트 / SO 매핑 9종 전수 조회 누락 0. 에러 0. 실플레이 시각 확인은 사람 대기.
-- **커밋 해시**: (이 커밋)
+- **커밋 해시**: `4875e78` (브랜치 `main`)
 - **커밋 해시**: `1a6f9e1` (브랜치 `main`)
 - **커밋 해시**: `fc30c29` (브랜치 `main`)
 
