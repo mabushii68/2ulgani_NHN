@@ -358,3 +358,10 @@ P(dir) = (obs_dir + 1) / (obs_L + obs_R + 2)      // 가상 카운트 (1,1) 고�
   PREDICTION FAILED / MODEL UPDATING / USER MODEL LOADED / INITIALIZING / AI ANALYSIS 통계 블록
 - `WaveLabel`: 던전 ON = `ROOM n/7`, 폴백 = `WAVE n/7` (v1.1 "표기만 방/ROOM" — 내부 상태명 Wave 유지)
 - ⚠️ 씬에 구운 텍스트는 **`Luddite/Setup/GameState 골격` 빌더 재실행 후 폰트 빌더 마지막 재실행** 필요
+
+### 16.6 화면 밖 위협 화살표 (개정안 §3 보정 ① — D7 세션 4, §15.6-5 해소)
+- `UI/OffscreenThreatIndicator.cs` — HUD 자식(Combat에서만 표시). 화면 밖 생존 적마다 가장자리에
+  방향 화살표: **엘리트·보스 = 마젠타 / 일반 = 무채색** (§10.4). 풀 12개 Awake 생성 — 프레임 할당 0
+- 화살표 스프라이트 = 조준 표식과 같은 `AimArrow` 재사용. 보정 ②(조준선 전체 렌더)는 기충족
+- 배선: `Luddite/Setup/화면 밖 위협 화살표 배선 (개정안 §3)` (멱등)
+- 이로써 **추적 카메라의 조건부 동반 계약("보정 없는 추적 금지")이 완결** — §15.6 잔여는 2(토글 OFF 실주행)·4(보스 P1 실플레이)·6(타일셋 라이선스)·7(적 색역)뿐
