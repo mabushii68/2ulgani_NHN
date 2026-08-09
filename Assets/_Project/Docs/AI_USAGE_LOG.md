@@ -818,7 +818,7 @@
   - `Core/SubMajor.cs`(enum 9종 + None, 전공 매핑·한국어 표기), `GameManager.SelectedSubMajor` + `SelectSubMajor()`(WaveInterval 한정 / 소속 전공 검증 / 런당 1회 / 새 런 리셋), `UI/SubMajorPanel.cs`(첫 인터벌만 노출, 안내문 교체·복원), `UpgradePanel` 양보 로직(SubMajorPanel이 실제 배선된 경우에만 — 미배선 소프트락 방어), `Editor/SubMajorSetupTools.cs`(멱등 빌더 — UpgradeCard와 같은 띠 재사용), SpriteBinding 스킨 3줄.
   - 상태 신설 없음 — WaveInterval 재사용 (🔴 계약 §1 준수). UI는 GameManager 전용 API 경유 (규칙 7 선례).
 - **검증**: 플레이 모드에서 API 직접 호출 스모크 — 첫 인터벌: 세부전공 카드 3장(전공별 라벨 정확)·업그레이드 카드/NEXT 숨김·안내문 교체 / 선택 후: 저장·전투 진행·전투 중 재선택 거부 / 2번째 인터벌: 업그레이드 카드 복귀·안내문 복원 / 새 런: None 리셋·타 전공 라벨 갱신. 에러 0. 중간에 스모크 자체의 전환 순서 오류(WaveInterval에서 EndRun 호출)로 거짓 실패 1회 — 가드 경고 로그로 원인 특정 후 유효 순서로 재검증.
-- **커밋 해시**: (이 커밋)
+- **커밋 해시**: `1a6f9e1` (브랜치 `main`)
 - **커밋 해시**: `fc30c29` (브랜치 `main`)
 
 ---
