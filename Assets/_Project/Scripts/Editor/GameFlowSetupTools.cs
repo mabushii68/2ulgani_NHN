@@ -66,38 +66,40 @@ namespace Luddite.EditorTools
             GameScreens screens = EnsureComponent<GameScreens>(canvasObject);
 
             // 4) 패널 6종 + 내용물
+            // 텍스트 규칙 (§10.5): 인간 세계 = 한국어 원문 / AI 시스템 발화 = 영어 대문자 터미널체.
+            // 타이틀 로고는 영문 유지 + 정체성 문구를 한국어 부제로 (D7 한국어 교체)
             GameObject titlePanel = EnsurePanel(canvasObject, "TitlePanel", PANEL_BG);
             EnsureText(titlePanel, "TitleText", "LUDDITE 2026", 96, TEXT_MAIN, new Vector2(0f, 160f), new Vector2(1400f, 140f));
-            EnsureText(titlePanel, "SubtitleText", "AI LEARNS HOW YOU DODGE. SO LIE TO IT.", 28, TEXT_DIM, new Vector2(0f, 40f), new Vector2(1400f, 60f));
-            GameObject startButton = EnsureButton(titlePanel, "StartButton", "START", BUTTON_BG, new Vector2(0f, -140f), new Vector2(360f, 72f));
+            EnsureText(titlePanel, "SubtitleText", "AI는 당신의 플레이를 학습합니다. 그러니 AI에게 거짓말하세요.", 28, TEXT_DIM, new Vector2(0f, 40f), new Vector2(1400f, 60f));
+            GameObject startButton = EnsureButton(titlePanel, "StartButton", "시작", BUTTON_BG, new Vector2(0f, -140f), new Vector2(360f, 72f));
 
             GameObject majorPanel = EnsurePanel(canvasObject, "MajorSelectPanel", PANEL_BG);
-            EnsureText(majorPanel, "HeaderText", "SELECT MAJOR", 56, TEXT_MAIN, new Vector2(0f, 260f), new Vector2(1200f, 90f));
-            GameObject liberalButton = EnsureButton(majorPanel, "LiberalArtsButton", "LIBERAL ARTS", MAJOR_BLUE, new Vector2(-420f, -40f), new Vector2(360f, 180f));
-            GameObject scienceButton = EnsureButton(majorPanel, "ScienceButton", "SCIENCE", MAJOR_GREEN, new Vector2(0f, -40f), new Vector2(360f, 180f));
-            GameObject artsButton = EnsureButton(majorPanel, "ArtsButton", "ARTS", MAJOR_YELLOW, new Vector2(420f, -40f), new Vector2(360f, 180f));
+            EnsureText(majorPanel, "HeaderText", "전공을 선택하세요", 56, TEXT_MAIN, new Vector2(0f, 260f), new Vector2(1200f, 90f));
+            GameObject liberalButton = EnsureButton(majorPanel, "LiberalArtsButton", "문과\n<size=60%>펜은 칼보다 강하다</size>", MAJOR_BLUE, new Vector2(-420f, -40f), new Vector2(360f, 180f));
+            GameObject scienceButton = EnsureButton(majorPanel, "ScienceButton", "이과\n<size=60%>증명 끝. (Q.E.D.)</size>", MAJOR_GREEN, new Vector2(0f, -40f), new Vector2(360f, 180f));
+            GameObject artsButton = EnsureButton(majorPanel, "ArtsButton", "예체능\n<size=60%>영혼은 학습되지 않는다</size>", MAJOR_YELLOW, new Vector2(420f, -40f), new Vector2(360f, 180f));
 
             // 세로 배치 (위→아래): Header 330 / Body 258 / CounterProtocol 150 (DdaSetupTools) /
             // 업그레이드 카드 -110 (UpgradeSetupTools) / NextWave -320. 서로 겹치지 않게 예약된 띠.
             GameObject wavePanel = EnsurePanel(canvasObject, "WaveIntervalPanel", PANEL_BG);
             EnsureText(wavePanel, "HeaderText", "TARGET PROFILE", 56, TEXT_MAIN, new Vector2(0f, 330f), new Vector2(1200f, 80f));
-            EnsureText(wavePanel, "BodyText", "( LEARNING STATS — D5 )", 24, TEXT_DIM, new Vector2(0f, 258f), new Vector2(1200f, 50f));
-            GameObject nextWaveButton = EnsureButton(wavePanel, "NextWaveButton", "NEXT WAVE", BUTTON_BG, new Vector2(0f, -320f), new Vector2(360f, 72f));
+            EnsureText(wavePanel, "BodyText", "AI가 당신의 회피 습관을 분석했습니다. 업그레이드를 고르면 다음 전투가 시작됩니다.", 24, TEXT_DIM, new Vector2(0f, 258f), new Vector2(1200f, 50f));
+            GameObject nextWaveButton = EnsureButton(wavePanel, "NextWaveButton", "다음 전투로", BUTTON_BG, new Vector2(0f, -320f), new Vector2(360f, 72f));
 
             GameObject bossPanel = EnsurePanel(canvasObject, "BossIntroPanel", PANEL_BG);
-            EnsureText(bossPanel, "IntroText", "WAVE 7 — MASSIVE LLM", 72, TEXT_MAIN, new Vector2(0f, 40f), new Vector2(1500f, 110f));
+            EnsureText(bossPanel, "IntroText", "최종 전투 — 거대 LLM", 72, TEXT_MAIN, new Vector2(0f, 40f), new Vector2(1500f, 110f));
             EnsureText(bossPanel, "SubText", "INITIALIZING...", 30, TEXT_DIM, new Vector2(0f, -60f), new Vector2(1200f, 60f));
 
             // 세로 배치: 승패 380 / 별명 280 / 요약 200 / 통계·히스토그램 -40 / 코멘트 -240 / 버튼 -340
             // (별명~코멘트는 ResultSetupTools가 얹는다 — §13 프로필)
             GameObject resultPanel = EnsurePanel(canvasObject, "ResultPanel", PANEL_BG);
             GameObject resultMessage = EnsureText(resultPanel, "ResultMessage", "RESULT", 38, TEXT_MAIN, new Vector2(0f, 380f), new Vector2(1500f, 80f));
-            GameObject resultToTitle = EnsureButton(resultPanel, "ToTitleButton", "TO TITLE", BUTTON_BG, new Vector2(0f, -340f), new Vector2(360f, 72f));
+            GameObject resultToTitle = EnsureButton(resultPanel, "ToTitleButton", "타이틀로", BUTTON_BG, new Vector2(0f, -340f), new Vector2(360f, 72f));
 
             GameObject pausePanel = EnsurePanel(canvasObject, "PausePanel", PAUSE_BG);
-            EnsureText(pausePanel, "HeaderText", "PAUSED", 64, TEXT_MAIN, new Vector2(0f, 140f), new Vector2(800f, 100f));
-            GameObject resumeButton = EnsureButton(pausePanel, "ResumeButton", "RESUME", BUTTON_BG, new Vector2(0f, -20f), new Vector2(360f, 72f));
-            GameObject pauseToTitle = EnsureButton(pausePanel, "ToTitleButton", "TO TITLE", BUTTON_BG, new Vector2(0f, -120f), new Vector2(360f, 72f));
+            EnsureText(pausePanel, "HeaderText", "일시정지", 64, TEXT_MAIN, new Vector2(0f, 140f), new Vector2(800f, 100f));
+            GameObject resumeButton = EnsureButton(pausePanel, "ResumeButton", "계속", BUTTON_BG, new Vector2(0f, -20f), new Vector2(360f, 72f));
+            GameObject pauseToTitle = EnsureButton(pausePanel, "ToTitleButton", "타이틀로", BUTTON_BG, new Vector2(0f, -120f), new Vector2(360f, 72f));
 
             // 5) 초기 활성 상태 — 플레이 진입 시 GameManager.Start가 Title 통지로 맞춰 주지만,
             //    에디터에서 씬을 열었을 때도 타이틀만 보이는 것이 자연스럽다

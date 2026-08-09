@@ -349,3 +349,12 @@ P(dir) = (obs_dir + 1) / (obs_L + obs_R + 2)      // 가상 카운트 (1,1) 고�
 - BGM: Combat 진입 시 시작, 런 내내 유지(인터벌·일시정지 포함), Title/Result 정지
 - 배선: `Luddite/Setup/오디오 배선 (§12)` (멱등 — 누락 클립은 LogError로 드러남)
 - 품질 교체 경로: WAV 파일만 갈아끼우면 됨 (AudioDirector는 출처 무관)
+
+### 16.5 UI 한국어 교체 (§10.5 — D7 세션 3)
+- **한국어 (인간 세계)**: 업그레이드 카드(`UpgradeSO.DisplayName/Tooltip`) / 결과 별명·코멘트(`NameKo/CommentKo`) /
+  승패 문구(§1.4 원문 + 영어 병기) / 타이틀 부제(정체성 문구)·시작·전공 3버튼(§4.1 문구 병기)·
+  일시정지·계속·타이틀로·다음 전투로·보스 인트로 헤더
+- **영어 유지 (AI 시스템 발화)**: TARGET PROFILE / COUNTER PROTOCOL / AI MODEL: LEARNING / AI READS /
+  PREDICTION FAILED / MODEL UPDATING / USER MODEL LOADED / INITIALIZING / AI ANALYSIS 통계 블록
+- `WaveLabel`: 던전 ON = `ROOM n/7`, 폴백 = `WAVE n/7` (v1.1 "표기만 방/ROOM" — 내부 상태명 Wave 유지)
+- ⚠️ 씬에 구운 텍스트는 **`Luddite/Setup/GameState 골격` 빌더 재실행 후 폰트 빌더 마지막 재실행** 필요

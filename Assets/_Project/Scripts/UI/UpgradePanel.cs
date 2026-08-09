@@ -11,7 +11,7 @@ namespace Luddite.UI
     /// WaveInterval 패널의 업그레이드 3택 카드 (GDD §8, §10.2 하단).
     /// 패널이 켜질 때(인터벌 진입) 추첨하고, 카드 선택 = 적용 + 다음 웨이브 진행.
     /// 후보가 없을 때(전부 상한)만 NEXT WAVE 버튼을 노출한다.
-    /// TODO(D3 폰트): 한글 폰트 반입 후 SO의 한국어 원문으로 교체 표시.
+    /// 표기는 SO의 한국어 원문 (§10.5 인간 세계 = 한국어 — D3 반입 한글 폰트 전제, D7 이행).
     /// </summary>
     public class UpgradePanel : MonoBehaviour
     {
@@ -59,8 +59,8 @@ namespace Luddite.UI
                 int stack = _upgradeManager.StackOf(upgrade);
                 string stackLabel = upgrade.MaxStacks > 0 ? $"  ({stack}/{upgrade.MaxStacks})" : "";
 
-                if (_cardNames[i] != null) _cardNames[i].text = upgrade.DisplayNameEn + stackLabel;
-                if (_cardTooltips[i] != null) _cardTooltips[i].text = upgrade.TooltipEn;
+                if (_cardNames[i] != null) _cardNames[i].text = upgrade.DisplayName + stackLabel;
+                if (_cardTooltips[i] != null) _cardTooltips[i].text = upgrade.Tooltip;
             }
 
             if (_nextWaveButton != null) _nextWaveButton.gameObject.SetActive(_choices.Count == 0);

@@ -12,7 +12,7 @@ namespace Luddite.UI
     /// 회피 편향 / AI 예측 적중률 / 역카운터 성공률 / 8방향 이동 히스토그램.
     /// 데이터는 <see cref="AIBrainRunner"/>를 읽기만 한다 (규칙 7).
     /// Result 패널이 켜질 때 1회 구성 — 런은 이미 끝났으므로 갱신이 필요 없다.
-    /// TODO(D3 폰트): 한글 폰트 반입 후 SO의 한국어 원문으로 교체.
+    /// 별명·코멘트는 SO 한국어 원문(§13 목업), 통계 블록은 영어 시스템 발화 (§10.5 — D7 이행).
     /// </summary>
     public class ResultProfile : MonoBehaviour
     {
@@ -47,7 +47,7 @@ namespace Luddite.UI
             }
 
             if (_nickname != null)
-                _nickname.text = entry != null ? $"[ {entry.NameEn} ]" : "[ SUBJECT #001 ]";
+                _nickname.text = entry != null ? $"[ {entry.NameKo} ]" : "[ 피험자 #001 ]";
 
             if (_summaryLine != null)
                 _summaryLine.text =
@@ -66,7 +66,7 @@ namespace Luddite.UI
             if (_histogramBlock != null) _histogramBlock.text = BuildHistogram();
 
             if (_comment != null)
-                _comment.text = entry != null ? $"\"{entry.CommentEn}\"" : "";
+                _comment.text = entry != null ? $"\"{entry.CommentKo}\"" : "";
         }
 
         /// <summary>8방향 이동 히스토그램 텍스트 바. TODO(아트): 회피 히트맵 시각화로 교체 (§13).</summary>
