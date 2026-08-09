@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<title>러다이트 2026 — 게임 소개</title><style>
+body { font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; color: #1a1a1e;
+       max-width: 800px; margin: 0 auto; padding: 40px 24px; line-height: 1.65; font-size: 14px; }
+h1 { font-size: 26px; border-bottom: 3px solid #c026d3; padding-bottom: 8px; }
+h2 { font-size: 20px; margin-top: 36px; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
+h3 { font-size: 16px; margin-top: 26px; }
+code { background: #f2f0f5; padding: 1px 5px; border-radius: 3px; font-size: 12.5px; }
+pre { background: #f2f0f5; padding: 12px; border-radius: 6px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+table { border-collapse: collapse; width: 100%; margin: 14px 0; font-size: 13px; }
+th, td { border: 1px solid #ccc; padding: 6px 9px; text-align: left; vertical-align: top; }
+th { background: #f5f2f8; }
+blockquote { border-left: 4px solid #c026d3; margin: 12px 0; padding: 4px 16px; color: #444;
+             background: #faf6fc; }
+a { color: #9333ea; }
+hr { border: none; border-top: 1px solid #ddd; margin: 28px 0; }
+.cut { border: 2px dashed #d97706; border-radius: 8px; padding: 4px 18px; margin-top: 32px;
+       background: #fffbeb; }
+.cut::before { content: "⚠ 아래 절은 인쇄(PDF)에서 자동 제외됩니다 — 화면 확인용";
+               display: block; color: #b45309; font-weight: bold; margin: 10px 0; }
+@media print {
+  body { padding: 0; font-size: 12px; }
+  .cut { display: none; }
+  a { color: inherit; }
+  h2 { page-break-after: avoid; }
+  table, pre, blockquote { page-break-inside: avoid; }
+}
+</style></head>
+<body>
+<h1>러다이트 2026 — 게임 소개</h1>
+<blockquote>
+<p><strong>제출물 #3 「게임 소개 문서」 초안</strong> (D6 작성 / D7 PDF 변환)
+필수 항목은 <code>SUBMISSION.md</code> §#3 기준. 🟡 = 확정 전 플레이스홀더, 제출 전 반드시 교체.</p>
+</blockquote>
+<hr />
+<h2>게임 제목</h2>
+<p><strong>러다이트 2026</strong> (Luddite 2026)</p>
+<blockquote>
+<p><strong>AI는 당신의 플레이를 학습합니다. 그러니 AI에게 거짓말하세요.</strong></p>
+</blockquote>
+<hr />
+<h2>한 줄 소개</h2>
+<p>적 AI가 당신의 회피 습관을 <strong>실시간으로 학습</strong>하고, 그 학습 결과를 화면에 <strong>숨김없이 공개</strong>한다. 플레이어는 자신에 대한 AI의 예측을 읽고 <strong>일부러 배신</strong>해서 살아남는 2D 탑뷰 던전 슈터.</p>
+<hr />
+<h2>이 게임의 핵심 — 무엇이 다른가</h2>
+<p>대부분의 게임에서 AI는 <strong>더 강해지는 방향</strong>으로 작동한다. 러다이트 2026의 AI는 <strong>더 정확해지는 방향</strong>으로 작동하고, 그 정확도를 플레이어에게 그대로 보여준다.</p>
+<ol>
+<li><strong>AI가 당신을 관찰한다</strong> — 적 탄이 당신에게 접근할 때마다, 당신이 <strong>왼쪽으로 피했는지 오른쪽으로 피했는지</strong>를 기록한다.</li>
+<li><strong>AI가 확신을 갖는다</strong> — 표본이 충분히 쌓이고 한쪽 편향이 뚜렷해지면 화면 우상단 패널이 바뀐다.
+   <code>AI MODEL: LEARNING...</code> → <strong><code>AI READS: LEFT 73% [HIGH]</code></strong></li>
+<li><strong>AI가 그 예측대로 쏜다</strong> — 확신 상태의 엘리트는 당신이 <em>피할 자리</em>를 향해 <strong>마젠타색 예측탄</strong>을 쏜다. 평소처럼 피하면 그대로 맞는다.</li>
+<li><strong>당신이 배신한다</strong> — 조준선을 읽고 <strong>반대로</strong> 피하면 <code>PREDICTION FAILED</code>가 화면을 때리고, AI의 확신이 눈앞에서 무너진다.
+   <code>LEFT 82% → 64%</code> · <code>MODEL UPDATING...</code></li>
+</ol>
+<p>즉 <strong>화면의 확률 표기가 곧 공략 정보</strong>다. 숨겨진 AI가 아니라 <strong>읽을 수 있는 AI</strong>를 상대한다.</p>
+<hr />
+<h2>게임 방법</h2>
+<h3>목표</h3>
+<p>선형 던전의 전투방을 차례로 돌파하고 <strong>최종 보스 「거대 LLM」을 격파</strong>한다.
+보스 2페이즈에서 AI는 당신에게서 학습한 것을 그대로 되돌려준다 — <strong><code>PATTERN: YOU</code></strong>: 당신의 교전 거리를 유지하고, 당신의 전공 무기를 마젠타로 복제하며, 당신이 좋아하는 구역을 선점한다. 🟡 <em>(D7 구현 완료 — 최종 실플레이 검증 후 이 표기 제거)</em></p>
+<h3>조작</h3>
+<table>
+<thead>
+<tr>
+<th>입력</th>
+<th>동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>W / A / S / D</strong></td>
+<td>이동 (8방향)</td>
+</tr>
+<tr>
+<td><strong>마우스 이동</strong></td>
+<td>조준</td>
+</tr>
+<tr>
+<td><strong>마우스 좌클릭(홀드)</strong></td>
+<td>발사 — 누르고 있으면 자동 연사</td>
+</tr>
+<tr>
+<td><strong>ESC</strong></td>
+<td>일시정지</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>조작은 이 4가지가 전부다. 대시·구르기가 없기 때문에 <strong>회피는 오직 이동 방향 선택</strong>이고, 그래서 AI가 학습할 대상이 명확하다.</p>
+</blockquote>
+<h3>진행 흐름</h3>
+<pre><code>타이틀 → 전공 선택(문과 / 이과 / 예체능)
+   ↓
+시작방 ─복도─ 전투방 1 … 전투방 6 ─복도─ 보스방
+            (방 진입 시 문이 잠기고, 배정된 적을 전멸시켜야 열린다)
+   ↓ 방을 비울 때마다
+상자 획득 → 업그레이드 3택 1 + AI가 파악한 내 프로필 열람
+   ↓
+보스전 → 결과 화면 「AI가 학습한 나」
+</code></pre>
+<ul>
+<li><strong>전멸형 종료</strong>: 시간이 지나서 끝나는 방은 없다. 버티기가 최적해가 되면 AI에게 줄 회피 데이터가 사라지기 때문이다.</li>
+<li><strong>업그레이드 중 2종은 AI를 직접 겨냥한다</strong> — 「행동교정」은 AI가 쌓은 관측을 지워버리고, 「논문조작」은 <strong>가짜 표본을 주입해 AI를 반대 방향으로 속인다.</strong></li>
+</ul>
+<h3>종료 조건</h3>
+<table>
+<thead>
+<tr>
+<th>결과</th>
+<th>조건</th>
+<th>화면</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>승리</strong></td>
+<td>보스 「거대 LLM」 격파</td>
+<td>결과 화면 — AI가 학습한 당신의 프로필(별명·평균 교전 거리·회피 편향·AI 예측 적중률·역카운터 성공률)</td>
+</tr>
+<tr>
+<td><strong>패배</strong></td>
+<td>플레이어 HP 0</td>
+<td>같은 결과 화면 (패배 표기)</td>
+</tr>
+</tbody>
+</table>
+<p>승패와 무관하게, 결과 화면은 <strong>AI가 본 당신</strong>을 보여준다. 이 게임에서 최종 점수는 숫자가 아니라 <em>프로필</em>이다.</p>
+<hr />
+<h2>실행 방법</h2>
+<p><strong>설치가 필요 없다.</strong> 브라우저에서 링크를 열면 바로 실행된다.</p>
+<ol>
+<li>아래 플레이 링크를 클릭한다</li>
+<li>로딩이 끝나면 화면의 <strong>[시작]</strong> 버튼을 누른다</li>
+<li>전공을 선택하면 곧바로 던전이 시작된다</li>
+</ol>
+<ul>
+<li>권장 환경: <strong>Chrome / Edge 최신 버전, 데스크톱</strong></li>
+<li>별도 설치·로그인·결제 <strong>없음</strong>. 실행 파일(.exe) 배포 없음</li>
+<li>키보드와 마우스가 필요하다 (모바일 미지원)</li>
+</ul>
+<hr />
+<h2>링크</h2>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>주소</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>플레이 (GitHub Pages)</strong></td>
+<td>🟡 <code>https://mabushii68.github.io/2ulgani_NHN/</code> — D7 최종 빌드 후 확정</td>
+</tr>
+<tr>
+<td><strong>플레이 영상 (YouTube)</strong></td>
+<td>🟡 <em>D7 촬영·업로드 후 기입</em></td>
+</tr>
+<tr>
+<td><strong>소스 코드 (GitHub)</strong></td>
+<td>🟡 <em>저장소 URL 기입</em></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>제작</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>팀</td>
+<td>2인</td>
+</tr>
+<tr>
+<td>이양빈</td>
+<td>기획 · 프로그래밍 (AI 로직, 전투, 적 AI, 보스, 밸런스)</td>
+</tr>
+<tr>
+<td>김정준</td>
+<td>아트 · 프로그래밍 (아트 전반, 던전·맵, HUD/UI, WebGL 파이프라인)</td>
+</tr>
+<tr>
+<td>개발 기간</td>
+<td>2026-08-04 ~ 2026-08-10 (7일)</td>
+</tr>
+<tr>
+<td>엔진</td>
+<td>Unity 6000.3.7f1 · URP 2D · WebGL</td>
+</tr>
+</tbody>
+</table>
+<p>외부 에셋 출처와 라이선스는 <strong>제출물 #4「AI 활용 기술 문서」의 출처 절</strong> 및 저장소 <code>Assets/_Project/Docs/CREDITS.md</code>에 전량 기재.</p>
+<hr />
+<div class="cut">
+<h2>🟡 제출 전 확인 (이 절은 PDF에서 삭제)</h2>
+<ul>
+<li>[ ] 플레이 링크를 <strong>시크릿 창</strong>에서 열어 실행 확인</li>
+<li>[ ] 영상 링크 기입 + 시크릿 창 재생 확인</li>
+<li>[ ] 보스 P2 미탑재 시 「목표」 절의 <code>PATTERN: YOU</code> 문단 삭제</li>
+<li>[ ] 스크린샷 3~4장 삽입 (① AI 패널 HIGH 전환 ② 마젠타 예측탄 조준선 ③ PREDICTION FAILED ④ 결과 프로필)</li>
+<li>[ ] PDF 내 링크 클릭 동작 확인</li>
+</ul>
+</div>
+</body></html>
