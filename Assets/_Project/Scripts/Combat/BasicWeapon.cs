@@ -21,6 +21,12 @@ namespace Luddite.Combat
         [Tooltip("투사체 색. 플레이어 계열은 전공색 (GDD §10.4) — 마젠타 사용 금지")]
         [SerializeField] private Color _projectileColor = Color.white;
 
+        [Tooltip("세부전공별 탄막 스프라이트 (D7). 미지정·세부전공 미선택이면 기본 탄 유지")]
+        [SerializeField] private SubMajorBulletSetSO _subMajorBullets;
+
+        [Tooltip("세부전공 조회용 — 빌더가 배선, 비어 있으면 Awake에서 찾는다")]
+        [SerializeField] private GameManager _gameManager;
+
         private float _cooldownRemaining;
 
         /// <summary>업그레이드 배수 (§8). 없으면 배수 1로 동작한다 — 테스트 씬 호환.</summary>
@@ -33,6 +39,7 @@ namespace Luddite.Combat
             if (_stats == null) Debug.LogError($"[BasicWeapon] PlayerStatsSO 미지정 — {name}", this);
             if (_projectilePrefab == null) Debug.LogError($"[BasicWeapon] Projectile 프리팹 미지정 — {name}", this);
             _upgrades = GetComponentInParent<PlayerUpgrades>();
+            if (_gameManager == null) _gameManager = FindFirstObjectByType<GameManager>();
         }
 
         public void Tick(float deltaTime)
@@ -56,7 +63,24 @@ namespace Luddite.Combat
             Projectile shot = Instantiate(_projectilePrefab, spawnPoint, Quaternion.identity);
 
             SpriteRenderer spriteRenderer = shot.GetComponent<SpriteRenderer>();
-            if (spriteRenderer != null) spriteRenderer.color = _projectileColor;
+            if (spriteRenderer != null)
+            {
+                // 세부전공 탄막 (D7): 선택돼 있으면 테마 스프라이트로 교체. 아이콘은 원색
+                // 픽셀 아트라 전공색 틴트를 곱하면 팔레트가 죽는다 — 흰색(무틴트)으로 쏜다.
+                Sprite themed = _subMajorBullets != null && _gameManager != null
+                    ? _subMajorBullets.SpriteOf(_gameManager.SelectedSubMajor)
+                    : null;
+
+                if (themed != null)
+                {
+                    spriteRenderer.sprite = themed;
+                    spriteRenderer.color = Color.white;
+                }
+                else
+                {
+                    spriteRenderer.color = _projectileColor;
+                }
+            }
 
             shot.Launch(
                 direction: aimDirection,

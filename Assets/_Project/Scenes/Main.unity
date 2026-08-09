@@ -10280,6 +10280,8 @@ MonoBehaviour:
   _projectilePrefab: {fileID: 6308917006428486915, guid: 506faf8382a80b34ca9f9761ae63b749, type: 3}
   _muzzleOffset: 0.6
   _projectileColor: {r: 0.43529412, g: 0.65882355, b: 1, a: 1}
+  _subMajorBullets: {fileID: 11400000, guid: fccec0f0d2a48cb4fa1e94b338be6981, type: 2}
+  _gameManager: {fileID: 673012771}
 --- !u!114 &623667968
 MonoBehaviour:
   m_ObjectHideFlags: 0

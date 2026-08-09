@@ -8,7 +8,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
+using Luddite.Combat;
 using Luddite.Core;
+using Luddite.Data;
 using Luddite.UI;
 
 namespace Luddite.EditorTools
@@ -95,6 +97,85 @@ namespace Luddite.EditorTools
             EditorSceneManager.MarkSceneDirty(scene);
             bool saved = EditorSceneManager.SaveScene(scene);
             Debug.Log($"[SubMajorSetup] 세부전공 선택 배선 완료 — 카드 3장 / scene saved={saved}");
+        }
+
+        // ── 세부전공 탄막 배선 (D7 — 사람 지정 매핑) ──
+        // 어문계=펜 / 상경계=돈 / 법조계=책 / 자연과학=숫자 / 공학=기계(번개) /
+        // 컴퓨터과학=컴퓨터 / 체육=공 / 미술=붓 / 음악=음표.
+        // 스프라이트 매핑은 이 빌더가 소유한다 — 재실행하면 아래 표로 재설정된다.
+
+        private const string BULLET_SET_PATH = "Assets/_Project/SO/SubMajorBulletSet.asset";
+
+        private static readonly (string field, string spritePath)[] BULLET_MAP =
+        {
+            ("_linguistics",       "Assets/_Project/Sprites/Icons/Procedural/Proc_Pencil.png"),
+            ("_commerce",          "Assets/_Project/Sprites/Icons/Icon_092_Coin.png"),
+            ("_law",               "Assets/_Project/Sprites/Icons/Icon_248_Scroll.png"),
+            ("_naturalScience",    "Assets/_Project/Sprites/Icons/Icon_234_Plus.png"),
+            ("_engineering",       "Assets/_Project/Sprites/Icons/Procedural/Proc_Bolt.png"),
+            ("_computerScience",   "Assets/_Project/Sprites/Icons/Procedural/Proc_Monitor.png"),
+            ("_physicalEducation", "Assets/_Project/Sprites/Icons/Procedural/Proc_Ball.png"),
+            ("_fineArts",          "Assets/_Project/Sprites/Icons/Icon_261_Brush.png"),
+            ("_music",             "Assets/_Project/Sprites/Icons/Procedural/Proc_Note.png"),
+        };
+
+        [MenuItem("Luddite/Setup/세부전공 탄막 배선 (9종)")]
+        public static void EnsureSubMajorBullets()
+        {
+            if (Application.isPlaying)
+            {
+                Debug.LogWarning("[SubMajorSetup] 플레이 모드에서는 씬을 편집하지 않는다");
+                return;
+            }
+
+            Scene scene = EditorSceneManager.GetActiveScene();
+            if (scene.path != MAIN_SCENE_PATH)
+            {
+                Debug.LogError($"[SubMajorSetup] 활성 씬이 Main.unity가 아니다 (현재: {scene.path})");
+                return;
+            }
+
+            // 1) SO 인스턴스 보장 + 스프라이트 9종 배선
+            SubMajorBulletSetSO bulletSet = AssetDatabase.LoadAssetAtPath<SubMajorBulletSetSO>(BULLET_SET_PATH);
+            if (bulletSet == null)
+            {
+                bulletSet = ScriptableObject.CreateInstance<SubMajorBulletSetSO>();
+                AssetDatabase.CreateAsset(bulletSet, BULLET_SET_PATH);
+            }
+
+            SerializedObject bulletSo = new SerializedObject(bulletSet);
+            int wired = 0;
+            foreach (var (field, spritePath) in BULLET_MAP)
+            {
+                Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(spritePath);
+                if (sprite == null)
+                {
+                    Debug.LogError($"[SubMajorSetup] 스프라이트 없음: {spritePath}");
+                    continue;
+                }
+                bulletSo.FindProperty(field).objectReferenceValue = sprite;
+                wired++;
+            }
+            bulletSo.ApplyModifiedPropertiesWithoutUndo();
+            AssetDatabase.SaveAssets();
+
+            // 2) 플레이어 무기에 배선
+            GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+            BasicWeapon weapon = playerObject != null ? playerObject.GetComponentInChildren<BasicWeapon>(true) : null;
+            if (weapon == null)
+            {
+                Debug.LogError("[SubMajorSetup] Player의 BasicWeapon 없음 — 탄막 배선 실패");
+                return;
+            }
+
+            SerializedObject weaponSo = new SerializedObject(weapon);
+            weaponSo.FindProperty("_subMajorBullets").objectReferenceValue = bulletSet;
+            weaponSo.FindProperty("_gameManager").objectReferenceValue = Object.FindFirstObjectByType<GameManager>();
+            weaponSo.ApplyModifiedPropertiesWithoutUndo();
+
+            EditorSceneManager.MarkSceneDirty(scene);
+            bool saved = EditorSceneManager.SaveScene(scene);
+            Debug.Log($"[SubMajorSetup] 세부전공 탄막 배선 완료 — 스프라이트 {wired}/9 / scene saved={saved}");
         }
 
         private static TMP_Text EnsureNameText(GameObject card)
