@@ -19,5 +19,20 @@ namespace Luddite.Combat
         /// <param name="origin">발사 기준 위치 (보통 소유자 중심)</param>
         /// <param name="aimDirection">조준 방향(정규화)</param>
         void Fire(Vector2 origin, Vector2 aimDirection);
+
+        // ── 탄창 상태 (D7 신규). HUD가 **읽기만** 한다 — UI가 무기를 수정하지 않는다 (CLAUDE.md 규칙 7).
+        //    무기 교체(D8 전공별 무기)를 대비해 BasicWeapon이 아니라 이 인터페이스에 둔다 (규칙 6).
+
+        /// <summary>탄창 1개당 발수.</summary>
+        int MagazineSize { get; }
+
+        /// <summary>현재 탄창에 남은 발수.</summary>
+        int AmmoRemaining { get; }
+
+        /// <summary>재장전 중인지. 이 동안 <see cref="CanFire"/>는 false다.</summary>
+        bool IsReloading { get; }
+
+        /// <summary>재장전 진행률 0~1 (재장전 중이 아니면 0). 게이지 연출용.</summary>
+        float ReloadProgress01 { get; }
     }
 }

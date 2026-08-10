@@ -89,13 +89,13 @@ namespace Luddite.EditorTools
             miniSo.FindProperty("_background").objectReferenceValue = miniBackground;
             miniSo.ApplyModifiedPropertiesWithoutUndo();
 
-            // ── HP 바 (좌하단, §10.1) ──
+            // ── HP 바 (좌상단 — D7에 좌하단에서 이동, 사람 요청) ──
             GameObject barRoot = EnsureChild(hudPanel, "HpBar");
             RectTransform barRect = barRoot.GetComponent<RectTransform>();
-            barRect.anchorMin = Vector2.zero;
-            barRect.anchorMax = Vector2.zero;
-            barRect.pivot = Vector2.zero;
-            barRect.anchoredPosition = new Vector2(24f, 24f);
+            barRect.anchorMin = new Vector2(0f, 1f);
+            barRect.anchorMax = new Vector2(0f, 1f);
+            barRect.pivot = new Vector2(0f, 1f);
+            barRect.anchoredPosition = new Vector2(24f, -24f);
             barRect.sizeDelta = new Vector2(360f, 28f);
 
             GameObject barBackground = EnsureChild(barRoot, "Background");
@@ -132,6 +132,9 @@ namespace Luddite.EditorTools
             barSo.FindProperty("_fill").objectReferenceValue = fillRect;
             barSo.FindProperty("_majorIcon").objectReferenceValue = iconImage;
             barSo.ApplyModifiedPropertiesWithoutUndo();
+
+            // ── 무기·탄약 (우하단, D7 신규 — 사람 요청 "엔터 더 건전과 동일") ──
+            EnsureAmmoCounter(hudPanel, playerObject);
 
             // ── PREDICTION FAILED 오버레이 (§10.3 — HUD와 같은 Combat 수명) ──
             GameObject overlayRoot = EnsureChild(hudPanel, "PredictionFailedOverlay");
@@ -184,7 +187,84 @@ namespace Luddite.EditorTools
 
             EditorSceneManager.MarkSceneDirty(scene);
             bool saved = EditorSceneManager.SaveScene(scene);
-            Debug.Log($"[HudSetup] HUD 배선 완료 (AI 미니 패널 + HP 바) / scene saved={saved}");
+            Debug.Log($"[HudSetup] HUD 배선 완료 (AI 미니 패널 + HP 바(좌상단) + 무기·탄약(우하단)) / scene saved={saved}");
+        }
+
+        /// <summary>
+        /// 우하단 무기·탄약 표시. 아이콘은 <b>플레이어가 실제로 쏘는 투사체 스프라이트</b>(FireballBig)를 쓴다 —
+        /// 신규 에셋 0이고, 화면에 나가는 탄과 같은 그림이라 무엇을 쏘는지가 그대로 읽힌다.
+        /// </summary>
+        private static void EnsureAmmoCounter(GameObject hudPanel, GameObject playerObject)
+        {
+            GameObject root = EnsureChild(hudPanel, "AmmoCounter");
+            RectTransform rect = root.GetComponent<RectTransform>();
+            rect.anchorMin = new Vector2(1f, 0f);
+            rect.anchorMax = new Vector2(1f, 0f);
+            rect.pivot = new Vector2(1f, 0f);
+            rect.anchoredPosition = new Vector2(-24f, 24f);
+            rect.sizeDelta = new Vector2(272f, 76f);
+
+            GameObject bg = EnsureChild(root, "Background");
+            Stretch(bg);
+            Image bgImage = EnsureComponent<Image>(bg);
+            bgImage.color = PANEL_BACKGROUND;
+            bgImage.raycastTarget = false;
+
+            // 무기 아이콘 (좌측)
+            GameObject iconObject = EnsureChild(root, "WeaponIcon");
+            RectTransform iconRect = iconObject.GetComponent<RectTransform>();
+            iconRect.anchorMin = new Vector2(0f, 0.5f);
+            iconRect.anchorMax = new Vector2(0f, 0.5f);
+            iconRect.pivot = new Vector2(0f, 0.5f);
+            iconRect.anchoredPosition = new Vector2(14f, 4f);
+            iconRect.sizeDelta = new Vector2(52f, 52f);
+            Image icon = EnsureComponent<Image>(iconObject);
+            icon.raycastTarget = false;
+            icon.preserveAspect = true;
+            Sprite bullet = AssetDatabase.LoadAssetAtPath<Sprite>(
+                "Assets/_Project/Sprites/Projectiles/FireballBig.png");
+            if (bullet != null) icon.sprite = bullet;
+            else Debug.LogWarning("[HudSetup] FireballBig 스프라이트를 찾지 못함 — 무기 아이콘이 빈다");
+
+            // 잔탄 텍스트 (우측)
+            GameObject countObject = EnsureChild(root, "Count");
+            RectTransform countRect = countObject.GetComponent<RectTransform>();
+            countRect.anchorMin = new Vector2(0f, 0f);
+            countRect.anchorMax = new Vector2(1f, 1f);
+            countRect.offsetMin = new Vector2(74f, 10f);
+            countRect.offsetMax = new Vector2(-14f, 0f);
+            TextMeshProUGUI count = EnsureComponent<TextMeshProUGUI>(countObject);
+            count.text = "30 / 30";
+            count.fontSize = 34f;
+            count.color = TEXT_MAIN;
+            count.alignment = TextAlignmentOptions.Right;
+            count.raycastTarget = false;
+
+            // 재장전 게이지 (하단 얇은 바) — pivot 왼쪽이라 scale.x로 왼→오 충전
+            GameObject fillObject = EnsureChild(root, "ReloadFill");
+            RectTransform fillRect = fillObject.GetComponent<RectTransform>();
+            fillRect.anchorMin = new Vector2(0f, 0f);
+            fillRect.anchorMax = new Vector2(1f, 0f);
+            fillRect.pivot = new Vector2(0f, 0f);
+            fillRect.offsetMin = new Vector2(0f, 0f);
+            fillRect.offsetMax = new Vector2(0f, 6f);
+            Image fillImage = EnsureComponent<Image>(fillObject);
+            fillImage.color = BAR_FILL;
+            fillImage.raycastTarget = false;
+
+            AmmoCounter counter = EnsureComponent<AmmoCounter>(root);
+            SerializedObject so = new SerializedObject(counter);
+            // IWeapon은 인터페이스라 직렬화되지 않는다 → 구현 MonoBehaviour를 넣고 런타임에 캐스팅한다
+            MonoBehaviour weapon = playerObject != null
+                ? playerObject.GetComponentInChildren<Luddite.Combat.BasicWeapon>() : null;
+            so.FindProperty("_weaponSource").objectReferenceValue = weapon;
+            so.FindProperty("_countLabel").objectReferenceValue = count;
+            so.FindProperty("_weaponIcon").objectReferenceValue = icon;
+            so.FindProperty("_reloadFill").objectReferenceValue = fillRect;
+            so.ApplyModifiedPropertiesWithoutUndo();
+
+            if (weapon == null)
+                Debug.LogWarning("[HudSetup] 플레이어에서 BasicWeapon을 찾지 못함 — AmmoCounter가 런타임에 Player 태그로 재탐색한다");
         }
 
         private static GameObject EnsureChild(GameObject parent, string name)
