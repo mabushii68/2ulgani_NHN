@@ -84,6 +84,7 @@
 | D7 | 9 | 이양빈 (Git `VJL02` — 본인 확인 요) | 세부전공 선택 (첫 인터벌 대체, 9종) + 전공 버튼 간격 확대 | `Scripts/Core/{SubMajor,GameManager}.cs`, `Scripts/UI/{SubMajorPanel,UpgradePanel}.cs`, `Scripts/Editor/{SubMajorSetupTools,GameFlowSetupTools,SpriteBindingSetupTools}.cs`, `Scenes/Main.unity` | ⭕ | 게임 플로우 = 이양빈 / UI·레이아웃 = 김정준 영역 교차. 탄막 차별화는 보류(선택 저장까지) |
 | D7 | 10 | 이양빈 (Git `VJL02` — 본인 확인 요) | 세부전공 탄막 9종 배선 — SO 매핑 + BasicWeapon 발사 시점 교체 | `Scripts/Data/SubMajorBulletSetSO.cs`, `Scripts/Combat/BasicWeapon.cs`, `Scripts/Editor/SubMajorSetupTools.cs`, `SO/SubMajorBulletSet.asset`, `Scenes/Main.unity`, `Docs/CREDITS.md` | ⭕ | 전투 로직 = 이양빈 / 탄막 시각 언어 = 김정준 영역 교차. 테마 탄은 무틴트(원색 아이콘 보존) |
 | D7 | 11 | 이양빈 (Git `VJL02` — 본인 확인 요) | 최종 WebGL 빌드(18.33MB)·gh-pages 배포 커밋·제출 문서 현행화·누락 .meta 18개 수정 | `Builds/`(비추적), `gh-pages` 브랜치, `Docs/SUBMIT_3·4`, `SUBMISSION.md`, `README.md`, `.gitignore`, `.meta` ×18 | ⭕ | WebGL 파이프라인 = 김정준 담당 영역이나 위임 지시로 수행. 푸시 2건은 사람 터미널 |
+| D7 | 12 | 이양빈 (Git `VJL02` — 본인 확인 요) | 밸런스 패치(몹 HP×2·탄속×1.5 / 보스 HP×4·탄속×2·공속×2.5) + 최종 빌드 재생성 | `SO/EnemyStats_*.asset` ×5, `gh-pages` 브랜치 | — | 밸런스 결정 = 이양빈 본인 영역. [balance] 명시 요청 |
 
 ## 3. 협업·페어 작업 기록
 | 일차 | 작업 | 참여 | 분업 방식 (누가 무엇을) | 결과 |
