@@ -159,6 +159,7 @@ D5에 발견된 결함 4건(전투방 문이 잠겨 진입 불가 / 복도에서
 | 스프라이트 | **Franuka** — RPG Heroes / RPG Monster / Elemental Dungeons(Fire) / RPG UI pack | 독자 라이선스 (상업·비상업 ⭕ / 수정 ⭕ / **팩 원본 재배포 ❌** / 출처 링크 필수) | 플레이어·적·투사체·아레나·UI |
 | 아이콘 | **Franuka** — RPG Icon pack | **CC BY 4.0** | AI 위협 상징, 전공 아이콘, 업그레이드 아이콘, 세부전공 탄막 4종(동전·두루마리·플러스·붓) — 나머지 탄막 5종(연필·번개·모니터·공·음표)은 자체 절차 생성 (팀 저작물) |
 | 타일셋 | **Franuka** — Dungeon Asset Pack (https://franuka.itch.io/dungeon-asset-pack) | 독자 라이선스 (상업 ⭕ / 재배포·재판매 ❌ / 크레딧 권장) | 던전 방·복도 바닥/벽, 문, 상자, 횃불, 장식 |
+| 파생 에셋 | 위 Franuka 팩의 **2차 저작물 2종** — `Dungeon/Generated/Wall_Side.png`(타일셋에서 주황 띠 제거, 세로 벽용) / `UI/Generated/Cursor01_2x.png`(커서 최근접 2배 확대) | 원본과 동일 (수정 ⭕ / 재배포 ❌) | 세로 벽 타일, 인게임 마우스 커서. 둘 다 에디터 빌더로 결정론 재생성 가능 |
 | 엔진·패키지 | Unity 6000.3.7f1, Universal RP, TextMeshPro | Unity Companion License | — |
 
 **재배포 금지 조항 준수 방법**: 팩 원본(약 16,000파일)을 저장소에 넣지 않고 **실제 게임에 쓰는 90여 파일만 선별 반입**했다. 이는 팩을 팩으로 재배포하는 행위가 아니라 라이선스가 명시적으로 허용한 "게임에 사용"에 해당한다. 후보 열람용 로컬 라이브러리(4,893파일)는 `.gitignore`로 격리해 커밋하지 않는다.

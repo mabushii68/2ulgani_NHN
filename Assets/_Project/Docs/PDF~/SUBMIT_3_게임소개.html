@@ -82,13 +82,20 @@ hr { border: none; border-top: 1px solid #ddd; margin: 28px 0; }
 <td>발사 — 누르고 있으면 자동 연사</td>
 </tr>
 <tr>
+<td><strong>E</strong></td>
+<td>상자 열기 (방을 비운 뒤, 방 가운데 상자에 다가가면 안내가 뜬다)</td>
+</tr>
+<tr>
 <td><strong>ESC</strong></td>
 <td>일시정지</td>
 </tr>
 </tbody>
 </table>
 <blockquote>
-<p>조작은 이 4가지가 전부다. 대시·구르기가 없기 때문에 <strong>회피는 오직 이동 방향 선택</strong>이고, 그래서 AI가 학습할 대상이 명확하다.</p>
+<p>조작은 이 5가지가 전부다. 대시·구르기가 없기 때문에 <strong>회피는 오직 이동 방향 선택</strong>이고, 그래서 AI가 학습할 대상이 명확하다.</p>
+<p>탄창은 30발이고 다 쓰면 <strong>자동으로 재장전</strong>된다(탄약 총량은 무한). 재장전 키가 따로 없는 것은
+자원 관리를 시키려는 게 아니라, <strong>잠깐 쏘지 못하는 구간을 만들어 회피에만 집중하게</strong> 하려는 것이다 —
+그 구간이 AI에게는 가장 깨끗한 학습 표본이 된다.</p>
 </blockquote>
 <h3>진행 흐름</h3>
 <pre><code>타이틀 → 전공 선택(문과 / 이과 / 예체능)
@@ -98,7 +105,7 @@ hr { border: none; border-top: 1px solid #ddd; margin: 28px 0; }
    ↓ 첫 방을 비우면
 세부전공 선택 (전공당 3종) → 이후 내 탄환이 세부전공 테마로 바뀐다
    ↓ 이후 방을 비울 때마다
-상자 획득 → 업그레이드 3택 1 + AI가 파악한 내 프로필 열람
+방 가운데 상자를 E로 열면 → 업그레이드 3택 1 + AI가 파악한 내 프로필 열람
    ↓
 보스전 → 결과 화면 「AI가 학습한 나」
 </code></pre>
