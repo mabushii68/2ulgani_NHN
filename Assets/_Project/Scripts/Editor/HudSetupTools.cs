@@ -22,6 +22,12 @@ namespace Luddite.EditorTools
         private static readonly Color PANEL_BACKGROUND = new Color(0f, 0f, 0f, 0.55f);
         private static readonly Color TEXT_MAIN = new Color(0.92f, 0.92f, 0.95f, 1f);
 
+        /// <summary>밝은 팩 패널을 HUD 밝기로 낮추는 곱셈 틴트. 위 EnsureAmmoCounter 주석 참조.</summary>
+        private static readonly Color PANEL_TINT = new Color(0.18f, 0.20f, 0.27f, 0.92f);
+
+        /// <summary>재장전 게이지 — 🔴 초록(BAR_FILL)은 전공색 예약이라 못 쓴다. 잔탄 경고와 같은 호박색.</summary>
+        private static readonly Color RELOAD_FILL = new Color(1f, 0.72f, 0.30f, 1f);
+
         private const float MINIMAP_WIDTH = 340f;
         private const float MINIMAP_HEIGHT = 110f;
         private const float MINIMAP_PADDING = 10f;
@@ -409,7 +415,11 @@ namespace Luddite.EditorTools
                 bgImage.sprite = panelSprite;
                 bgImage.type = Image.Type.Sliced;
                 bgImage.pixelsPerUnitMultiplier = 0.34f;   // 16px 타일을 HUD 크기에 맞게 확대 (테두리 굵기 조절)
-                bgImage.color = Color.white;
+                // ⚠️ 이 팩의 배경 박스 13종은 **전부 밝은 채움**이다 (01A 채움 = (1.00,0.76,0.63), 밝기 0.82).
+                //    흰 글씨를 얹으면 거의 안 읽히고 어두운 던전 구석에서 박스만 튄다 (D7에 실제로 낸 결함).
+                //    Image.color는 스프라이트에 곱해지므로, 테두리 모양은 살리고 밝기만 낮춘다.
+                //    최종 채움 ≈ (0.18,0.15,0.17) — 어두운 중성 난색, 흰 글씨 대비 충분.
+                bgImage.color = PANEL_TINT;
             }
             else
             {
@@ -456,8 +466,11 @@ namespace Luddite.EditorTools
             fillRect.offsetMin = new Vector2(0f, 0f);
             fillRect.offsetMax = new Vector2(0f, 6f);
             Image fillImage = EnsureComponent<Image>(fillObject);
-            fillImage.color = BAR_FILL;
+            fillImage.color = RELOAD_FILL;
             fillImage.raycastTarget = false;
+            // 재장전 중이 아닐 때는 꺼져 있어야 한다. 런타임 AmmoCounter가 매 프레임 토글하지만,
+            // 켜진 채로 구워두면 에디터·첫 프레임에 게이지가 가득 찬 것처럼 보인다
+            fillObject.SetActive(false);
 
             AmmoCounter counter = EnsureComponent<AmmoCounter>(root);
             SerializedObject so = new SerializedObject(counter);
