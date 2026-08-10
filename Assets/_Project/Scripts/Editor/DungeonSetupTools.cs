@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
+using TMPro;
 using Luddite.Core;
 using Luddite.Data;
 
@@ -228,7 +229,7 @@ namespace Luddite.EditorTools
                     so.FindProperty("_exitDoor").objectReferenceValue =
                         MakeDoor(go.transform, "Door_Exit", doorClosed, doorOpen, exitDir, hx, hy, t, exitGap);
                 if (!isStart && !isBoss && chestClosed != null)
-                    so.FindProperty("_chest").objectReferenceValue = MakeChest(go.transform, chestClosed, chestOpen);
+                    so.FindProperty("_chest").objectReferenceValue = MakeChest(go.transform, chestClosed, chestOpen, config);
                 so.ApplyModifiedProperties();
                 rooms[i] = room;
 
@@ -487,7 +488,7 @@ namespace Luddite.EditorTools
             return door;
         }
 
-        private static Chest MakeChest(Transform parent, Sprite closed, Sprite open)
+        private static Chest MakeChest(Transform parent, Sprite closed, Sprite open, DungeonConfigSO config)
         {
             GameObject go = new GameObject("Chest");
             go.transform.SetParent(parent, false);
@@ -497,10 +498,34 @@ namespace Luddite.EditorTools
             sr.sortingLayerName = LUnits;
             sr.sortingOrder = 0;
             go.transform.localScale = Vector3.one * 2f;
+            // "[E] 열기" 안내 — 반경 안에 들어왔을 때만 Chest가 켠다.
+            // 월드 스페이스 TMP라 카메라가 따라와도 상자 위에 붙어 있는다.
+            var promptGo = new GameObject("Prompt");
+            promptGo.transform.SetParent(go.transform, false);
+            promptGo.transform.localPosition = new Vector3(0f, 0.9f, 0f);
+            promptGo.transform.localScale = Vector3.one * 0.5f;   // 상자가 2배 스케일이라 되돌린다
+            var prompt = promptGo.AddComponent<TextMeshPro>();
+            prompt.text = "[E] 열기";
+            prompt.fontSize = 3.2f;
+            prompt.alignment = TextAlignmentOptions.Center;
+            prompt.color = new Color(1f, 0.86f, 0.55f, 1f);       // 난색 — 예약 색역 회피
+            var promptFont = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(
+                "Assets/_Project/Fonts/x10y12pxDenkiChipHangul SDF.asset");
+            if (promptFont != null) prompt.font = promptFont;
+            var promptRenderer = promptGo.GetComponent<MeshRenderer>();
+            promptRenderer.sortingLayerName = LWallTops;           // 벽·유닛 위에 뜨게
+            promptRenderer.sortingOrder = 10;
+            promptGo.SetActive(false);
+
             Chest chest = go.AddComponent<Chest>();
             var so = new SerializedObject(chest);
             so.FindProperty("_closedSprite").objectReferenceValue = closed;
             so.FindProperty("_openSprite").objectReferenceValue = open;
+            so.FindProperty("_prompt").objectReferenceValue = promptGo;
+            // 런타임에는 DungeonManager.Configure가 SO 값을 덮어쓰지만, 씬 기본값도 같이 맞춰 둔다.
+            // 안 맞추면 Configure가 돌기 전(에디터 스모크 등)에 자동 오픈 기본값 true가 살아난다 — D7에 실제로 잡힌 결함.
+            so.FindProperty("_autoOpen").boolValue = config != null && config.AutoOpenChest;
+            if (config != null) so.FindProperty("_interactRadius").floatValue = config.ChestInteractRadius;
             so.ApplyModifiedProperties();
             go.SetActive(false);
             return chest;

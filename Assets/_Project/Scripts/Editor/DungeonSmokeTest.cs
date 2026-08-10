@@ -87,7 +87,28 @@ namespace Luddite.EditorTools
                 Check(log, ref pass, ref fail, "전멸 → 출구문 개방", combat.ExitDoor != null && !combat.ExitDoor.IsLocked);
                 Check(log, ref pass, ref fail, "전멸 → 상자 등장", combat.Chest != null && combat.Chest.gameObject.activeSelf);
                 if (cfg.AutoOpenChest)
+                {
                     Check(log, ref pass, ref fail, "상자 자동 오픈 → 인터벌 신호 발행", openedFired && combat.Chest.IsOpened);
+                }
+                else
+                {
+                    // D7 수동 오픈 경로. 키 입력은 주입할 수 없으므로 **입력 이외의 전부**를 검사한다:
+                    // ① 다가가는 것만으로는 안 열린다 ② 안내가 있고 처음엔 꺼져 있다 ③ Open()이 이벤트를 발행한다
+                    Check(log, ref pass, ref fail, "수동 오픈 — 무장만으로는 안 열림",
+                        combat.Chest != null && !combat.Chest.IsOpened && !openedFired);
+
+                    Transform prompt = combat.Chest != null ? combat.Chest.transform.Find("Prompt") : null;
+                    Check(log, ref pass, ref fail, "수동 오픈 — '[E] 열기' 안내 존재", prompt != null);
+                    Check(log, ref pass, ref fail, "수동 오픈 — 안내는 기본 비활성(범위 밖)",
+                        prompt != null && !prompt.gameObject.activeSelf);
+
+                    // Open()은 private — 실제 키 입력이 도달하는 지점을 그대로 호출해 이벤트 배선을 확인한다
+                    var openMethod = typeof(Luddite.Core.Chest).GetMethod("Open",
+                        System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    if (openMethod != null && combat.Chest != null) openMethod.Invoke(combat.Chest, null);
+                    Check(log, ref pass, ref fail, "수동 오픈 — Open() → 인터벌 신호 발행",
+                        openedFired && combat.Chest != null && combat.Chest.IsOpened);
+                }
 
                 if (combat.Chest != null) combat.Chest.Opened -= handler;
                 combat.ResetRoom();

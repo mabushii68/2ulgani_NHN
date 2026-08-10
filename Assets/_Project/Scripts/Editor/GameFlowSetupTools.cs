@@ -86,6 +86,10 @@ namespace Luddite.EditorTools
             EnsureText(wavePanel, "BodyText", "AI가 당신의 회피 습관을 분석했습니다. 업그레이드를 고르면 다음 전투가 시작됩니다.", 24, TEXT_DIM, new Vector2(0f, 258f), new Vector2(1200f, 50f));
             GameObject nextWaveButton = EnsureButton(wavePanel, "NextWaveButton", "다음 전투로", BUTTON_BG, new Vector2(0f, -320f), new Vector2(360f, 72f));
 
+            // 상자를 열면 이 패널이 뜬다 (D7 — 자동 오픈 폐기). 팝으로 들어와 "열었다"는 인과가 보이게.
+            // PanelPopIn은 unscaled로 돈다 — 인터벌은 timeScale 0이라 scaled면 첫 프레임에서 멈춘다.
+            if (wavePanel.GetComponent<PanelPopIn>() == null) wavePanel.AddComponent<PanelPopIn>();
+
             GameObject bossPanel = EnsurePanel(canvasObject, "BossIntroPanel", PANEL_BG);
             EnsureText(bossPanel, "IntroText", "최종 전투 — 거대 LLM", 72, TEXT_MAIN, new Vector2(0f, 40f), new Vector2(1500f, 110f));
             EnsureText(bossPanel, "SubText", "INITIALIZING...", 30, TEXT_DIM, new Vector2(0f, -60f), new Vector2(1200f, 60f));

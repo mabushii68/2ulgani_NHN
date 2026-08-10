@@ -18,5 +18,5 @@ MonoBehaviour:
   _combatRoomCount: 6
   _corridorLength: 10
   _corridorWidth: 5
-  _autoOpenChest: 1
-  _chestInteractRadius: 1.2
+  _autoOpenChest: 0
+  _chestInteractRadius: 2.2
