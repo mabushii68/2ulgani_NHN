@@ -829,6 +829,21 @@
   - `Data/SubMajorBulletSetSO.cs`(9종 스프라이트 매핑 SO — 규칙 2) + 인스턴스 `SO/SubMajorBulletSet.asset`, `BasicWeapon` 발사 시점 교체(테마 탄은 흰색 무틴트 — 원색 아이콘에 전공색 틴트를 곱하면 팔레트가 죽는다 / 미선택·미배선이면 기본 탄+전공색 폴백), `SubMajorSetupTools`에 배선 메뉴 추가(SO 생성·스프라이트 9종·무기 참조).
   - 스프라이트 출처: 자체 제작 5종(세션 7 Proc_*) + Franuka 아이콘 4종(Coin/Scroll/Plus/Brush — CC BY 4.0, CREDITS 사용 위치 갱신 같은 커밋).
 - **검증**: 플레이 모드 발사 스모크 — 선택 전 FireballBig+전공색 틴트 / 상경계 선택 후 Coin 무틴트 / 새 런 예체능·음악 선택 후 Proc_Note 무틴트 / SO 매핑 9종 전수 조회 누락 0. 에러 0. 실플레이 시각 확인은 사람 대기.
+
+#### 세션 11 — D7 최종 빌드·배포 준비 + 제출 문서 현행화 + 누락 .meta 결함 수정
+- **목표**: 제출 순서(SUBMISSION §최종) 이행 — 최종 WebGL 빌드, gh-pages 배포 커밋, 문서 링크·내용 현행화, 시크릿 점검.
+- **핵심 프롬프트 (원문)**:
+  ```
+  고고
+  ```
+- **결과·수정**:
+  - **최종 WebGL 빌드**: 18.33MB (<50MB), 에러 0. gzip 매직 바이트 3/3(`1f8b`), 로컬 `http.server`로 6/6 에셋 200 (D1과 동일한 Pages 동등 조건 검증).
+  - **gh-pages 배포 커밋**: D1의 orphan + plumbing 방식 재현 (`4350ad3`, `.nojekyll` 포함, blob md5 4/4 원본 일치). force push는 사람 터미널 대기.
+  - **문서**: SUBMIT_3 세부전공 반영·소스 URL 기입 / SUBMIT_4 출처 절 탄막 반영 / README 게임 방법 갱신·D1 경고 블록 제거 / SUBMISSION #1 링크 기입 / PDF HTML 3종 재생성. `Builds/` gitignore 등록.
+  - **🔴 결함 발견·수정**: D7 오디오·보스 P2·화살표·탄막 생성기 세션들이 `.cs`/`.wav`만 커밋하고 **`.meta` 18개를 누락** — 클론 시 GUID 재생성으로 씬 배선 전체가 Missing이 되는 실격급 리스크. `git status` 전수 확인으로 잡아 일괄 커밋(`85c855b`).
+  - 시크릿 grep: API 키·토큰·비밀번호 패턴 0건 (히트 2건은 Unity 기본 빈 필드).
+- **검증**: 위 수치 전부 실측. 남은 사람 확인 — ① `git push origin main` ② `git push origin gh-pages --force` ③ 배포 후 시크릿 창 실플레이 ④ 영상 촬영·업로드 ⑤ PDF 3종 Ctrl+P 확정.
+- **커밋 해시**: (이 커밋)
 - **커밋 해시**: `4875e78` (브랜치 `main`)
 - **커밋 해시**: `1a6f9e1` (브랜치 `main`)
 - **커밋 해시**: `fc30c29` (브랜치 `main`)
