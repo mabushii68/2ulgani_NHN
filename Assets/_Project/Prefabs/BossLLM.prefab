@@ -560,7 +560,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Luddite.Enemies.BossLLM
   _stats: {fileID: 11400000, guid: d2fd34a198310614388fe5ffcafbac15, type: 2}
   _renderer: {fileID: 0}
-  _hitFlashDuration: 0.06
+  _hitFlashDuration: 0.12
+  _hitFlashColor: {r: 1, g: 0.22, b: 0.18, a: 1}
   _knockbackDamping: 12
   _knockbackDuration: 0.15
   _config: {fileID: 11400000, guid: a5e2d9b764afd7a4b8d8dfb555a4a23f, type: 2}

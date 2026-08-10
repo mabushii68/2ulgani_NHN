@@ -31,8 +31,11 @@ namespace Luddite.Enemies
         [Tooltip("본체 스프라이트. 피격 플래시·스폰 텔레그래프에 사용")]
         [SerializeField] private SpriteRenderer _renderer;
 
-        [Tooltip("피격 플래시 지속(초) — 연출값")]
-        [SerializeField] private float _hitFlashDuration = 0.06f;
+        [Tooltip("피격 플래시 지속(초). 이 시간에 걸쳐 플래시색 → 원래 색으로 되돌아온다 — 연출값")]
+        [SerializeField] private float _hitFlashDuration = 0.12f;
+
+        [Tooltip("피격 순간의 색. 🔴 마젠타·핫핑크·보라(AI 전용)와 파랑·초록·노랑(전공색)은 쓰지 말 것")]
+        [SerializeField] private Color _hitFlashColor = new Color(1f, 0.22f, 0.18f, 1f);
 
         [Tooltip("넉백 후 급감속 계수. 맞고 미끄러지지 않게 하는 연출값")]
         [SerializeField] private float _knockbackDamping = 12f;
@@ -160,12 +163,38 @@ namespace Luddite.Enemies
             if (_renderer != null) _renderer.color = _baseColor;
         }
 
+        /// <summary>
+        /// 피격 플래시 — 플래시색에서 원래 색으로 <b>서서히</b> 돌아온다 (툭 끊기면 눈에 안 남는다).
+        /// 알파는 원래 값을 유지한다 — 스폰 텔레그래프가 알파로 등장 연출을 하므로 건드리면 겹친다.
+        /// </summary>
         private void TickHitFlash()
         {
             if (_flashRemaining <= 0f) return;
 
             _flashRemaining -= Time.deltaTime;
-            if (_flashRemaining <= 0f && _renderer != null) _renderer.color = _baseColor;
+            if (_renderer == null) return;
+
+            if (_flashRemaining <= 0f)
+            {
+                _renderer.color = _baseColor;
+                return;
+            }
+
+            float t = _hitFlashDuration > 0f ? _flashRemaining / _hitFlashDuration : 0f;   // 1 → 0
+            Color c = Color.Lerp(_baseColor, _hitFlashColor, t);
+            c.a = _baseColor.a;
+            _renderer.color = c;
+        }
+
+        /// <summary>
+        /// 원래 색을 갱신한다. 런타임에 본체 틴트를 바꾸는 쪽(보스 P2 마젠타화)이 호출해야
+        /// <b>피격 플래시가 끝날 때 그 틴트로 복귀</b>한다 — 안 부르면 Awake 시점 색으로 되돌아가
+        /// 맞을 때마다 P2 마젠타가 벗겨진다.
+        /// </summary>
+        protected void SetBaseColor(Color color)
+        {
+            _baseColor = color;
+            if (_renderer != null && _flashRemaining <= 0f && !IsSpawning) _renderer.color = color;
         }
 
         public void TakeDamage(float amount, Vector2 hitDirection)
@@ -180,7 +209,10 @@ namespace Luddite.Enemies
 
             if (_renderer != null)
             {
-                _renderer.color = Color.white;
+                // ⚠️ D7 이전에는 Color.white로 번쩍였는데, D5 컬러 전환 이후 적 프리팹의
+                //    SpriteRenderer.color가 전부 흰색이라 **아무 변화가 없었다** (회색조 시절엔 본체가
+                //    틴트돼 있어 보였다). 조용히 무효가 된 연출이라 콘솔에도 안 잡혔다.
+                _renderer.color = _hitFlashColor;
                 _flashRemaining = _hitFlashDuration;
             }
 

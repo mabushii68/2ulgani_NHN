@@ -345,7 +345,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Luddite.Enemies.ChatbotDrone
   _stats: {fileID: 11400000, guid: 55ebec2320c500b458ccc88492c00d28, type: 2}
   _renderer: {fileID: 4064909501934968973}
-  _hitFlashDuration: 0.06
+  _hitFlashDuration: 0.12
+  _hitFlashColor: {r: 1, g: 0.22, b: 0.18, a: 1}
   _knockbackDamping: 12
   _knockbackDuration: 0.15
   _gun: {fileID: 4388336933555046369}
