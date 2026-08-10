@@ -8,9 +8,9 @@
 |---|---|---|---|
 | 1 | 빌드 + 소스 (GitHub) | 소스 `https://github.com/mabushii68/2ulgani_NHN` / 플레이 `https://mabushii68.github.io/2ulgani_NHN/` | ☐ |
 | 2 | 플레이 영상 (YouTube) | | ☐ |
-| 3 | 게임 소개 문서 (PDF) | | ☐ |
-| 4 | AI 활용 기술 문서 (PDF) | | ☐ |
-| 5 | 팀원 롤 기술서 (PDF) | | ☐ |
+| 3 | 게임 소개 문서 (PDF) | `Docs/PDF~/SUBMIT_3_게임소개.pdf` (D7 헤드리스 생성 — 제출 전 눈검수) | ☐ |
+| 4 | AI 활용 기술 문서 (PDF) | `Docs/PDF~/SUBMIT_4_AI활용.pdf` (〃) | ☐ |
+| 5 | 팀원 롤 기술서 (PDF) | `Docs/PDF~/SUBMIT_5_팀역할.pdf` (〃) | ☐ |
 
 ---
 

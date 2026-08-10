@@ -44,9 +44,9 @@
 |---|---|---|
 | 1 | 빌드 + 소스 | 이 저장소 + 상단 플레이 링크 |
 | 2 | 플레이 영상 | 상단 YouTube 링크 |
-| 3 | 게임 소개 문서 | <!-- PDF 경로/링크 --> |
-| 4 | AI 활용 기술 문서 | <!-- PDF 경로/링크 --> (원천: `Assets/_Project/Docs/AI_USAGE_LOG.md`) |
-| 5 | 팀원 롤 기술서 | <!-- PDF 경로/링크 --> (원천: `Assets/_Project/Docs/TEAM_ROLES_LOG.md`) |
+| 3 | 게임 소개 문서 | [`Docs/PDF~/SUBMIT_3_게임소개.pdf`](./Assets/_Project/Docs/PDF~/SUBMIT_3_게임소개.pdf) |
+| 4 | AI 활용 기술 문서 | [`Docs/PDF~/SUBMIT_4_AI활용.pdf`](./Assets/_Project/Docs/PDF~/SUBMIT_4_AI활용.pdf) (원천: `Assets/_Project/Docs/AI_USAGE_LOG.md`) |
+| 5 | 팀원 롤 기술서 | [`Docs/PDF~/SUBMIT_5_팀역할.pdf`](./Assets/_Project/Docs/PDF~/SUBMIT_5_팀역할.pdf) (원천: `Assets/_Project/Docs/TEAM_ROLES_LOG.md`) |
 
 ## 팀
 | 이름 | 역할 |
