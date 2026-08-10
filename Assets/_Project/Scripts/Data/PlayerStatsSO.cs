@@ -39,6 +39,13 @@ namespace Luddite.Data
         [Tooltip("투사체 지름(유닛)")]
         [SerializeField] private float _projectileDiameter = 0.25f;
 
+        [Header("탄창 (D7 신규 — 사람 요청. 탄약 총량은 무한, 탄창만 소모한다)")]
+        [Tooltip("탄창 1개당 발수. 전부 소모하면 자동 재장전된다")]
+        [SerializeField] private int _magazineSize = 30;
+
+        [Tooltip("자동 재장전 소요 시간(초). 이 동안 발사 불가 — 회피에만 집중하는 구간이 생긴다")]
+        [SerializeField] private float _reloadDuration = 1.2f;
+
         public float MaxHp => _maxHp;
         public float InvincibleDuration => _invincibleDuration;
         public float HitboxDiameter => _hitboxDiameter;
@@ -52,5 +59,8 @@ namespace Luddite.Data
         public float ProjectileLifetime => _projectileLifetime;
         public float ProjectileDiameter => _projectileDiameter;
         public float ProjectileRadius => _projectileDiameter * 0.5f;
+
+        public int MagazineSize => Mathf.Max(1, _magazineSize);
+        public float ReloadDuration => Mathf.Max(0f, _reloadDuration);
     }
 }

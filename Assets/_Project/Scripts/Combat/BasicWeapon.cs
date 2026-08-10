@@ -32,7 +32,25 @@ namespace Luddite.Combat
         /// <summary>업그레이드 배수 (§8). 없으면 배수 1로 동작한다 — 테스트 씬 호환.</summary>
         private PlayerUpgrades _upgrades;
 
-        public bool CanFire => _cooldownRemaining <= 0f;
+        // ── 탄창 (D7 신규). 탄약 총량은 무한이고 탄창만 소모한다 — 자원 관리가 아니라
+        //    "재장전 동안 회피에만 집중하는 구간"을 만드는 것이 목적이다.
+        private int _ammo = -1;              // -1 = 미초기화. Awake에서 탄창 가득으로 채운다
+        private float _reloadRemaining;
+
+        public int MagazineSize => _stats != null ? _stats.MagazineSize : 0;
+        public int AmmoRemaining => Mathf.Max(0, _ammo);
+        public bool IsReloading => _reloadRemaining > 0f;
+
+        public float ReloadProgress01
+        {
+            get
+            {
+                if (!IsReloading || _stats == null || _stats.ReloadDuration <= 0f) return 0f;
+                return Mathf.Clamp01(1f - _reloadRemaining / _stats.ReloadDuration);
+            }
+        }
+
+        public bool CanFire => _cooldownRemaining <= 0f && !IsReloading && _ammo != 0;
 
         private void Awake()
         {
@@ -40,11 +58,41 @@ namespace Luddite.Combat
             if (_projectilePrefab == null) Debug.LogError($"[BasicWeapon] Projectile 프리팹 미지정 — {name}", this);
             _upgrades = GetComponentInParent<PlayerUpgrades>();
             if (_gameManager == null) _gameManager = FindFirstObjectByType<GameManager>();
+            RefillMagazine();
+        }
+
+        private void OnEnable()
+        {
+            // 런 재시작(RunStarted로 플레이어가 되살아나는 경로) 대비 — 재장전 중 상태로 부활하지 않게
+            GameEvents.RunStarted += OnRunStarted;
+        }
+
+        private void OnDisable()
+        {
+            GameEvents.RunStarted -= OnRunStarted;
+        }
+
+        private void OnRunStarted() => RefillMagazine();
+
+        private void RefillMagazine()
+        {
+            _ammo = _stats != null ? _stats.MagazineSize : 0;
+            _reloadRemaining = 0f;
         }
 
         public void Tick(float deltaTime)
         {
             if (_cooldownRemaining > 0f) _cooldownRemaining -= deltaTime;
+
+            if (_reloadRemaining > 0f)
+            {
+                _reloadRemaining -= deltaTime;
+                if (_reloadRemaining <= 0f) RefillMagazine();
+                return;
+            }
+
+            // 탄창이 비면 입력과 무관하게 자동 재장전을 건다 (사람 요청: "전부 소모하면 자동으로 재장전")
+            if (_ammo == 0 && _stats != null) _reloadRemaining = _stats.ReloadDuration;
         }
 
         public void Fire(Vector2 origin, Vector2 aimDirection)
@@ -57,6 +105,7 @@ namespace Luddite.Combat
             float sizeMultiplier = _upgrades != null ? _upgrades.ProjectileSizeMultiplier : 1f;
 
             _cooldownRemaining = _stats.FireInterval / Mathf.Max(fireRateMultiplier, 0.01f);
+            if (_ammo > 0) _ammo--;                    // 0이 되면 다음 Tick이 자동 재장전을 건다
             AudioDirector.Play(GameSfx.PlayerShoot);   // 씬에 AudioDirector 없으면 무음 no-op
 
             Vector2 spawnPoint = origin + aimDirection * _muzzleOffset;
