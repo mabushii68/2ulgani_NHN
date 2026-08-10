@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: EnemyStats_PainterBot
   m_EditorClassIdentifier: Assembly-CSharp::Luddite.Data.EnemyStatsSO
   _displayName: "\uADF8\uB9BC\uBD07"
-  _maxHp: 40
+  _maxHp: 80
   _spawnTelegraphDuration: 0.5
   _knockbackDistance: 0.5
   _moveSpeed: 3
@@ -27,7 +27,11 @@ MonoBehaviour:
   _spreadShotCount: 3
   _spreadAngleStep: 30
   _repositionDuration: 0.8
+  _dashSpeed: 10
+  _dashDuration: 0.6
+  _recoveryDuration: 0.8
+  _dashContactDamage: 12
   _projectileDamage: 6
-  _projectileSpeed: 5
+  _projectileSpeed: 7.5
   _projectileLifetime: 3
   _projectileDiameter: 0.3

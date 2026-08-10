@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: EnemyStats_Boss
   m_EditorClassIdentifier: Assembly-CSharp::Luddite.Data.EnemyStatsSO
   _displayName: "\uAC70\uB300 LLM"
-  _maxHp: 600
+  _maxHp: 2400
   _spawnTelegraphDuration: 0.5
   _knockbackDistance: 0.1
   _moveSpeed: 2
@@ -21,7 +21,7 @@ MonoBehaviour:
   _contactDamage: 8
   _attackRange: 8
   _aimDuration: 0.3
-  _attackCooldown: 2
+  _attackCooldown: 0.8
   _preferredRangeMin: 6
   _preferredRangeMax: 9
   _spreadShotCount: 3
@@ -32,6 +32,6 @@ MonoBehaviour:
   _recoveryDuration: 0.8
   _dashContactDamage: 12
   _projectileDamage: 8
-  _projectileSpeed: 6
+  _projectileSpeed: 12
   _projectileLifetime: 3
   _projectileDiameter: 0.3

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: EnemyStats_CoderBot
   m_EditorClassIdentifier: Assembly-CSharp::Luddite.Data.EnemyStatsSO
   _displayName: "\uCF54\uB529\uBD07"
-  _maxHp: 20
+  _maxHp: 40
   _spawnTelegraphDuration: 0.5
   _knockbackDistance: 0.5
   _moveSpeed: 5.5
@@ -32,6 +32,6 @@ MonoBehaviour:
   _recoveryDuration: 0.8
   _dashContactDamage: 12
   _projectileDamage: 8
-  _projectileSpeed: 6
+  _projectileSpeed: 9
   _projectileLifetime: 3
   _projectileDiameter: 0.3

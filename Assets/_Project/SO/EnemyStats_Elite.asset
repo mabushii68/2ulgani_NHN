@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: EnemyStats_Elite
   m_EditorClassIdentifier: Assembly-CSharp::Luddite.Data.EnemyStatsSO
   _displayName: "\uD504\uB9AC\uBBF8\uC5C4 \uAD6C\uB3C5\uBD07"
-  _maxHp: 60
+  _maxHp: 120
   _spawnTelegraphDuration: 0.5
   _knockbackDistance: 0.5
   _moveSpeed: 2.5
@@ -22,7 +22,16 @@ MonoBehaviour:
   _attackRange: 8
   _aimDuration: 0.3
   _attackCooldown: 1.5
+  _preferredRangeMin: 6
+  _preferredRangeMax: 9
+  _spreadShotCount: 3
+  _spreadAngleStep: 30
+  _repositionDuration: 0.8
+  _dashSpeed: 10
+  _dashDuration: 0.6
+  _recoveryDuration: 0.8
+  _dashContactDamage: 12
   _projectileDamage: 8
-  _projectileSpeed: 6
+  _projectileSpeed: 9
   _projectileLifetime: 3
   _projectileDiameter: 0.3
