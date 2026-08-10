@@ -104,8 +104,8 @@
 
 | 항목 | 주소 |
 |---|---|
-| **플레이 (GitHub Pages)** | 🟡 `https://mabushii68.github.io/2ulgani_NHN/` — D7 최종 빌드 후 확정 |
-| **플레이 영상 (YouTube)** | 🟡 *D7 촬영·업로드 후 기입* |
+| **플레이 (GitHub Pages)** | **https://mabushii68.github.io/2ulgani_NHN/** |
+| **플레이 영상 (YouTube)** | **https://youtu.be/aw24y8qpnlU** |
 | **소스 코드 (GitHub)** | `https://github.com/mabushii68/2ulgani_NHN` |
 
 ---

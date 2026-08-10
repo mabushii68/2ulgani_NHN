@@ -9,7 +9,7 @@
 | | 링크 |
 |---|---|
 | **웹 플레이 (설치 불필요)** | 🔗 **https://mabushii68.github.io/2ulgani_NHN/** |
-| **플레이 영상 (30~60초)** | ▶️ <!-- YouTube URL — D6 기입 --> |
+| **플레이 영상 (30~60초)** | ▶️ **https://youtu.be/aw24y8qpnlU** |
 
 <!-- D6: 대표 스크린샷 1~2장 (PREDICTION FAILED 순간 + WaveInterval 패널 권장) -->
 

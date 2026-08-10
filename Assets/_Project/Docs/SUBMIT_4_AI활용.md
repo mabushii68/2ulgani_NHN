@@ -155,9 +155,9 @@ D5에 발견된 결함 4건(전투방 문이 잠겨 진입 불가 / 복도에서
 
 | 구분 | 에셋 | 라이선스 | 사용 위치 |
 |---|---|---|---|
-| 폰트 | **x10y12pxDenkiChipHangul** (제작 Lee Minseo / 원본 The x8y12pxDenkiChip Project) | **SIL OFL 1.1** | 게임 내 모든 UI 텍스트 |
-| 스프라이트 | **Franuka** — RPG Heroes / RPG Monster / Elemental Dungeons(Fire) / RPG UI pack | 독자 라이선스 (상업·비상업 ⭕ / 수정 ⭕ / **팩 원본 재배포 ❌** / 출처 링크 필수) | 플레이어·적·투사체·아레나·UI |
-| 아이콘 | **Franuka** — RPG Icon pack | **CC BY 4.0** | AI 위협 상징, 전공 아이콘, 업그레이드 아이콘, 세부전공 탄막 4종(동전·두루마리·플러스·붓) — 나머지 탄막 5종(연필·번개·모니터·공·음표)은 자체 절차 생성 (팀 저작물) |
+| 폰트 | **x10y12pxDenkiChipHangul** (제작 Lee Minseo / 원본 The x8y12pxDenkiChip Project — https://github.com/hicchicc/x8y12pxDenkiChip) | **SIL OFL 1.1** | 게임 내 모든 UI 텍스트 |
+| 스프라이트 | **Franuka** — RPG Heroes (https://franuka.itch.io/rpg-heroes-pack) / RPG Monster (https://franuka.itch.io/rpg-monster-pack) / Elemental Dungeons Fire (https://franuka.itch.io/elemental-dungeons-fire) / RPG UI pack (https://franuka.itch.io/rpg-ui-pack) | 독자 라이선스 (상업·비상업 ⭕ / 수정 ⭕ / **팩 원본 재배포 ❌** / 출처 링크 필수) | 플레이어·적·투사체·아레나·UI·커서 |
+| 아이콘 | **Franuka** — RPG Icon pack (https://franuka.itch.io/rpg-icon-pack) | **CC BY 4.0** (https://creativecommons.org/licenses/by/4.0/) | AI 위협 상징, 전공 아이콘, 업그레이드 아이콘, 세부전공 탄막 4종(동전·두루마리·플러스·붓) — 나머지 탄막 5종(연필·번개·모니터·공·음표)은 자체 절차 생성 (팀 저작물) |
 | 타일셋 | **Franuka** — Dungeon Asset Pack (https://franuka.itch.io/dungeon-asset-pack) | 독자 라이선스 (상업 ⭕ / 재배포·재판매 ❌ / 크레딧 권장) | 던전 방·복도 바닥/벽, 문, 상자, 횃불, 장식 |
 | 파생 에셋 | 위 Franuka 팩의 **2차 저작물 2종** — `Dungeon/Generated/Wall_Side.png`(타일셋에서 주황 띠 제거, 세로 벽용) / `UI/Generated/Cursor01_2x.png`(커서 최근접 2배 확대) | 원본과 동일 (수정 ⭕ / 재배포 ❌) | 세로 벽 타일, 인게임 마우스 커서. 둘 다 에디터 빌더로 결정론 재생성 가능 |
 | 엔진·패키지 | Unity 6000.3.7f1, Universal RP, TextMeshPro | Unity Companion License | — |

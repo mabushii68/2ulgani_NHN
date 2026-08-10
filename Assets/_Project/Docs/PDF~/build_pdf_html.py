@@ -4,6 +4,7 @@
 # "🟡 제출 전 확인" 절은 화면에는 보이고 @media print에서 자동으로 숨겨진다 — 손 삭제 불필요.
 import io
 import os
+import re
 import markdown
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -64,8 +65,47 @@ def split_cut_section(md_text):
     return md_text, ""
 
 
+# 태그와 텍스트를 갈라 텍스트 부분에서만 URL을 찾는다 (HTML 속성 안의 URL을 건드리지 않으려고)
+_TAG_SPLIT = re.compile(r"(<[^>]+>)")
+_URL = re.compile(r"https?://[^\s<>\"'()\[\]]+")
+
+
+def autolink(html):
+    """본문에 맨몸으로 적힌 URL을 <a>로 감싼다.
+
+    ⚠️ 이게 없으면 **PDF에 클릭 가능한 링크가 하나도 생기지 않는다.**
+    Python-Markdown은 표 안의 맨몸 URL을 자동 링크하지 않고, 문서들이 URL을
+    `**...**` 나 백틱으로만 적어 뒀다. 제출물 #3은 "PDF 내 링크 클릭 동작"이
+    필수 점검 항목이라 여기서 일괄 처리한다 (문서마다 손으로 고치면 또 빠진다).
+    """
+    parts = _TAG_SPLIT.split(html)
+    in_anchor = False
+    out = []
+    for part in parts:
+        if part.startswith("<"):
+            lowered = part.lower()
+            if lowered.startswith("<a "):
+                in_anchor = True
+            elif lowered.startswith("</a"):
+                in_anchor = False
+            out.append(part)
+            continue
+        if in_anchor:            # 이미 링크 안이면 중첩시키지 않는다
+            out.append(part)
+            continue
+
+        def wrap(match):
+            url = match.group(0).rstrip(".,;:")      # 문장 끝 구두점은 링크에서 뺀다
+            tail = match.group(0)[len(url):]
+            return '<a href="%s">%s</a>%s' % (url, url, tail)
+
+        out.append(_URL.sub(wrap, part))
+    return "".join(out)
+
+
 def convert(md_text):
-    return markdown.markdown(md_text, extensions=["tables", "fenced_code", "sane_lists"])
+    html = markdown.markdown(md_text, extensions=["tables", "fenced_code", "sane_lists"])
+    return autolink(html)
 
 
 def main():
