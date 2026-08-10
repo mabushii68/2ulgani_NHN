@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
+using TMPro;
 using Luddite.Core;
 using Luddite.Data;
 
@@ -28,9 +29,29 @@ namespace Luddite.EditorTools
         private const string ChestPath = "Assets/_Project/Sprites/Dungeon/Chest_Small.png";
         private const string DecorDir = "Assets/_Project/Sprites/Dungeon/Decor";
 
-        private const string FloorSprite = "DungeonTileset_96";
+        // 바닥 베이스는 완전 균일 타일(113). 실측: 평균 (0.24,0.16,0.21) / 표준편차 0.000.
+        // ⚠️ D7 이전에는 96을 썼는데 이 타일은 y6~y11에 얼룩이 있어 32×18 방에서 576번 반복되며
+        //    격자 무늬로 보였다 (사람 지적 "타일링이 눈에 거슬린다"). 베이스는 반드시 무늬 없는 타일로 둔다.
+        private const string FloorSprite = "DungeonTileset_113";
+
+        // 바닥 디테일 — 베이스 위에 성기게 얹는다. 전부 같은 바닥색이라 얼룩만 더해진다 (95~100 6종).
+        // 배열 중복 = 가중치. 잉크량 실측(베이스와 다른 픽셀 비율): 96=10% 99=11% 97=19% 100=21% 95=33% 98=38%.
+        // 진한 타일(95·98)이 인접해 뭉치면 그물 무늬로 보여 되레 "타일링" 인상을 준다 → 옅은 것 위주로 뽑는다.
+        private static readonly string[] FloorDetailSprites =
+        {
+            "DungeonTileset_96", "DungeonTileset_96", "DungeonTileset_96",
+            "DungeonTileset_99", "DungeonTileset_99", "DungeonTileset_99",
+            "DungeonTileset_97", "DungeonTileset_100",
+            "DungeonTileset_95", "DungeonTileset_98",
+        };
+
         private const string WallSprite = "DungeonTileset_32";
         private const string WallTopSprite = "DungeonTileset_4";     // 벽 윗면 캡 (§4 높이 착시)
+
+        // 세로(좌/우) 벽 전용 — 32의 주황 띠(y1~y4)를 벽돌로 덮은 파생 타일.
+        // 32를 그대로 세로로 반복하면 띠가 1유닛마다 나와 사다리처럼 보인다 (D7 수정 대상 결함).
+        private const string GeneratedDir = "Assets/_Project/Sprites/Dungeon/Generated";
+        private const string WallSidePath = GeneratedDir + "/Wall_Side.png";
 
         // MAP_SPEC §3 Sorting Layer
         private const string LGround = "Ground", LDecor = "Decor", LUnits = "Units", LWalls = "Walls", LWallTops = "WallTops";
@@ -55,9 +76,60 @@ namespace Luddite.EditorTools
             new Step(Vector2.right, 18f, 6f),    // 6→7  보스방 앞 긴 진입로
         };
 
+        /// <summary>
+        /// 세로 벽 전용 파생 타일을 만든다 (멱등 — 이미 있으면 건너뜀).
+        /// 원본 타일 32는 상단 y1~y4가 주황 띠(벽의 밝은 앞면)라, 가로 벽에서는 방을 향한 면으로 읽히지만
+        /// <b>세로 벽에서 세로로 반복하면 1유닛마다 띠가 나와 사다리처럼 보인다.</b>
+        /// 띠 구간을 아래쪽 벽돌 영역으로 덮어 "띠 없는 벽돌" 타일을 만든다.
+        /// </summary>
+        [MenuItem("Luddite/Setup/던전 파생 타일 생성 (멱등)")]
+        public static void EnsureDerivedTiles()
+        {
+            if (AssetDatabase.LoadAssetAtPath<Sprite>(WallSidePath) != null)
+            {
+                Debug.Log("[던전 빌더] 파생 타일 이미 존재 — 건너뜀 (멱등)");
+                return;
+            }
+            if (!System.IO.Directory.Exists(GeneratedDir)) System.IO.Directory.CreateDirectory(GeneratedDir);
+
+            var src = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+            UnityEngine.ImageConversion.LoadImage(src, System.IO.File.ReadAllBytes(TilesetPath));
+
+            const int T = 16, BAND_TOP = 0, BAND_BOTTOM = 5;   // 실측: 주황 띠 = y0~y4
+            int c = 32 % 28, r = 32 / 28;                       // 타일 32 = (4,1)
+            var outTex = new Texture2D(T, T, TextureFormat.RGBA32, false);
+            for (int y = 0; y < T; y++)
+            {
+                // 띠 구간은 벽돌 영역(y6~y10)에서 끌어와 덮는다 — 이음매가 자연스럽도록 같은 벽돌 행을 쓴다
+                int srcY = (y >= BAND_TOP && y < BAND_BOTTOM) ? 6 + y : y;
+                for (int x = 0; x < T; x++)
+                    outTex.SetPixel(x, T - 1 - y, src.GetPixel(c * T + x, src.height - 1 - (r * T + srcY)));
+            }
+            outTex.Apply();
+            System.IO.File.WriteAllBytes(WallSidePath, UnityEngine.ImageConversion.EncodeToPNG(outTex));
+            AssetDatabase.ImportAsset(WallSidePath, ImportAssetOptions.ForceUpdate);
+
+            var imp = (TextureImporter)AssetImporter.GetAtPath(WallSidePath);
+            imp.textureType = TextureImporterType.Sprite;
+            imp.spriteImportMode = SpriteImportMode.Single;
+            imp.spritePixelsPerUnit = 16f;                 // 타일 카테고리 PPU (CLAUDE.md)
+            imp.filterMode = FilterMode.Point;
+            imp.textureCompression = TextureImporterCompression.Uncompressed;
+            imp.wrapMode = TextureWrapMode.Clamp;
+            var st = new TextureImporterSettings();
+            imp.ReadTextureSettings(st);
+            st.spriteMeshType = SpriteMeshType.FullRect;   // Tiled drawMode 필수
+            imp.SetTextureSettings(st);
+            imp.SaveAndReimport();
+
+            Debug.Log("[던전 빌더] 파생 타일 생성: " + WallSidePath + " (타일 32의 주황 띠 제거)");
+        }
+
         [MenuItem("Luddite/Setup/던전 체인 생성 (멱등)")]
         public static void Build()
         {
+            EnsureDerivedTiles();
+
             DungeonConfigSO config = AssetDatabase.LoadAssetAtPath<DungeonConfigSO>(ConfigPath);
             if (config == null)
             {
@@ -75,7 +147,22 @@ namespace Luddite.EditorTools
             Sprite chestOpen = FindSprite(ChestPath, "Chest_Small_3");
             if (floor == null || wall == null) { Debug.LogError("[던전 빌더] 타일 스프라이트 없음"); return; }
 
-            Sprite[] pillars = LoadDecor("Column_");
+            Sprite wallSide = AssetDatabase.LoadAssetAtPath<Sprite>(WallSidePath) ?? wall;
+
+            var details = new System.Collections.Generic.List<Sprite>();
+            foreach (string n in FloorDetailSprites)
+            {
+                Sprite s = FindSprite(TilesetPath, n);
+                if (s != null) details.Add(s);
+            }
+            Sprite[] floorDetails = details.ToArray();
+
+            // 🔴 기둥은 Column_3 하나로 통일한다 (실측 평균 0.59,0.36,0.34 — R/B 1.74로 명확한 난색).
+            //    · Column_5·6 = 한색(B>R) → 예약 색역(파랑=전공색) 침범. CLAUDE.md 아트 색 규칙 위반
+            //    · Column_1·4 = 저채도 자주 → "고채도 보라" 예약에 닿을 소지
+            //    · Column_2 = R/B 1.27로 수치상 난색이나 화면에서는 창백한 청백색으로 읽힌다 (D7 실제 캡처로 확인)
+            //    방 간 차별화는 계약상 "타일·조명 색 테마로만"이므로 기둥을 통일하는 편이 규격에 맞다.
+            Sprite[] pillars = LoadDecor("Column_3");
             Sprite[] props = LoadDecor("Bones_", "Crate", "Vase_", "Chains");
 
             GameObject old = GameObject.Find(RootName);
@@ -96,8 +183,9 @@ namespace Luddite.EditorTools
                 centers[i + 1] = centers[i] + Steps[i].Dir * (alongHalf * 2f + Steps[i].Length);
             }
 
+            // 배치는 전부 결정론(방 인덱스·격자 해시) — 난수 시드를 쓰지 않는다.
+            // 이전에는 System.Random을 돌려 소품이 흩어졌고, 호출 순서가 바뀌면 배치도 흔들렸다 (D7 수정)
             var rooms = new Room[total];
-            var rand = new System.Random(20260809);   // 고정 시드 — 빌더 재실행 시 배치가 흔들리지 않게
 
             for (int i = 0; i < total; i++)
             {
@@ -116,10 +204,12 @@ namespace Luddite.EditorTools
                 float exitGap = i < last ? Steps[i].Width : 0f;
 
                 MakeTiled(go.transform, "Floor", floor, Vector2.zero, new Vector2(hx * 2f, hy * 2f), LGround, 0, false);
+                ScatterFloorDetail(go.transform, hx, hy, floorDetails, i);
 
-                // 벽 4면 — 뚫린 변만 구멍을 남긴다
-                BuildWall(go.transform, Vector2.left,  hx, hy, t, GapOn(Vector2.left,  entryDir, exitDir, entryGap, exitGap), wall, wallTop);
-                BuildWall(go.transform, Vector2.right, hx, hy, t, GapOn(Vector2.right, entryDir, exitDir, entryGap, exitGap), wall, wallTop);
+                // 벽 4면 — 뚫린 변만 구멍을 남긴다.
+                // 좌/우는 띠 없는 파생 타일(wallSide), 상/하는 원본(wall). 위 상수 주석 참조
+                BuildWall(go.transform, Vector2.left,  hx, hy, t, GapOn(Vector2.left,  entryDir, exitDir, entryGap, exitGap), wallSide, wallTop);
+                BuildWall(go.transform, Vector2.right, hx, hy, t, GapOn(Vector2.right, entryDir, exitDir, entryGap, exitGap), wallSide, wallTop);
                 BuildWall(go.transform, Vector2.up,    hx, hy, t, GapOn(Vector2.up,    entryDir, exitDir, entryGap, exitGap), wall, wallTop);
                 BuildWall(go.transform, Vector2.down,  hx, hy, t, GapOn(Vector2.down,  entryDir, exitDir, entryGap, exitGap), wall, wallTop);
 
@@ -139,11 +229,11 @@ namespace Luddite.EditorTools
                     so.FindProperty("_exitDoor").objectReferenceValue =
                         MakeDoor(go.transform, "Door_Exit", doorClosed, doorOpen, exitDir, hx, hy, t, exitGap);
                 if (!isStart && !isBoss && chestClosed != null)
-                    so.FindProperty("_chest").objectReferenceValue = MakeChest(go.transform, chestClosed, chestOpen);
+                    so.FindProperty("_chest").objectReferenceValue = MakeChest(go.transform, chestClosed, chestOpen, config);
                 so.ApplyModifiedProperties();
                 rooms[i] = room;
 
-                ScatterDecor(go.transform, hx, hy, pillars, props, rand, isBoss);
+                ScatterDecor(go.transform, hx, hy, pillars, props, i, isBoss);
             }
 
             // 2) 복도
@@ -160,6 +250,7 @@ namespace Luddite.EditorTools
                 cor.transform.localPosition = mid;
                 Vector2 floorSize = horiz ? new Vector2(len, w) : new Vector2(w, len);
                 MakeTiled(cor.transform, "Floor", floor, Vector2.zero, floorSize, LGround, 0, false);
+                ScatterFloorDetail(cor.transform, floorSize.x * 0.5f, floorSize.y * 0.5f, floorDetails, 100 + i);
 
                 if (horiz)
                 {
@@ -168,8 +259,9 @@ namespace Luddite.EditorTools
                 }
                 else
                 {
-                    MakeWallWithTop(cor.transform, "Wall_Left", wall, wallTop, new Vector2(-(w * 0.5f + t * 0.5f), 0f), new Vector2(t, len));
-                    MakeWallWithTop(cor.transform, "Wall_Right", wall, wallTop, new Vector2((w * 0.5f + t * 0.5f), 0f), new Vector2(t, len));
+                    // 세로 복도의 좌/우 벽도 띠 없는 파생 타일 — 방과 같은 이유
+                    MakeWallWithTop(cor.transform, "Wall_Left", wallSide, wallTop, new Vector2(-(w * 0.5f + t * 0.5f), 0f), new Vector2(t, len));
+                    MakeWallWithTop(cor.transform, "Wall_Right", wallSide, wallTop, new Vector2((w * 0.5f + t * 0.5f), 0f), new Vector2(t, len));
                 }
             }
 
@@ -257,36 +349,78 @@ namespace Luddite.EditorTools
         }
 
         /// <summary>
+        /// 바닥 얼룩. 베이스(균일 타일) 위에 <b>성기게</b> 얹어 "같은 무늬 반복" 인상을 없앤다.
+        /// 좌표는 타일 격자에 스냅하고 해시로 결정론 배치 — 빌더를 다시 돌려도 같은 그림이 나온다.
+        /// </summary>
+        private static void ScatterFloorDetail(Transform parent, float hx, float hy, Sprite[] details, int seed)
+        {
+            if (details.Length == 0) return;
+            var holder = new GameObject("FloorDetail");
+            holder.transform.SetParent(parent, false);
+
+            int nx = Mathf.FloorToInt(hx * 2f), ny = Mathf.FloorToInt(hy * 2f);
+            for (int gy = 0; gy < ny; gy++)
+            {
+                for (int gx = 0; gx < nx; gx++)
+                {
+                    // 결정론 해시 (System.Random을 쓰면 호출 순서에 얽혀 다른 배치가 흔들린다)
+                    int h = ((gx * 73856093) ^ (gy * 19349663) ^ (seed * 83492791)) & 0x7fffffff;
+                    if (h % 100 >= 10) continue;                  // 밀도 10% — 과밀하면 다시 무늬로 보인다
+
+                    // 종류는 위치와 다른 해시로 뽑는다 — 같은 h를 나눠 쓰면 종류가 위치에 상관돼 줄무늬가 생긴다
+                    int h2 = ((gx * 19349663) ^ (gy * 83492791) ^ (seed * 73856093)) & 0x7fffffff;
+                    Sprite s = details[h2 % details.Length];
+                    float x = -hx + 0.5f + gx;
+                    float y = -hy + 0.5f + gy;
+                    MakeSprite(holder.transform, "FloorDetail", s, new Vector2(x, y), LGround, 1);
+                }
+            }
+        }
+
+        /// <summary>
         /// 방 장식. <b>전부 비충돌</b> (🔴 계약 — 위 클래스 주석 참조).
         /// 기둥은 Decor 레이어라 플레이어가 앞을 지나간다. 스폰 링·중앙 상자 자리를 피해 배치.
+        ///
+        /// <para>⚠️ D7에 <b>난수 흩뿌리기를 걷어냈다.</b> 이전에는 위치·종류를 전부 <c>rand</c>로 뽑아
+        /// 소품이 허공에 흩어져 "난잡하다"는 지적을 받았다. 지금은 <b>벽을 따라 난 고정 슬롯</b>에
+        /// 좌우 대칭으로 놓는다 — 배치에 논리가 보이고, 방마다 종류만 바뀌어 일관성이 유지된다.</para>
         /// </summary>
         private static void ScatterDecor(Transform room, float hx, float hy, Sprite[] pillars, Sprite[] props,
-            System.Random rand, bool isBoss)
+            int roomIndex, bool isBoss)
         {
             var holder = new GameObject("Decor");
             holder.transform.SetParent(room, false);
 
-            // 기둥 — 네 모서리 안쪽에 대칭 배치 (보스방은 패턴 가독성 위해 생략)
+            // 기둥 — 네 모서리 안쪽 대칭 (보스방은 패턴 가독성 위해 생략)
             if (!isBoss && pillars.Length > 0)
             {
-                Sprite p = pillars[rand.Next(pillars.Length)];
+                Sprite p = pillars[roomIndex % pillars.Length];
                 float px = hx - 4.5f, py = hy - 3.5f;
                 for (int sx = -1; sx <= 1; sx += 2)
                     for (int sy = -1; sy <= 1; sy += 2)
                         MakeSprite(holder.transform, "Pillar", p, new Vector2(px * sx, py * sy), LDecor, 1);
             }
 
-            // 소품 — MAP_SPEC §3 "방당 5~10개만 (과밀 금지 — 탄 가독성)"
             if (props.Length == 0) return;
-            int count = 5 + rand.Next(5);
-            for (int i = 0; i < count; i++)
+
+            // 소품 — 벽을 따라 난 고정 슬롯. 상/하 벽 각 3개 + 좌/우 벽 각 1개 = 8개
+            // (MAP_SPEC §3 "방당 5~10개만 — 과밀 금지, 탄 가독성")
+            float inset = 1.6f;                       // 벽 안쪽으로 들여놓는 거리
+            var slots = new System.Collections.Generic.List<Vector2>();
+            float[] xs = { -hx * 0.55f, 0f, hx * 0.55f };
+            foreach (float x in xs)
             {
-                Sprite s = props[rand.Next(props.Length)];
-                // 벽 쪽에 붙여 배치 — 방 중앙(교전 공간·상자 자리)을 비운다
-                float x = (float)(rand.NextDouble() * 2 - 1) * (hx - 2f);
-                float y = (float)(rand.NextDouble() * 2 - 1) * (hy - 2f);
-                if (Mathf.Abs(x) < hx * 0.45f && Mathf.Abs(y) < hy * 0.45f) { i--; continue; }
-                MakeSprite(holder.transform, "Prop", s, new Vector2(x, y), LDecor, 0);
+                slots.Add(new Vector2(x, hy - inset));
+                slots.Add(new Vector2(x, -hy + inset));
+            }
+            slots.Add(new Vector2(-hx + inset, 0f));
+            slots.Add(new Vector2(hx - inset, 0f));
+
+            for (int i = 0; i < slots.Count; i++)
+            {
+                // 방 중앙 상자 자리는 위 슬롯이 애초에 비켜 있다 (x=0 슬롯도 y가 벽 쪽)
+                Sprite s = props[(roomIndex * 3 + i) % props.Length];
+                MakeSprite(holder.transform, "Prop", s, slots[i], LDecor, 0);
             }
         }
 
@@ -354,7 +488,7 @@ namespace Luddite.EditorTools
             return door;
         }
 
-        private static Chest MakeChest(Transform parent, Sprite closed, Sprite open)
+        private static Chest MakeChest(Transform parent, Sprite closed, Sprite open, DungeonConfigSO config)
         {
             GameObject go = new GameObject("Chest");
             go.transform.SetParent(parent, false);
@@ -364,10 +498,34 @@ namespace Luddite.EditorTools
             sr.sortingLayerName = LUnits;
             sr.sortingOrder = 0;
             go.transform.localScale = Vector3.one * 2f;
+            // "[E] 열기" 안내 — 반경 안에 들어왔을 때만 Chest가 켠다.
+            // 월드 스페이스 TMP라 카메라가 따라와도 상자 위에 붙어 있는다.
+            var promptGo = new GameObject("Prompt");
+            promptGo.transform.SetParent(go.transform, false);
+            promptGo.transform.localPosition = new Vector3(0f, 0.9f, 0f);
+            promptGo.transform.localScale = Vector3.one * 0.5f;   // 상자가 2배 스케일이라 되돌린다
+            var prompt = promptGo.AddComponent<TextMeshPro>();
+            prompt.text = "[E] 열기";
+            prompt.fontSize = 3.2f;
+            prompt.alignment = TextAlignmentOptions.Center;
+            prompt.color = new Color(1f, 0.86f, 0.55f, 1f);       // 난색 — 예약 색역 회피
+            var promptFont = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(
+                "Assets/_Project/Fonts/x10y12pxDenkiChipHangul SDF.asset");
+            if (promptFont != null) prompt.font = promptFont;
+            var promptRenderer = promptGo.GetComponent<MeshRenderer>();
+            promptRenderer.sortingLayerName = LWallTops;           // 벽·유닛 위에 뜨게
+            promptRenderer.sortingOrder = 10;
+            promptGo.SetActive(false);
+
             Chest chest = go.AddComponent<Chest>();
             var so = new SerializedObject(chest);
             so.FindProperty("_closedSprite").objectReferenceValue = closed;
             so.FindProperty("_openSprite").objectReferenceValue = open;
+            so.FindProperty("_prompt").objectReferenceValue = promptGo;
+            // 런타임에는 DungeonManager.Configure가 SO 값을 덮어쓰지만, 씬 기본값도 같이 맞춰 둔다.
+            // 안 맞추면 Configure가 돌기 전(에디터 스모크 등)에 자동 오픈 기본값 true가 살아난다 — D7에 실제로 잡힌 결함.
+            so.FindProperty("_autoOpen").boolValue = config != null && config.AutoOpenChest;
+            if (config != null) so.FindProperty("_interactRadius").floatValue = config.ChestInteractRadius;
             so.ApplyModifiedProperties();
             go.SetActive(false);
             return chest;

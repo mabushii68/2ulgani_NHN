@@ -76,6 +76,19 @@ namespace Luddite.Core
                     _rooms[i].Chest.Opened += OnChestOpened;
                 }
             }
+            // 시작 시점부터 시작방에 세운다.
+            // ⚠️ 이전에는 RunStarted에서만 옮겨서, 타이틀 화면 배경에 **폴백 아레나**(0,0)가 보였다 —
+            //    던전은 y=-200에 있어 화면에 없었고, 심사자가 처음 보는 그림이 안 쓰는 맵이었다 (D7 수정).
+            //    토글 OFF면 이 경로 자체를 타지 않으므로 폴백 동작은 그대로다.
+            Room startRoom = FindRoom(0);
+            if (startRoom != null)
+            {
+                if (_player != null)
+                    _player.position = new Vector3(startRoom.Center.x, startRoom.Center.y, _player.position.z);
+                MoveCameraTo(startRoom);
+                if (_cameraFollow != null) _cameraFollow.SnapToTarget();
+            }
+
             Debug.Log("[DungeonManager] 던전 모드 ON — 방 " + _rooms.Length + "개 (전투방 " + _config.CombatRoomCount + ")");
         }
 

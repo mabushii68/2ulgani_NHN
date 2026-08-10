@@ -44,6 +44,8 @@ namespace Luddite.EditorTools
                 return;
             }
 
+            EnsureAudioListener();
+
             GameObject host = GameObject.Find("AudioDirector");
             if (host == null) host = new GameObject("AudioDirector");
 
@@ -83,6 +85,35 @@ namespace Luddite.EditorTools
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
             Debug.Log($"[AudioSetup] 배선 {wired}건 변경 / 누락 {missing}건 (0/0 = 이미 완비 · 멱등 확인)");
+        }
+
+        /// <summary>
+        /// 씬에 AudioListener를 보장한다. 리스너가 0개면 <b>AudioSource가 아무리 정상이어도 전부 무음</b>이며,
+        /// 이 경우 Unity는 경고조차 내지 않는다 (2개 이상일 때만 경고) — D7에 실제로 낸 결함.
+        /// URP 2D 템플릿의 Main Camera에 원래 붙어 있었으나 던전 카메라 재구성 과정에서 유실됐다.
+        /// </summary>
+        private static void EnsureAudioListener()
+        {
+            AudioListener[] listeners = Object.FindObjectsByType<AudioListener>(
+                FindObjectsInactive.Include, FindObjectsSortMode.None);
+            if (listeners.Length > 0)
+            {
+                if (listeners.Length > 1)
+                    Debug.LogWarning($"[AudioSetup] AudioListener {listeners.Length}개 — 1개만 남겨야 한다 (Unity가 나머지를 무시)");
+                return;
+            }
+
+            Camera camera = Camera.main != null
+                ? Camera.main
+                : Object.FindFirstObjectByType<Camera>();
+            if (camera == null)
+            {
+                Debug.LogError("[AudioSetup] 씬에 카메라가 없어 AudioListener를 붙일 곳이 없다 — 무음 상태로 남는다");
+                return;
+            }
+
+            camera.gameObject.AddComponent<AudioListener>();
+            Debug.Log($"[AudioSetup] AudioListener 추가: {camera.name} (없으면 전부 무음이었다)");
         }
     }
 }

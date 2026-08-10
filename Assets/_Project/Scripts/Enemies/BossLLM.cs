@@ -227,7 +227,9 @@ namespace Luddite.Enemies
         /// </summary>
         private void ApplyPhaseTwoVisuals()
         {
-            if (_bodyRenderer != null) _bodyRenderer.color = _p2BodyTint;
+            // SetBaseColor를 경유해야 한다 — 직접 색만 바꾸면 피격 플래시가 끝날 때
+            // Awake 시점 색으로 되돌아가 맞을 때마다 P2 마젠타가 벗겨진다 (D7)
+            if (_bodyRenderer != null) SetBaseColor(_p2BodyTint);
 
             if (_laserLine != null)
             {

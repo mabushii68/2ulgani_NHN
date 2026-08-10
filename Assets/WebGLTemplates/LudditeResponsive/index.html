@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>{{{ PRODUCT_NAME }}}</title>
+    <link rel="stylesheet" href="TemplateData/style.css">
+  </head>
+  <body>
+    <div id="unity-container">
+      <canvas id="unity-canvas" width={{{ WIDTH }}} height={{{ HEIGHT }}} tabindex="-1"></canvas>
+      <div id="unity-loading-bar">
+        <div id="unity-loading-title">{{{ PRODUCT_NAME }}}</div>
+        <div id="unity-progress-bar-empty"><div id="unity-progress-bar-full"></div></div>
+        <div id="unity-loading-hint">불러오는 중…</div>
+      </div>
+      <div id="unity-warning"></div>
+    </div>
+    <button id="unity-fullscreen-button" title="전체화면">⛶</button>
+
+    <script>
+      var canvas = document.querySelector("#unity-canvas");
+
+      // 게임이 상정한 종횡비. WIDTH/HEIGHT 매크로는 Player Settings의 기본 캔버스 크기다.
+      var ASPECT = {{{ WIDTH }}} / {{{ HEIGHT }}};
+
+      // ── 반응형 캔버스 ─────────────────────────────────────────────
+      // ⚠️ Unity 기본 템플릿은 데스크톱에서 캔버스를 1280x720으로 **하드코딩**한다.
+      //    창이 그보다 작으면 화면이 잘려서, 사용자가 브라우저를 줄이거나 확대를 낮춰야
+      //    전체가 보였다 (D7에 사람이 지적). 여기서는 뷰포트에 맞춰 16:9를 유지한 채
+      //    최대 크기로 맞추고 남는 곳은 레터박스로 둔다.
+      function resizeCanvas() {
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+        if (w / h > ASPECT) w = Math.floor(h * ASPECT);
+        else h = Math.floor(w / ASPECT);
+        canvas.style.width = w + "px";
+        canvas.style.height = h + "px";
+      }
+      resizeCanvas();
+      window.addEventListener("resize", resizeCanvas);
+      window.addEventListener("orientationchange", function () { setTimeout(resizeCanvas, 200); });
+      // 전체화면 진입·이탈 시 Unity가 캔버스 크기를 바꾸므로 되돌아올 때 다시 맞춘다
+      document.addEventListener("fullscreenchange", function () { setTimeout(resizeCanvas, 100); });
+
+      function unityShowBanner(msg, type) {
+        var warningBanner = document.querySelector("#unity-warning");
+        function updateBannerVisibility() {
+          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
+        }
+        var div = document.createElement('div');
+        div.innerHTML = msg;
+        warningBanner.appendChild(div);
+        if (type == 'error') div.style = 'background: #b3261e; color: #fff; padding: 10px;';
+        else {
+          if (type == 'warning') div.style = 'background: #f6c453; color: #201a12; padding: 10px;';
+          setTimeout(function () {
+            warningBanner.removeChild(div);
+            updateBannerVisibility();
+          }, 5000);
+        }
+        updateBannerVisibility();
+      }
+
+      var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/{{{ LOADER_FILENAME }}}";
+      var config = {
+        arguments: [],
+        dataUrl: buildUrl + "/{{{ DATA_FILENAME }}}",
+        frameworkUrl: buildUrl + "/{{{ FRAMEWORK_FILENAME }}}",
+        codeUrl: buildUrl + "/{{{ CODE_FILENAME }}}",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "{{{ COMPANY_NAME }}}",
+        productName: "{{{ PRODUCT_NAME }}}",
+        productVersion: "{{{ PRODUCT_VERSION }}}",
+        showBanner: unityShowBanner,
+      };
+
+      document.querySelector("#unity-loading-bar").style.display = "flex";
+
+      var script = document.createElement("script");
+      script.src = loaderUrl;
+      script.onload = () => {
+        createUnityInstance(canvas, config, (progress) => {
+          document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
+        }).then((unityInstance) => {
+          document.querySelector("#unity-loading-bar").style.display = "none";
+          document.querySelector("#unity-fullscreen-button").onclick = () => {
+            unityInstance.SetFullscreen(1);
+          };
+          resizeCanvas();
+        }).catch((message) => {
+          unityShowBanner(message, 'error');
+        });
+      };
+      document.body.appendChild(script);
+    </script>
+  </body>
+</html>

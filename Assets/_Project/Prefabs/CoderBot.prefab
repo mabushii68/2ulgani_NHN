@@ -204,7 +204,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Luddite.Enemies.CoderBot
   _stats: {fileID: 11400000, guid: 36829750eaed9534ca30af8768210cdc, type: 2}
   _renderer: {fileID: 0}
-  _hitFlashDuration: 0.06
+  _hitFlashDuration: 0.12
+  _hitFlashColor: {r: 1, g: 0.22, b: 0.18, a: 1}
   _knockbackDamping: 12
   _knockbackDuration: 0.15
   _aimPivot: {fileID: 3134048397806921468}

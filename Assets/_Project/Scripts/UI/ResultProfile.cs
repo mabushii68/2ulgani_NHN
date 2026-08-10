@@ -51,7 +51,9 @@ namespace Luddite.UI
 
             if (_summaryLine != null)
                 _summaryLine.text =
-                    $"AVG DISTANCE {distance:F1}  ·  DODGE {direction} {bias:P0}  ·  ZONE {_brain.FavoriteQuadrant}";
+                    // 구분자는 '|' — 가운뎃점(U+00B7)이 한글 폰트에 없어 □로 렌더링됐다 (D7 세션 8).
+                    // 폴백 폰트(LiberationSans SDF - Fallback)는 글리프가 1개뿐이라 구제되지 않는다
+                    $"AVG DISTANCE {distance:F1}  |  DODGE {direction} {bias:P0}  |  ZONE {_brain.FavoriteQuadrant}";
 
             if (_statsBlock != null)
                 _statsBlock.text =

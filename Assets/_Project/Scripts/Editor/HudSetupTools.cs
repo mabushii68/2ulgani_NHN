@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 using Luddite.Core;
+using Luddite.Data;
 using Luddite.Player;
 using Luddite.UI;
 
@@ -20,6 +21,13 @@ namespace Luddite.EditorTools
         private static readonly Color BAR_FILL = new Color(0.45f, 0.9f, 0.55f, 1f);
         private static readonly Color PANEL_BACKGROUND = new Color(0f, 0f, 0f, 0.55f);
         private static readonly Color TEXT_MAIN = new Color(0.92f, 0.92f, 0.95f, 1f);
+
+        /// <summary>재장전 게이지 — 🔴 초록(BAR_FILL)은 전공색 예약이라 못 쓴다. 잔탄 경고와 같은 호박색.</summary>
+        private static readonly Color RELOAD_FILL = new Color(1f, 0.72f, 0.30f, 1f);
+
+        private const float MINIMAP_WIDTH = 340f;
+        private const float MINIMAP_HEIGHT = 110f;
+        private const float MINIMAP_PADDING = 10f;
 
         [MenuItem("Luddite/Setup/HUD 배선 (§10.1)")]
         public static void EnsureHud()
@@ -57,13 +65,19 @@ namespace Luddite.EditorTools
             GameObject hudPanel = EnsureChild(canvas, "HudPanel");
             Stretch(hudPanel);
 
-            // ── AI 미니 패널 (우상단, §10.1) ──
+            // ── 미니맵 (우상단 최상단, D7 신규) ──
+            // 먼저 자리를 잡고, AI 미니 패널을 그 아래로 민다.
+            EnsureMinimap(hudPanel);
+
+            // ── AI 미니 패널 (우상단 — 미니맵 아래로 이동, D7) ──
+            // §10.1의 "정보 위계 최상위"는 유지된다: 미니맵은 위치 정보고 이쪽은 AI 상태다.
+            // 폭이 460이라 미니맵(340)보다 넓어 오른쪽 정렬로 겹치지 않는다.
             GameObject miniRoot = EnsureChild(hudPanel, "AiMiniPanel");
             RectTransform miniRect = miniRoot.GetComponent<RectTransform>();
             miniRect.anchorMin = Vector2.one;
             miniRect.anchorMax = Vector2.one;
             miniRect.pivot = Vector2.one;
-            miniRect.anchoredPosition = new Vector2(-24f, -24f);
+            miniRect.anchoredPosition = new Vector2(-24f, -(24f + MINIMAP_HEIGHT + 12f));
             miniRect.sizeDelta = new Vector2(460f, 52f);
 
             GameObject miniContent = EnsureChild(miniRoot, "Content");
@@ -89,13 +103,13 @@ namespace Luddite.EditorTools
             miniSo.FindProperty("_background").objectReferenceValue = miniBackground;
             miniSo.ApplyModifiedPropertiesWithoutUndo();
 
-            // ── HP 바 (좌하단, §10.1) ──
+            // ── HP 바 (좌상단 — D7에 좌하단에서 이동, 사람 요청) ──
             GameObject barRoot = EnsureChild(hudPanel, "HpBar");
             RectTransform barRect = barRoot.GetComponent<RectTransform>();
-            barRect.anchorMin = Vector2.zero;
-            barRect.anchorMax = Vector2.zero;
-            barRect.pivot = Vector2.zero;
-            barRect.anchoredPosition = new Vector2(24f, 24f);
+            barRect.anchorMin = new Vector2(0f, 1f);
+            barRect.anchorMax = new Vector2(0f, 1f);
+            barRect.pivot = new Vector2(0f, 1f);
+            barRect.anchoredPosition = new Vector2(24f, -24f);
             barRect.sizeDelta = new Vector2(360f, 28f);
 
             GameObject barBackground = EnsureChild(barRoot, "Background");
@@ -132,6 +146,12 @@ namespace Luddite.EditorTools
             barSo.FindProperty("_fill").objectReferenceValue = fillRect;
             barSo.FindProperty("_majorIcon").objectReferenceValue = iconImage;
             barSo.ApplyModifiedPropertiesWithoutUndo();
+
+            // ── 무기·탄약 (우하단, D7 신규 — 사람 요청 "엔터 더 건전과 동일") ──
+            EnsureAmmoCounter(hudPanel, playerObject);
+
+            // ── 인게임 마우스 커서 (D7 신규) — 캔버스에 상주시켜 모든 상태에서 적용된다
+            EnsureGameCursor(canvas);
 
             // ── PREDICTION FAILED 오버레이 (§10.3 — HUD와 같은 Combat 수명) ──
             GameObject overlayRoot = EnsureChild(hudPanel, "PredictionFailedOverlay");
@@ -184,7 +204,272 @@ namespace Luddite.EditorTools
 
             EditorSceneManager.MarkSceneDirty(scene);
             bool saved = EditorSceneManager.SaveScene(scene);
-            Debug.Log($"[HudSetup] HUD 배선 완료 (AI 미니 패널 + HP 바) / scene saved={saved}");
+            Debug.Log($"[HudSetup] HUD 배선 완료 (AI 미니 패널 + HP 바(좌상단) + 무기·탄약(우하단)) / scene saved={saved}");
+        }
+
+        private const string CURSOR_SRC = "Assets/_Project/Sprites/UI/Cursor01.png";
+        private const string CURSOR_GEN_DIR = "Assets/_Project/Sprites/UI/Generated";
+        private const string CURSOR_GEN = CURSOR_GEN_DIR + "/Cursor01_2x.png";
+
+        /// <summary>
+        /// 인게임 커서. 원본 <c>Cursor01</c>은 16×16이라 1920×1080에서 너무 작아
+        /// <b>최근접 2배 확대본을 굽는다</b>(픽셀 아트라 보간하면 뭉개진다).
+        /// 핫스팟은 그림의 뾰족한 끝을 <b>실측</b>해 채운다 — 손으로 넣으면 조준이 밀려 보인다.
+        /// </summary>
+        private static void EnsureGameCursor(GameObject canvas)
+        {
+            const int SCALE = 2;
+            Texture2D cursorTex = AssetDatabase.LoadAssetAtPath<Texture2D>(CURSOR_GEN);
+            Vector2 hotspot = Vector2.zero;
+
+            var src = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+            if (!System.IO.File.Exists(CURSOR_SRC))
+            {
+                Debug.LogError("[HudSetup] 커서 원본 없음: " + CURSOR_SRC);
+                return;
+            }
+            UnityEngine.ImageConversion.LoadImage(src, System.IO.File.ReadAllBytes(CURSOR_SRC));
+
+            // 팁 실측 — 위에서 아래로 훑어 처음 나오는 불투명 픽셀
+            bool found = false;
+            for (int y = 0; y < src.height && !found; y++)
+            {
+                for (int x = 0; x < src.width; x++)
+                {
+                    if (src.GetPixel(x, src.height - 1 - y).a > 0.5f)
+                    {
+                        hotspot = new Vector2(x * SCALE, y * SCALE);
+                        found = true;
+                        break;
+                    }
+                }
+            }
+
+            if (cursorTex == null)
+            {
+                if (!System.IO.Directory.Exists(CURSOR_GEN_DIR)) System.IO.Directory.CreateDirectory(CURSOR_GEN_DIR);
+                var big = new Texture2D(src.width * SCALE, src.height * SCALE, TextureFormat.RGBA32, false);
+                for (int y = 0; y < big.height; y++)
+                    for (int x = 0; x < big.width; x++)
+                        big.SetPixel(x, y, src.GetPixel(x / SCALE, y / SCALE));
+                big.Apply();
+                System.IO.File.WriteAllBytes(CURSOR_GEN, UnityEngine.ImageConversion.EncodeToPNG(big));
+                AssetDatabase.ImportAsset(CURSOR_GEN, ImportAssetOptions.ForceUpdate);
+
+                var imp = (TextureImporter)AssetImporter.GetAtPath(CURSOR_GEN);
+                imp.textureType = TextureImporterType.Cursor;   // 커서 전용 — 무압축·mipmap 없음이 강제된다
+                imp.isReadable = true;                          // Cursor.SetCursor 요구사항
+                imp.textureCompression = TextureImporterCompression.Uncompressed;
+                imp.filterMode = FilterMode.Point;
+                imp.mipmapEnabled = false;
+                imp.alphaIsTransparency = true;
+                imp.SaveAndReimport();
+
+                cursorTex = AssetDatabase.LoadAssetAtPath<Texture2D>(CURSOR_GEN);
+                Debug.Log("[HudSetup] 커서 2배 확대본 생성: " + CURSOR_GEN + " (" + (src.width * SCALE) + "px)");
+            }
+
+            GameCursor cursor = EnsureComponent<GameCursor>(canvas);
+            SerializedObject so = new SerializedObject(cursor);
+            so.FindProperty("_cursorTexture").objectReferenceValue = cursorTex;
+            so.FindProperty("_hotspot").vector2Value = hotspot;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            Debug.Log("[HudSetup] 커서 배선 — 핫스팟 " + hotspot + " (원본 팁 실측 ×" + SCALE + ")");
+        }
+
+        /// <summary>
+        /// 우상단 미니맵. 방 아이콘 위치를 <b>씬의 Room 실좌표에서 계산해 굽는다</b> —
+        /// 체인 배치를 바꾸면 이 빌더를 다시 돌리는 것만으로 미니맵이 따라온다 (수치 손입력 없음).
+        /// 런타임 <see cref="Minimap"/>은 색만 바꾼다.
+        /// </summary>
+        private static void EnsureMinimap(GameObject hudPanel)
+        {
+            var rooms = Object.FindObjectsByType<Room>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            System.Array.Sort(rooms, delegate (Room a, Room b) { return a.ChainIndex.CompareTo(b.ChainIndex); });
+
+            GameObject root = EnsureChild(hudPanel, "Minimap");
+            RectTransform rect = root.GetComponent<RectTransform>();
+            rect.anchorMin = Vector2.one;
+            rect.anchorMax = Vector2.one;
+            rect.pivot = Vector2.one;
+            rect.anchoredPosition = new Vector2(-24f, -24f);
+            rect.sizeDelta = new Vector2(MINIMAP_WIDTH, MINIMAP_HEIGHT);
+
+            GameObject content = EnsureChild(root, "Content");
+            Stretch(content);
+            Image contentBackground = EnsureComponent<Image>(content);
+            contentBackground.color = PANEL_BACKGROUND;
+            contentBackground.raycastTarget = false;
+
+            // 기존 아이콘을 지우고 다시 굽는다 — 체인 길이가 바뀌어도 잔재가 남지 않게
+            Transform oldIcons = content.transform.Find("Icons");
+            if (oldIcons != null) Object.DestroyImmediate(oldIcons.gameObject);
+            GameObject icons = EnsureChild(content, "Icons");
+            Stretch(icons);
+
+            Minimap minimap = EnsureComponent<Minimap>(root);
+            if (rooms.Length == 0)
+            {
+                Debug.LogWarning("[HudSetup] 씬에 Room이 없어 미니맵 아이콘을 굽지 못했다 — 먼저 '던전 체인 생성' 실행");
+                return;
+            }
+
+            // 방 중심 + 방 크기를 모두 담는 월드 바운드 → 패널 안쪽에 비율 유지로 맞춘다
+            DungeonConfigSO config = AssetDatabase.LoadAssetAtPath<DungeonConfigSO>(
+                "Assets/_Project/SO/DungeonConfig_Default.asset");
+            Vector2 half = config != null ? config.RoomHalfExtents : new Vector2(16f, 9f);
+
+            float minX = float.MaxValue, maxX = float.MinValue, minY = float.MaxValue, maxY = float.MinValue;
+            foreach (Room r in rooms)
+            {
+                minX = Mathf.Min(minX, r.Center.x - half.x); maxX = Mathf.Max(maxX, r.Center.x + half.x);
+                minY = Mathf.Min(minY, r.Center.y - half.y); maxY = Mathf.Max(maxY, r.Center.y + half.y);
+            }
+            float worldW = Mathf.Max(0.01f, maxX - minX), worldH = Mathf.Max(0.01f, maxY - minY);
+            float innerW = MINIMAP_WIDTH - MINIMAP_PADDING * 2f, innerH = MINIMAP_HEIGHT - MINIMAP_PADDING * 2f;
+            float scale = Mathf.Min(innerW / worldW, innerH / worldH);
+            Vector2 worldCenter = new Vector2((minX + maxX) * 0.5f, (minY + maxY) * 0.5f);
+
+            var roomImages = new Image[rooms.Length];
+            var corridorImages = new Image[Mathf.Max(0, rooms.Length - 1)];
+
+            // 복도 연결선을 먼저 깔아 방 아이콘이 위에 오게 한다
+            for (int i = 0; i < rooms.Length - 1; i++)
+            {
+                Vector2 a = (rooms[i].Center - worldCenter) * scale;
+                Vector2 b = (rooms[i + 1].Center - worldCenter) * scale;
+                GameObject link = new GameObject("Link_" + i, typeof(RectTransform));
+                link.transform.SetParent(icons.transform, false);
+                RectTransform lr = link.GetComponent<RectTransform>();
+                lr.anchorMin = lr.anchorMax = new Vector2(0.5f, 0.5f);
+                lr.pivot = new Vector2(0.5f, 0.5f);
+                lr.anchoredPosition = (a + b) * 0.5f;
+                // 체인은 직교(가로 또는 세로)로만 꺾인다 — 회전 없이 두께로 처리한다
+                bool horizontal = Mathf.Abs(b.x - a.x) >= Mathf.Abs(b.y - a.y);
+                lr.sizeDelta = horizontal
+                    ? new Vector2(Mathf.Abs(b.x - a.x), 3f)
+                    : new Vector2(3f, Mathf.Abs(b.y - a.y));
+                Image li = link.AddComponent<Image>();
+                li.raycastTarget = false;
+                corridorImages[i] = li;
+            }
+
+            for (int i = 0; i < rooms.Length; i++)
+            {
+                GameObject cell = new GameObject("Room_" + rooms[i].ChainIndex, typeof(RectTransform));
+                cell.transform.SetParent(icons.transform, false);
+                RectTransform cr = cell.GetComponent<RectTransform>();
+                cr.anchorMin = cr.anchorMax = new Vector2(0.5f, 0.5f);
+                cr.pivot = new Vector2(0.5f, 0.5f);
+                cr.anchoredPosition = (rooms[i].Center - worldCenter) * scale;
+                cr.sizeDelta = new Vector2(half.x * 2f * scale - 4f, half.y * 2f * scale - 4f);
+                Image ci = cell.AddComponent<Image>();
+                ci.raycastTarget = false;
+                roomImages[i] = ci;
+            }
+
+            SerializedObject so = new SerializedObject(minimap);
+            so.FindProperty("_dungeon").objectReferenceValue = Object.FindFirstObjectByType<DungeonManager>();
+            so.FindProperty("_content").objectReferenceValue = content;
+            SerializedProperty roomsProp = so.FindProperty("_roomIcons");
+            roomsProp.arraySize = roomImages.Length;
+            for (int i = 0; i < roomImages.Length; i++)
+                roomsProp.GetArrayElementAtIndex(i).objectReferenceValue = roomImages[i];
+            SerializedProperty corProp = so.FindProperty("_corridorIcons");
+            corProp.arraySize = corridorImages.Length;
+            for (int i = 0; i < corridorImages.Length; i++)
+                corProp.GetArrayElementAtIndex(i).objectReferenceValue = corridorImages[i];
+            so.ApplyModifiedPropertiesWithoutUndo();
+
+            Debug.Log("[HudSetup] 미니맵 — 방 " + rooms.Length + "개 / 연결선 " + corridorImages.Length +
+                      "개 (월드 " + worldW.ToString("F0") + "x" + worldH.ToString("F0") + "u → 배율 " + scale.ToString("F2") + ")");
+        }
+
+        /// <summary>
+        /// 우하단 무기·탄약 표시. 아이콘은 <b>플레이어가 실제로 쏘는 투사체 스프라이트</b>(FireballBig)를 쓴다 —
+        /// 신규 에셋 0이고, 화면에 나가는 탄과 같은 그림이라 무엇을 쏘는지가 그대로 읽힌다.
+        /// </summary>
+        private static void EnsureAmmoCounter(GameObject hudPanel, GameObject playerObject)
+        {
+            GameObject root = EnsureChild(hudPanel, "AmmoCounter");
+            RectTransform rect = root.GetComponent<RectTransform>();
+            rect.anchorMin = new Vector2(1f, 0f);
+            rect.anchorMax = new Vector2(1f, 0f);
+            rect.pivot = new Vector2(1f, 0f);
+            rect.anchoredPosition = new Vector2(-24f, 24f);
+            rect.sizeDelta = new Vector2(272f, 76f);
+
+            // 패널 배경 — 다른 HUD 패널과 같은 단색 반투명.
+            // ⚠️ D7에 팩 UI 박스(BGbox_01A)를 9-slice로 얹어봤다가 **되돌렸다**(사람 판단).
+            //    이 팩의 배경 박스 13종은 전부 밝은 채움이라(01A = (1.00,0.76,0.63), 밝기 0.82)
+            //    어두운 던전 위에서 박스만 튀고, 곱셈 틴트로 낮춰도 그림이 살지 않았다.
+            //    다시 시도할 이유가 생기면 이 팩 말고 어두운 패널 소스를 먼저 구할 것.
+            GameObject bg = EnsureChild(root, "Background");
+            Stretch(bg);
+            Image bgImage = EnsureComponent<Image>(bg);
+            bgImage.raycastTarget = false;
+            bgImage.sprite = null;
+            bgImage.type = Image.Type.Simple;
+            bgImage.color = PANEL_BACKGROUND;
+
+            // 무기 아이콘 (좌측)
+            GameObject iconObject = EnsureChild(root, "WeaponIcon");
+            RectTransform iconRect = iconObject.GetComponent<RectTransform>();
+            iconRect.anchorMin = new Vector2(0f, 0.5f);
+            iconRect.anchorMax = new Vector2(0f, 0.5f);
+            iconRect.pivot = new Vector2(0f, 0.5f);
+            iconRect.anchoredPosition = new Vector2(14f, 4f);
+            iconRect.sizeDelta = new Vector2(52f, 52f);
+            Image icon = EnsureComponent<Image>(iconObject);
+            icon.raycastTarget = false;
+            icon.preserveAspect = true;
+            Sprite bullet = AssetDatabase.LoadAssetAtPath<Sprite>(
+                "Assets/_Project/Sprites/Projectiles/FireballBig.png");
+            if (bullet != null) icon.sprite = bullet;
+            else Debug.LogWarning("[HudSetup] FireballBig 스프라이트를 찾지 못함 — 무기 아이콘이 빈다");
+
+            // 잔탄 텍스트 (우측)
+            GameObject countObject = EnsureChild(root, "Count");
+            RectTransform countRect = countObject.GetComponent<RectTransform>();
+            countRect.anchorMin = new Vector2(0f, 0f);
+            countRect.anchorMax = new Vector2(1f, 1f);
+            countRect.offsetMin = new Vector2(74f, 10f);
+            countRect.offsetMax = new Vector2(-14f, 0f);
+            TextMeshProUGUI count = EnsureComponent<TextMeshProUGUI>(countObject);
+            count.text = "30 / 30";
+            count.fontSize = 34f;
+            count.color = TEXT_MAIN;
+            count.alignment = TextAlignmentOptions.Right;
+            count.raycastTarget = false;
+
+            // 재장전 게이지 (하단 얇은 바) — pivot 왼쪽이라 scale.x로 왼→오 충전
+            GameObject fillObject = EnsureChild(root, "ReloadFill");
+            RectTransform fillRect = fillObject.GetComponent<RectTransform>();
+            fillRect.anchorMin = new Vector2(0f, 0f);
+            fillRect.anchorMax = new Vector2(1f, 0f);
+            fillRect.pivot = new Vector2(0f, 0f);
+            fillRect.offsetMin = new Vector2(0f, 0f);
+            fillRect.offsetMax = new Vector2(0f, 6f);
+            Image fillImage = EnsureComponent<Image>(fillObject);
+            fillImage.color = RELOAD_FILL;
+            fillImage.raycastTarget = false;
+            // 재장전 중이 아닐 때는 꺼져 있어야 한다. 런타임 AmmoCounter가 매 프레임 토글하지만,
+            // 켜진 채로 구워두면 에디터·첫 프레임에 게이지가 가득 찬 것처럼 보인다
+            fillObject.SetActive(false);
+
+            AmmoCounter counter = EnsureComponent<AmmoCounter>(root);
+            SerializedObject so = new SerializedObject(counter);
+            // IWeapon은 인터페이스라 직렬화되지 않는다 → 구현 MonoBehaviour를 넣고 런타임에 캐스팅한다
+            MonoBehaviour weapon = playerObject != null
+                ? playerObject.GetComponentInChildren<Luddite.Combat.BasicWeapon>() : null;
+            so.FindProperty("_weaponSource").objectReferenceValue = weapon;
+            so.FindProperty("_countLabel").objectReferenceValue = count;
+            so.FindProperty("_weaponIcon").objectReferenceValue = icon;
+            so.FindProperty("_reloadFill").objectReferenceValue = fillRect;
+            so.ApplyModifiedPropertiesWithoutUndo();
+
+            if (weapon == null)
+                Debug.LogWarning("[HudSetup] 플레이어에서 BasicWeapon을 찾지 못함 — AmmoCounter가 런타임에 Player 태그로 재탐색한다");
         }
 
         private static GameObject EnsureChild(GameObject parent, string name)
