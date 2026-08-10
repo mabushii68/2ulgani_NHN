@@ -147,6 +147,9 @@ namespace Luddite.EditorTools
             // ── 무기·탄약 (우하단, D7 신규 — 사람 요청 "엔터 더 건전과 동일") ──
             EnsureAmmoCounter(hudPanel, playerObject);
 
+            // ── 인게임 마우스 커서 (D7 신규) — 캔버스에 상주시켜 모든 상태에서 적용된다
+            EnsureGameCursor(canvas);
+
             // ── PREDICTION FAILED 오버레이 (§10.3 — HUD와 같은 Combat 수명) ──
             GameObject overlayRoot = EnsureChild(hudPanel, "PredictionFailedOverlay");
             Stretch(overlayRoot);
@@ -199,6 +202,76 @@ namespace Luddite.EditorTools
             EditorSceneManager.MarkSceneDirty(scene);
             bool saved = EditorSceneManager.SaveScene(scene);
             Debug.Log($"[HudSetup] HUD 배선 완료 (AI 미니 패널 + HP 바(좌상단) + 무기·탄약(우하단)) / scene saved={saved}");
+        }
+
+        private const string CURSOR_SRC = "Assets/_Project/Sprites/UI/Cursor01.png";
+        private const string CURSOR_GEN_DIR = "Assets/_Project/Sprites/UI/Generated";
+        private const string CURSOR_GEN = CURSOR_GEN_DIR + "/Cursor01_2x.png";
+
+        /// <summary>
+        /// 인게임 커서. 원본 <c>Cursor01</c>은 16×16이라 1920×1080에서 너무 작아
+        /// <b>최근접 2배 확대본을 굽는다</b>(픽셀 아트라 보간하면 뭉개진다).
+        /// 핫스팟은 그림의 뾰족한 끝을 <b>실측</b>해 채운다 — 손으로 넣으면 조준이 밀려 보인다.
+        /// </summary>
+        private static void EnsureGameCursor(GameObject canvas)
+        {
+            const int SCALE = 2;
+            Texture2D cursorTex = AssetDatabase.LoadAssetAtPath<Texture2D>(CURSOR_GEN);
+            Vector2 hotspot = Vector2.zero;
+
+            var src = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+            if (!System.IO.File.Exists(CURSOR_SRC))
+            {
+                Debug.LogError("[HudSetup] 커서 원본 없음: " + CURSOR_SRC);
+                return;
+            }
+            UnityEngine.ImageConversion.LoadImage(src, System.IO.File.ReadAllBytes(CURSOR_SRC));
+
+            // 팁 실측 — 위에서 아래로 훑어 처음 나오는 불투명 픽셀
+            bool found = false;
+            for (int y = 0; y < src.height && !found; y++)
+            {
+                for (int x = 0; x < src.width; x++)
+                {
+                    if (src.GetPixel(x, src.height - 1 - y).a > 0.5f)
+                    {
+                        hotspot = new Vector2(x * SCALE, y * SCALE);
+                        found = true;
+                        break;
+                    }
+                }
+            }
+
+            if (cursorTex == null)
+            {
+                if (!System.IO.Directory.Exists(CURSOR_GEN_DIR)) System.IO.Directory.CreateDirectory(CURSOR_GEN_DIR);
+                var big = new Texture2D(src.width * SCALE, src.height * SCALE, TextureFormat.RGBA32, false);
+                for (int y = 0; y < big.height; y++)
+                    for (int x = 0; x < big.width; x++)
+                        big.SetPixel(x, y, src.GetPixel(x / SCALE, y / SCALE));
+                big.Apply();
+                System.IO.File.WriteAllBytes(CURSOR_GEN, UnityEngine.ImageConversion.EncodeToPNG(big));
+                AssetDatabase.ImportAsset(CURSOR_GEN, ImportAssetOptions.ForceUpdate);
+
+                var imp = (TextureImporter)AssetImporter.GetAtPath(CURSOR_GEN);
+                imp.textureType = TextureImporterType.Cursor;   // 커서 전용 — 무압축·mipmap 없음이 강제된다
+                imp.isReadable = true;                          // Cursor.SetCursor 요구사항
+                imp.textureCompression = TextureImporterCompression.Uncompressed;
+                imp.filterMode = FilterMode.Point;
+                imp.mipmapEnabled = false;
+                imp.alphaIsTransparency = true;
+                imp.SaveAndReimport();
+
+                cursorTex = AssetDatabase.LoadAssetAtPath<Texture2D>(CURSOR_GEN);
+                Debug.Log("[HudSetup] 커서 2배 확대본 생성: " + CURSOR_GEN + " (" + (src.width * SCALE) + "px)");
+            }
+
+            GameCursor cursor = EnsureComponent<GameCursor>(canvas);
+            SerializedObject so = new SerializedObject(cursor);
+            so.FindProperty("_cursorTexture").objectReferenceValue = cursorTex;
+            so.FindProperty("_hotspot").vector2Value = hotspot;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            Debug.Log("[HudSetup] 커서 배선 — 핫스팟 " + hotspot + " (원본 팁 실측 ×" + SCALE + ")");
         }
 
         /// <summary>
@@ -323,11 +396,26 @@ namespace Luddite.EditorTools
             rect.anchoredPosition = new Vector2(-24f, 24f);
             rect.sizeDelta = new Vector2(272f, 76f);
 
+            // 패널 배경 — 단색 대신 팩 UI 박스를 9-slice로 (D7, 사람 요청).
+            // BGbox_01A는 48x48에 border(16,16,16,16)가 이미 잡혀 있어 늘려도 모서리가 뭉개지지 않는다.
             GameObject bg = EnsureChild(root, "Background");
             Stretch(bg);
             Image bgImage = EnsureComponent<Image>(bg);
-            bgImage.color = PANEL_BACKGROUND;
             bgImage.raycastTarget = false;
+            Sprite panelSprite = AssetDatabase.LoadAssetAtPath<Sprite>(
+                "Assets/_Project/Sprites/UI/BGbox_01A.png");
+            if (panelSprite != null)
+            {
+                bgImage.sprite = panelSprite;
+                bgImage.type = Image.Type.Sliced;
+                bgImage.pixelsPerUnitMultiplier = 0.34f;   // 16px 타일을 HUD 크기에 맞게 확대 (테두리 굵기 조절)
+                bgImage.color = Color.white;
+            }
+            else
+            {
+                bgImage.color = PANEL_BACKGROUND;          // 스프라이트가 없으면 기존 단색 폴백
+                Debug.LogWarning("[HudSetup] BGbox_01A를 찾지 못함 — 탄약 패널은 단색 배경으로 둔다");
+            }
 
             // 무기 아이콘 (좌측)
             GameObject iconObject = EnsureChild(root, "WeaponIcon");

@@ -68,7 +68,12 @@ namespace Luddite.UI
 
             if (_weaponIcon != null)
             {
-                Color c = _weaponIcon.color;
+                // 아이콘은 무기가 알려주는 "지금 나가는 탄"을 그대로 따른다 —
+                // 세부전공을 고르면 불꽃에서 해당 과목 탄으로 바뀐다 (D7, 사람 요청).
+                Sprite bullet = _weapon.CurrentBulletSprite;
+                if (bullet != null && _weaponIcon.sprite != bullet) _weaponIcon.sprite = bullet;
+
+                Color c = _weapon.CurrentBulletColor;
                 c.a = reloading ? _reloadingIconAlpha : 1f;
                 _weaponIcon.color = c;
             }
