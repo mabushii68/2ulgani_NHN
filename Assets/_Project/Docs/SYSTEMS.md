@@ -187,7 +187,7 @@ P(dir) = (obs_dir + 1) / (obs_L + obs_R + 2)      // 가상 카운트 (1,1) 고�
 - **픽셀 아트**: Franuka 5개 팩 76파일 반입·슬라이스 완료 (D3), 4방향 스프라이트는 `DirectionalSpriteAnimator`(자체 구현, Unity Animator 미사용)로 재생. 적 5종은 속도 자동 구동, 플레이어는 조준 방향 구동.
 - **아트 후보 라이브러리 `Sprites.v2`** (4,893장, **gitignore — 커밋 금지**, 라이선스 재배포 불가): D4에 **3x → 1x 원본으로 전량 교체 완료** (PPU 18/32/16, 슬라이스 ÷3). 열람 후 고른 것만 `Sprites/`·`Prefabs/`로 승격하는 흐름. `Prefabs.v2`는 아직 미생성.
 - 현재 3전공 모두 Sorcerer 시트 사용 중 (Gladiator·Swashbuckler는 반입만 됨).
-- **오디오: 전무** (SFX·BGM 미착수, D6 몫).
+- **오디오: 충족** (D7 — 자체 절차 합성 SFX 9종 + BGM 1트랙, 씬 배선·실재생 검증 완료). 상세 §16.4
 
 ## 13. 에디터 도구 (`Scripts/Editor/` — 빌드 미포함)
 
@@ -307,7 +307,7 @@ P(dir) = (obs_dir + 1) / (obs_L + obs_R + 2)      // 가상 카운트 (1,1) 고�
 5. 화면 밖 위협 보정(가장자리 화살표) — 추적 카메라 동반 계약인데 미구현
 6. Dungeon Tileset 팩 URL·라이선스 — `CREDITS.md`에 ⚠️ 표시. **실격 리스크 직결**
 7. 적 3종(Beholder·Djinn·Wizard)이 파랑·시안 계열 — 예약 색역(전공색 파랑)과 겹친다
-8. UI 한국어 교체 / 오디오 전무 / 영상 촬영 — D6~D7 몫
+8. 영상 촬영 — D7 몫 (UI 한국어 §16.5 · 오디오 §16.4는 D7에 해소)
 
 ---
 
@@ -347,8 +347,13 @@ P(dir) = (obs_dir + 1) / (obs_L + obs_R + 2)      // 가상 카운트 (1,1) 고�
   BossPhase / 인터벌 진입 AiAnalyze / BGM 시작·정지) + 소유 컴포넌트 훅 5줄(발사·피격·격파·조준음·버튼).
   **씬에 없으면 전부 무음 no-op.** 볼륨·연사음 간격은 인스펙터 노출
 - BGM: Combat 진입 시 시작, 런 내내 유지(인터벌·일시정지 포함), Title/Result 정지
-- 배선: `Luddite/Setup/오디오 배선 (§12)` (멱등 — 누락 클립은 LogError로 드러남)
+- 배선: `Luddite/Setup/오디오 배선 (§12)` (멱등 — 누락 클립은 LogError로 드러남).
+  **이 빌더가 AudioListener도 보장한다** (D7 세션 7) — 씬 리스너가 0개면 AudioSource가 정상이어도 전부 무음인데
+  **Unity는 0개일 때 경고를 내지 않는다**(2개 이상일 때만). D5 카메라 재구성 때 Main Camera에서 유실됐던 이력이 있어
+  카메라를 다시 만드는 빌더를 돌린 뒤에는 이 빌더를 재실행한다
 - 품질 교체 경로: WAV 파일만 갈아끼우면 됨 (AudioDirector는 출처 무관)
+- 실측 검증(D7 세션 7): 리스너 1개(Main Camera) / AudioSource 2개(`spatialBlend=0`) / 클립 배선 누락 0/10 /
+  SFX·BGM 실재생 `isPlaying=True` / 사람 청취 확인 완료
 
 ### 16.5 UI 한국어 교체 (§10.5 — D7 세션 3)
 - **한국어 (인간 세계)**: 업그레이드 카드(`UpgradeSO.DisplayName/Tooltip`) / 결과 별명·코멘트(`NameKo/CommentKo`) /

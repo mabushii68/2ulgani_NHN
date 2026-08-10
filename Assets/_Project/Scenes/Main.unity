@@ -2391,6 +2391,8 @@ MonoBehaviour:
   _entryDoor: {fileID: 1921415278}
   _exitDoor: {fileID: 1967275894}
   _chest: {fileID: 829168009}
+  _camLocalCenter: {x: 0, y: 0}
+  _camHalfExtents: {x: 0, y: 0}
 --- !u!61 &187410739
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -7326,6 +7328,8 @@ MonoBehaviour:
   _entryDoor: {fileID: 0}
   _exitDoor: {fileID: 1180280544}
   _chest: {fileID: 0}
+  _camLocalCenter: {x: 0, y: 0}
+  _camHalfExtents: {x: 0, y: 0}
 --- !u!61 &480604025
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -9855,6 +9859,8 @@ MonoBehaviour:
   _entryDoor: {fileID: 2029782233}
   _exitDoor: {fileID: 0}
   _chest: {fileID: 0}
+  _camLocalCenter: {x: 0, y: 0}
+  _camHalfExtents: {x: 0, y: 0}
 --- !u!61 &605404301
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -12759,6 +12765,8 @@ MonoBehaviour:
   _entryDoor: {fileID: 1182365320}
   _exitDoor: {fileID: 440192515}
   _chest: {fileID: 2005958956}
+  _camLocalCenter: {x: 0, y: 0}
+  _camHalfExtents: {x: 0, y: 0}
 --- !u!61 &800704009
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -14881,6 +14889,7 @@ GameObject:
   - component: {fileID: 919384043}
   - component: {fileID: 919384042}
   - component: {fileID: 919384045}
+  - component: {fileID: 919384046}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -15015,6 +15024,14 @@ MonoBehaviour:
   _roomCenter: {x: 0, y: 0}
   _roomHalfExtents: {x: 16, y: 9}
   _edgePeek: 6
+--- !u!81 &919384046
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919384041}
+  m_Enabled: 1
 --- !u!1 &921079648
 GameObject:
   m_ObjectHideFlags: 0
@@ -17511,6 +17528,8 @@ MonoBehaviour:
   _entryDoor: {fileID: 1687632561}
   _exitDoor: {fileID: 1539276798}
   _chest: {fileID: 870828588}
+  _camLocalCenter: {x: 0, y: 0}
+  _camHalfExtents: {x: 0, y: 0}
 --- !u!61 &1059553865
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -19283,6 +19302,8 @@ MonoBehaviour:
   _entryDoor: {fileID: 1654664667}
   _exitDoor: {fileID: 2078733948}
   _chest: {fileID: 212667573}
+  _camLocalCenter: {x: 0, y: 0}
+  _camHalfExtents: {x: 0, y: 0}
 --- !u!61 &1217908128
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -20626,6 +20647,8 @@ MonoBehaviour:
   _entryDoor: {fileID: 1991045478}
   _exitDoor: {fileID: 1850075213}
   _chest: {fileID: 1999333623}
+  _camLocalCenter: {x: 0, y: 0}
+  _camHalfExtents: {x: 0, y: 0}
 --- !u!61 &1299326526
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -25030,6 +25053,63 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &1582131311
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1582131313}
+  - component: {fileID: 1582131312}
+  m_Layer: 0
+  m_Name: AudioDirector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1582131312
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1582131311}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89bff1a74155fe844ae81318d5eb96e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Luddite.Core.AudioDirector
+  _playerShoot: {fileID: 8300000, guid: 103422b611d125648ae3590220918b60, type: 3}
+  _playerHit: {fileID: 8300000, guid: 39172f3b6f2c88b46894ed112a5051bd, type: 3}
+  _enemyDeath: {fileID: 8300000, guid: 6d28f27e6b6074f459a5d6334dd5e85e, type: 3}
+  _aiAnalyze: {fileID: 8300000, guid: 205eba99caf6638469fe244afd59c3d8, type: 3}
+  _predictionShot: {fileID: 8300000, guid: ab6d7cb0d8e047e4985d384ca05c7f51, type: 3}
+  _predictionFailed: {fileID: 8300000, guid: cf9a2bd60e8d00d4ca5adac2bee34d3f, type: 3}
+  _waveClear: {fileID: 8300000, guid: 247e90d29c5f5224883e2778ddb702c9, type: 3}
+  _uiButton: {fileID: 8300000, guid: 75e4c70881e882a4d8cb4e7b27e110c2, type: 3}
+  _bossPhase: {fileID: 8300000, guid: b8e996220a43c8d4499eb7cd50a0ba9e, type: 3}
+  _combatLoop: {fileID: 8300000, guid: f54944124db6fa14f8bd1aae181ab6c1, type: 3}
+  _sfxVolume: 0.8
+  _bgmVolume: 0.4
+  _shootSfxMinInterval: 0.08
+--- !u!4 &1582131313
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1582131311}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1587273818
 GameObject:
   m_ObjectHideFlags: 0
@@ -28998,6 +29078,8 @@ MonoBehaviour:
   _entryDoor: {fileID: 1940021247}
   _exitDoor: {fileID: 1830408010}
   _chest: {fileID: 2132929287}
+  _camLocalCenter: {x: 0, y: 0}
+  _camHalfExtents: {x: 0, y: 0}
 --- !u!61 &1819570798
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -37037,3 +37119,4 @@ SceneRoots:
   - {fileID: 1434895903}
   - {fileID: 1850496152}
   - {fileID: 2055843731}
+  - {fileID: 1582131313}
