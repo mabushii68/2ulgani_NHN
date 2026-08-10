@@ -80,6 +80,7 @@
 | D7 | 5 | 이양빈 (Git `VJL02` — 본인 확인 요) | Dungeon Tileset 출처 특정 — Franuka Dungeon Asset Pack URL·라이선스 확정 (실격 리스크 해소) | `Docs/{CREDITS,SUBMIT_4_AI활용,SYSTEMS}.md` | ⭕ | CREDITS = 김정준 담당 영역이나 위임 지시로 수행. 웹 검색 + 승격 파일 이미지 대조로 특정 |
 | D7 | 6 | 이양빈 (Git `VJL02` — 본인 확인 요) | 제출 문서 PDF 변환 파이프라인 — 인쇄용 HTML 3종 + 자동 컷 절 처리 | `Docs/PDF~/build_pdf_html.py`, `Docs/PDF~/SUBMIT_*.html` ×3 | — | 제출 문서 = 공동. PDF 제작이 Ctrl+P 1회로 축소 |
 | D7 | 7 | 김정준 (Git `김정준`) | 오디오 무음 결함 수정 — AudioListener 유실(D5 카메라 재구성) + 배선 빌더 미실행 2중 원인. 리스너 보장을 빌더에 흡수 + `.meta` 17개 미추적 회수 | `Scripts/Editor/AudioSetupTools.cs`, `Scenes/Main.unity`, `Audio/*.wav.meta` ×10, `Scripts/{Core,UI,Enemies,Editor}/*.cs.meta` ×7 | ⭕ | 오디오·씬 배선 = 김정준 담당 정면. 교차: `Main.unity`에 `AudioDirector` 오브젝트 추가 — 씬은 공용 자산이나 빌더 결정론 생성이라 손편집 충돌 없음. **`.meta` 누락은 D7 세션 1~4(이양빈) 산출물 전체에 걸쳐 있었다** — 클론 시 GUID 재생성으로 참조가 끊기므로 최종 빌드 전 필수 회수 |
+| D7 | 8 | 김정준 (Git `김정준`) | 폰트 글리프 결손(`·` → □) 수정 + 전수 검사(씬 33·SO 28·코드 149, 결손 0종) + `SYSTEMS.md` §15.6 잔여 목록 현행화 | `Scripts/UI/ResultProfile.cs`, `Docs/SYSTEMS.md` | — | 폰트·UI = 김정준 담당 정면. 세션 7 검증 중 부수 발견. §15.6 번호는 교차 참조(§16.1·§16.3) 보존 위해 고정 |
 
 ## 3. 협업·페어 작업 기록
 | 일차 | 작업 | 참여 | 분업 방식 (누가 무엇을) | 결과 |
