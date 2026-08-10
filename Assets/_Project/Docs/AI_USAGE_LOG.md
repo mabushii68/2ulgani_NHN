@@ -794,7 +794,7 @@
   - 수정: `AudioSetupTools`에 `EnsureAudioListener()` 추가 — **리스너 유실이 조용한 무음으로만 드러나는 것이 이 결함의 본질**이므로 배선 빌더가 리스너까지 소유하게 하고, 2개 이상이면 경고를 낸다. 이후 빌더 실행 → `AudioListener 추가: Main Camera` + `배선 10건 변경 / 누락 0건`.
   - **`.meta` 17개 미추적 발견 (별건, 무음 재발 요인)**: 세션 1~4가 만든 `.wav` 10 + `.cs` 7의 `.meta`가 `git add`에서 누락돼 있었다(무시 규칙 문제 아님). 이대로 push하면 클론 시 GUID가 재생성되어 **방금 배선한 클립 참조 10개와 신규 컴포넌트 4종 참조가 전부 끊긴다** — 마감일 최종 빌드 직전에 잡았다.
 - **검증**: 플레이 모드 런타임 실측(`execute_code`) — AudioListener 1개(Main Camera, enabled) / AudioSource 2개(`spatialBlend=0`) / **클립 배선 누락 0/10** / `Play(WaveClear)` 실호출 → `isPlaying=True` / `GameStateChanged(→Combat)` 실발화 → `bgmSource.isPlaying=True`, clip `Loaded`. 빌더 재실행 시 `0건 변경`·중복 리스너 없음(멱등). 콘솔 에러 0·경고 0. **사람 청취 확인 완료("잘 들린다 이제")**.
-- **커밋 해시**: (이 세션)
+- **커밋 해시**: `e40f8fa` (브랜치 `main`)
 
 ---
 
