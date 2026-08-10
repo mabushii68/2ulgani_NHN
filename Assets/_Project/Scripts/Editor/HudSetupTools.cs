@@ -22,9 +22,6 @@ namespace Luddite.EditorTools
         private static readonly Color PANEL_BACKGROUND = new Color(0f, 0f, 0f, 0.55f);
         private static readonly Color TEXT_MAIN = new Color(0.92f, 0.92f, 0.95f, 1f);
 
-        /// <summary>밝은 팩 패널을 HUD 밝기로 낮추는 곱셈 틴트. 위 EnsureAmmoCounter 주석 참조.</summary>
-        private static readonly Color PANEL_TINT = new Color(0.18f, 0.20f, 0.27f, 0.92f);
-
         /// <summary>재장전 게이지 — 🔴 초록(BAR_FILL)은 전공색 예약이라 못 쓴다. 잔탄 경고와 같은 호박색.</summary>
         private static readonly Color RELOAD_FILL = new Color(1f, 0.72f, 0.30f, 1f);
 
@@ -402,30 +399,18 @@ namespace Luddite.EditorTools
             rect.anchoredPosition = new Vector2(-24f, 24f);
             rect.sizeDelta = new Vector2(272f, 76f);
 
-            // 패널 배경 — 단색 대신 팩 UI 박스를 9-slice로 (D7, 사람 요청).
-            // BGbox_01A는 48x48에 border(16,16,16,16)가 이미 잡혀 있어 늘려도 모서리가 뭉개지지 않는다.
+            // 패널 배경 — 다른 HUD 패널과 같은 단색 반투명.
+            // ⚠️ D7에 팩 UI 박스(BGbox_01A)를 9-slice로 얹어봤다가 **되돌렸다**(사람 판단).
+            //    이 팩의 배경 박스 13종은 전부 밝은 채움이라(01A = (1.00,0.76,0.63), 밝기 0.82)
+            //    어두운 던전 위에서 박스만 튀고, 곱셈 틴트로 낮춰도 그림이 살지 않았다.
+            //    다시 시도할 이유가 생기면 이 팩 말고 어두운 패널 소스를 먼저 구할 것.
             GameObject bg = EnsureChild(root, "Background");
             Stretch(bg);
             Image bgImage = EnsureComponent<Image>(bg);
             bgImage.raycastTarget = false;
-            Sprite panelSprite = AssetDatabase.LoadAssetAtPath<Sprite>(
-                "Assets/_Project/Sprites/UI/BGbox_01A.png");
-            if (panelSprite != null)
-            {
-                bgImage.sprite = panelSprite;
-                bgImage.type = Image.Type.Sliced;
-                bgImage.pixelsPerUnitMultiplier = 0.34f;   // 16px 타일을 HUD 크기에 맞게 확대 (테두리 굵기 조절)
-                // ⚠️ 이 팩의 배경 박스 13종은 **전부 밝은 채움**이다 (01A 채움 = (1.00,0.76,0.63), 밝기 0.82).
-                //    흰 글씨를 얹으면 거의 안 읽히고 어두운 던전 구석에서 박스만 튄다 (D7에 실제로 낸 결함).
-                //    Image.color는 스프라이트에 곱해지므로, 테두리 모양은 살리고 밝기만 낮춘다.
-                //    최종 채움 ≈ (0.18,0.15,0.17) — 어두운 중성 난색, 흰 글씨 대비 충분.
-                bgImage.color = PANEL_TINT;
-            }
-            else
-            {
-                bgImage.color = PANEL_BACKGROUND;          // 스프라이트가 없으면 기존 단색 폴백
-                Debug.LogWarning("[HudSetup] BGbox_01A를 찾지 못함 — 탄약 패널은 단색 배경으로 둔다");
-            }
+            bgImage.sprite = null;
+            bgImage.type = Image.Type.Simple;
+            bgImage.color = PANEL_BACKGROUND;
 
             // 무기 아이콘 (좌측)
             GameObject iconObject = EnsureChild(root, "WeaponIcon");
